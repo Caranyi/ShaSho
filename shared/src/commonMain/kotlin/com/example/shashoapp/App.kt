@@ -3,6 +3,7 @@ package com.example.shashoapp
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,6 +24,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -44,7 +48,9 @@ import org.jetbrains.compose.resources.painterResource
 import shashoapp.shared.generated.resources.Res
 import shashoapp.shared.generated.resources.arrowLeft
 import shashoapp.shared.generated.resources.arrowRight
+import shashoapp.shared.generated.resources.filtro
 import shashoapp.shared.generated.resources.logoShaSho
+import shashoapp.shared.generated.resources.reparto
 
 @Composable
 @Preview
@@ -56,7 +62,6 @@ fun App() {
         Column(
             modifier = Modifier
                 .background(Color.White)
-                .safeContentPadding()
                 .fillMaxSize()
         ) {
             // PRIMERA SECCION: CABECERA MORADA CON LOGO
@@ -78,7 +83,7 @@ fun App() {
                 )
             }
 
-            // SEGUNDA SECCION: TITULO DE LA LISTA...
+            // SEGUNDA SECCION: TITULO DE LA LISTA
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -86,7 +91,7 @@ fun App() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { /* Acción piso anterior */ }) {
+                IconButton(onClick = { /*ir a la lista anterior*/ }) {
                     Icon(
                         painter = painterResource(Res.drawable.arrowLeft),
                         contentDescription = "Anterior",
@@ -102,7 +107,7 @@ fun App() {
                     color = Color.Black
                 )
 
-                IconButton(onClick = { /* Acción siguiente piso */ }) {
+                IconButton(onClick = { /*ir a la lista siguiente*/ }) {
                     Icon(
                         painter = painterResource(Res.drawable.arrowRight),
                         contentDescription = "Siguiente",
@@ -112,7 +117,48 @@ fun App() {
                 }
             }
 
-            // TERCERA SECCION: LISTA DE PRODUCTOS
+            // TERCERA SECCION : IDENTIFICADOR DE LISTA, BOTÓN DE FILTRADO Y BOTÓN DE REPARTO
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFF5F5F5))
+                    .padding(horizontal = 24.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Text(
+                    text = "LISTA",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+
+                Row( //esta row es para separar los dos botones en la parte derecha de la row principal
+                    horizontalArrangement = Arrangement.spacedBy(8.dp), //espacio entre los dos botones
+                    verticalAlignment =  Alignment.CenterVertically
+                ){
+
+                    IconButton(onClick = {/* ir a la sección de repartir pagos*/}){
+                        Icon(
+                            painter = painterResource(Res.drawable.reparto),
+                            contentDescription = "Repartir pagos lista",
+                            tint = Color.Black,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+
+                    IconButton(onClick = {/* ir a la sección de filtrado*/}){
+                        Icon(
+                            painter = painterResource(Res.drawable.filtro),
+                            contentDescription = "Filtrar productos lista",
+                            tint = Color.Black,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+            }
+
+            // CUARTA SECCION: LISTA DE PRODUCTOS
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -128,40 +174,81 @@ fun App() {
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     // PRIMER PRODUCTO
+                    var isChecked1 by remember { mutableStateOf(false) }
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth()
+                            .clickable { isChecked1 = !isChecked1},
                         border = BorderStroke(1.dp, Color.Black),
                         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                         colors = CardDefaults.cardColors(
                             containerColor = Color.White
                         )
                     ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(
-                                text = "Cuadrado 1",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ){
+
+                            Checkbox(
+                                checked = isChecked1,
+                                onCheckedChange = {isChecked1 = it},
+                                colors = CheckboxDefaults.colors(checkedColor = Color(0xFF673AB7))
                             )
-                            Text("Contenido del primer cuadrado.")
+
+                            Spacer(modifier = Modifier.width(12.dp)) //para separar la checkbox del texto
+
+                            Column(modifier = Modifier.weight(1f)){
+                                Text(
+                                    text = "Producto 1",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text("Precio: x€")
+                            }
+
+
                         }
                     }
 
                     // SEGUNDO PRODUCTO
+
+                    var isChecked2 by remember { mutableStateOf(false) }
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth()
+                            .clickable{isChecked2 = !isChecked2},
                         border = BorderStroke(1.dp, Color.Black),
                         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                         colors = CardDefaults.cardColors(
                             containerColor = Color.White
                         )
                     ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(
-                                text = "Cuadrado 2",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ){
+
+                            Checkbox(
+                                checked = isChecked2,
+                                onCheckedChange = {isChecked2 = it},
+                                colors = CheckboxDefaults.colors(checkedColor = Color(0xFF673AB7))
                             )
-                            Text("Contenido del segundo cuadrado.")
+
+                            Spacer(modifier = Modifier.width((12.dp)))
+
+                            Column(modifier = Modifier.weight(1f)){
+                                Text(
+                                    text = "Producto 2",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text("Precio: x€")
+                            }
+
+
                         }
                     }
 
