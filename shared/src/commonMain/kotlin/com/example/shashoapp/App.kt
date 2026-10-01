@@ -45,12 +45,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.DrawableResource
 import shashoapp.shared.generated.resources.Res
 import shashoapp.shared.generated.resources.arrowLeft
 import shashoapp.shared.generated.resources.arrowRight
 import shashoapp.shared.generated.resources.filtro
 import shashoapp.shared.generated.resources.logoShaSho
 import shashoapp.shared.generated.resources.reparto
+import shashoapp.shared.generated.resources.home
+import shashoapp.shared.generated.resources.addCircle
+import shashoapp.shared.generated.resources.settings
 
 @Composable
 @Preview
@@ -252,7 +256,7 @@ fun App() {
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(72.dp))
+                    //Spacer(modifier = Modifier.height(72.dp))
                 }
 
                 // BOTON AÑADIR PRODUCTO A LA LISTA
@@ -272,6 +276,63 @@ fun App() {
                     )
                 }
             }
+
+            // BARRA DE NAVEGADOR (CON INICIO, CREAR y AJUSTES)
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(74.dp)
+                    .background(Color(0xFF673AB7))
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .align(Alignment.Center),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    NavItem(
+                        icon = Res.drawable.home,
+                        label = "Inicio",
+                        onClick = { /* Acción ir al inicio */ }
+                    )
+                    NavItem(
+                        icon = Res.drawable.addCircle,
+                        label = "Crear",
+                        onClick = { /* Acción crear lista */ }
+                    )
+                    NavItem(
+                        icon = Res.drawable.settings,
+                        label = "Ajustes",
+                        onClick = { /* Acción ajustes */ }
+                    )
+                }
+            }
         }
+    }
+}
+// LA FUNCIÓN PARA CREAR LOS BOTONES EN EL NAVEGADOR DE ABAJO
+@Composable
+fun NavItem(
+    icon: DrawableResource,
+    label: String,
+    onClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier.clickable(onClick = onClick),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            painter = painterResource(icon),
+            contentDescription = label,
+            tint = Color.White,
+            modifier = Modifier.size(24.dp)
+        )
+        Text(
+            text = label,
+            color = Color.White,
+            fontSize = 11.sp
+        )
     }
 }
