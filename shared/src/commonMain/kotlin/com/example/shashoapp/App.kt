@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -32,6 +33,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -56,11 +58,22 @@ import shashoapp.shared.generated.resources.home
 import shashoapp.shared.generated.resources.addCircle
 import shashoapp.shared.generated.resources.settings
 
+data class Producto( //clase para cada producto, con su id, nombre y precio
+    val id: Int,
+    val nombre: String,
+    val precio: String,
+    var isChecked: Boolean = false
+)
 @Composable
 @Preview
 fun App() {
     MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
+        val productos = remember {
+            mutableStateListOf(
+                Producto(1, "Producto 1", "Precio: x€"),
+                Producto(2, "Producto 2", "Precio: x€"),
+            )
+        }
 
         // COLUMNA PRINCIPAL DE LA PÁGINA
         Column(
@@ -127,9 +140,9 @@ fun App() {
                     .fillMaxWidth()
                     .background(Color(0xFFF5F5F5))
                     .padding(horizontal = 24.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
-            ){
+            ) {
                 Text(
                     text = "LISTA",
                     fontSize = 22.sp,
@@ -139,10 +152,10 @@ fun App() {
 
                 Row( //esta row es para separar los dos botones en la parte derecha de la row principal
                     horizontalArrangement = Arrangement.spacedBy(8.dp), //espacio entre los dos botones
-                    verticalAlignment =  Alignment.CenterVertically
-                ){
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
 
-                    IconButton(onClick = {/* ir a la sección de repartir pagos*/}){
+                    IconButton(onClick = {/* ir a la sección de repartir pagos*/ }) {
                         Icon(
                             painter = painterResource(Res.drawable.reparto),
                             contentDescription = "Repartir pagos lista",
@@ -151,7 +164,7 @@ fun App() {
                         )
                     }
 
-                    IconButton(onClick = {/* ir a la sección de filtrado*/}){
+                    IconButton(onClick = {/* ir a la sección de filtrado*/ }) {
                         Icon(
                             painter = painterResource(Res.drawable.filtro),
                             contentDescription = "Filtrar productos lista",
@@ -177,93 +190,67 @@ fun App() {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    // PRIMER PRODUCTO
-                    var isChecked1 by remember { mutableStateOf(false) }
-                    Card(
-                        modifier = Modifier.fillMaxWidth()
-                            .clickable { isChecked1 = !isChecked1},
-                        border = BorderStroke(1.dp, Color.Black),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color.White
-                        )
-                    ) {
-                        Row(
+                    productos.forEachIndexed { index, producto ->
+                        Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ){
+                                .clickable {
+                                    productos[index] =
+                                        producto.copy(isChecked = !producto.isChecked)
+                                },
+                            border = BorderStroke(1.dp, Color.Black),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                            colors = CardDefaults.cardColors(Color.White)
+                        ) {
 
-                            Checkbox(
-                                checked = isChecked1,
-                                onCheckedChange = {isChecked1 = it},
-                                colors = CheckboxDefaults.colors(checkedColor = Color(0xFF673AB7))
-                            )
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
 
-                            Spacer(modifier = Modifier.width(12.dp)) //para separar la checkbox del texto
-
-                            Column(modifier = Modifier.weight(1f)){
-                                Text(
-                                    text = "Producto 1",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold
+                                Checkbox(
+                                    checked = producto.isChecked,
+                                    onCheckedChange = { isChecked ->
+                                        productos[index] = producto.copy(isChecked = isChecked)
+                                    },
+                                    colors = CheckboxDefaults.colors(checkedColor = Color(0xFF673AB7))
                                 )
-                                Text("Precio: x€")
+
+                                Spacer(modifier = Modifier.width(12.dp)) //para separar la checkbox del texto
+
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = producto.nombre,
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(producto.precio)
+                                }
+
                             }
-
-
                         }
                     }
 
-                    // SEGUNDO PRODUCTO
-
-                    var isChecked2 by remember { mutableStateOf(false) }
-                    Card(
-                        modifier = Modifier.fillMaxWidth()
-                            .clickable{isChecked2 = !isChecked2},
-                        border = BorderStroke(1.dp, Color.Black),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color.White
-                        )
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ){
-
-                            Checkbox(
-                                checked = isChecked2,
-                                onCheckedChange = {isChecked2 = it},
-                                colors = CheckboxDefaults.colors(checkedColor = Color(0xFF673AB7))
-                            )
-
-                            Spacer(modifier = Modifier.width((12.dp)))
-
-                            Column(modifier = Modifier.weight(1f)){
-                                Text(
-                                    text = "Producto 2",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Text("Precio: x€")
-                            }
-
-
-                        }
-                    }
-
-                    //Spacer(modifier = Modifier.height(72.dp))
+                    Spacer(modifier = Modifier.height(72.dp))
                 }
 
                 // BOTON AÑADIR PRODUCTO A LA LISTA
                 Button(
-                    onClick = { showContent = !showContent },
+                    onClick = {
+                        val nuevoNumero = productos.size + 1
+                        productos.add(
+                            Producto(
+                                id = nuevoNumero,
+                                nombre = "Producto  $nuevoNumero",
+                                precio = "Precio x€"
+                            )
+                        )
+                    },
                     shape = CircleShape,
                     contentPadding = PaddingValues(0.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF673AB7)),
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .padding(16.dp)
