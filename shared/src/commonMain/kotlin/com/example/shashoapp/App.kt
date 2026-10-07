@@ -1,6 +1,5 @@
 package com.example.shashoapp
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,19 +13,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -57,21 +50,27 @@ import shashoapp.shared.generated.resources.reparto
 import shashoapp.shared.generated.resources.home
 import shashoapp.shared.generated.resources.addCircle
 import shashoapp.shared.generated.resources.settings
+import androidx.compose.material3.AlertDialog
+import com.example.shashoapp.model.Producto
+import com.example.shashoapp.ui.AnnyadirCatalogue
+import com.example.shashoapp.ui.ProductoItem
 
-data class Producto( //clase para cada producto, con su id, nombre y precio
-    val id: Int,
-    val nombre: String,
-    val precio: String,
-    var isChecked: Boolean = false
-)
+
 @Composable
 @Preview
 fun App() {
     MaterialTheme {
+        var showCreateMenu by remember {mutableStateOf(false)}
         val productos = remember {
-            mutableStateListOf(
-                Producto(1, "Producto 1", "Precio: x€"),
-                Producto(2, "Producto 2", "Precio: x€"),
+            mutableStateListOf<Producto>()
+
+        }
+
+        val productosDisp = remember {
+            listOf(
+                Producto(1, "Leche Entera", 1.10),
+                Producto(2, "Pan de Molde", 1.45),
+                Producto(3, "Huevos Doce", 2.30)
             )
         }
 
@@ -190,64 +189,49 @@ fun App() {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    productos.forEachIndexed { index, producto ->
-                        Card(
+                    if(productos.isEmpty()){
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable {
-                                    productos[index] =
-                                        producto.copy(isChecked = !producto.isChecked)
-                                },
-                            border = BorderStroke(1.dp, Color.Black),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                            colors = CardDefaults.cardColors(Color.White)
+                                .padding(top = 40.dp),
+                            contentAlignment = Alignment.Center
                         ) {
-
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-
-                                Checkbox(
-                                    checked = producto.isChecked,
-                                    onCheckedChange = { isChecked ->
-                                        productos[index] = producto.copy(isChecked = isChecked)
-                                    },
-                                    colors = CheckboxDefaults.colors(checkedColor = Color(0xFF673AB7))
-                                )
-
-                                Spacer(modifier = Modifier.width(12.dp)) //para separar la checkbox del texto
-
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = producto.nombre,
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                    Text(producto.precio)
-                                }
-
-                            }
+                            Text(
+                            text = "    La lista está vacía. \n Añade un producto con +",
+                            color = Color.Gray,
+                            fontSize = 16.sp
+                            )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(72.dp))
+                    else {
+                        productos.forEachIndexed { index, producto ->
+                            ProductoItem(
+                                producto = producto,
+                                onCardClick = {
+                                    productos[index] = producto.copy(isChecked = !producto.isChecked)
+                                },
+                                onCheckedChange = { nuevoEstado ->
+                                    productos[index] = producto.copy(isChecked = nuevoEstado)
+                                }
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(72.dp))
+                    }
                 }
 
                 // BOTON AÑADIR PRODUCTO A LA LISTA
                 Button(
-                    onClick = {
-                        val nuevoNumero = productos.size + 1
+                    onClick = { showCreateMenu = true },
+                        /*val nuevoNumero = productos.size + 1
                         productos.add(
                             Producto(
                                 id = nuevoNumero,
                                 nombre = "Producto  $nuevoNumero",
                                 precio = "Precio x€"
                             )
-                        )
-                    },
+                        )*/
+
                     shape = CircleShape,
                     contentPadding = PaddingValues(0.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF673AB7)),
@@ -297,7 +281,24 @@ fun App() {
                 }
             }
         }
+
+        if(showCreateMenu){
+            AnnyadirCatalogue(
+
+                catalogo = productosDisp,
+
+                onProductSeleccionado = {
+
+                },
+                onDismissRequest = {
+                    showCreateMenu = false
+                }
+            )
+        }
     }
+
+
+
 }
 // LA FUNCIÓN PARA CREAR LOS BOTONES EN EL NAVEGADOR DE ABAJO
 @Composable
