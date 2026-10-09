@@ -5,11 +5,15 @@ data class Producto(
     val nombre: String,
     val precio: Double,
     val imagen: String = "",
-    var isChecked: Boolean = false
+    val isChecked: Boolean = false,
+    val cantidad: Int = 1
 ){
     val precioFormateado: String
         get() = "${precio.toString()}€"
 
     val dameChecked: Boolean
         get() = isChecked
+
+    val dameCantidad: Int
+        get() = cantidad;
 }

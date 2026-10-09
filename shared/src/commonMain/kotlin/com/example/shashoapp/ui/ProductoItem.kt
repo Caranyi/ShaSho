@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shashoapp.model.Producto
+import androidx.compose.material3.IconButton
 
 //En este file, vamos a encapsular las funciones box de enseñar un producto
 @Composable
@@ -34,8 +35,15 @@ internal fun ProductoItem(
     elevation: Dp = 4.dp,
     containerColor: Color = Color.White,
 
-    showCheckBox: Boolean = true,
-    onCheckedChange: ((Boolean) -> Unit)? = null
+    showCheckBox: Boolean = false,
+    onCheckedChange: ((Boolean) -> Unit)? = null,
+
+
+    ensennyaCantidad: Boolean = true,
+    incrementaCantidad: (() -> Unit),
+    decrementarCantidad: (()-> Unit),
+
+
 
 ){
     Card(onClick = onCardClick,
@@ -72,6 +80,36 @@ internal fun ProductoItem(
                     fontWeight = FontWeight.Bold
                 )
                 Text(text = producto.precioFormateado)
+            }
+
+
+
+            if(ensennyaCantidad){
+                Row(verticalAlignment = Alignment.CenterVertically){
+                    IconButton(onClick = {decrementarCantidad.invoke() }){
+                        Text(
+                            "-",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Text(
+                        text =  "${producto.dameCantidad}",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 4.dp)
+                    )
+
+                    IconButton(onClick = {incrementaCantidad.invoke()}){
+                        Text(
+                            "+",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                }
             }
         }
 
