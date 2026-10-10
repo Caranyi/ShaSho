@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+
+// Esta funcion es el desplegable al pulsar el boton de + para añadir productos
 fun AnnyadirCatalogue(
     catalogo: List<Producto>,
     onDismissRequest: () -> Unit,

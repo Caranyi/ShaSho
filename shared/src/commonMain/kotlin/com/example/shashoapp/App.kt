@@ -57,6 +57,7 @@
     import com.example.shashoapp.ui.AnnyadirCatalogue
     import com.example.shashoapp.ui.ProductoItem
     import androidx.compose.foundation.lazy.items
+    import androidx.compose.ui.layout.ContentScale
 
 
     @Composable
@@ -68,11 +69,12 @@
                 mutableStateListOf<Producto>()
             }
 
+            //Lista de productos "conocidos"
             val productosDisp = remember {
                 listOf(
                     Producto(1, "Leche Entera", 1.10),
                     Producto(2, "Pan de Molde", 1.45),
-                    Producto(3, "Huevos Doce", 2.30)
+                    Producto(3, "Docena de huevos", 2.30)
                 )
             }
 
@@ -86,19 +88,29 @@
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(130.dp)
+                        .height(140.dp)
                         .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
                         .background(Color(0xFF673AB7)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Image(
-                        painter = painterResource(Res.drawable.logoShaSho),
-                        contentDescription = "Logo ShaSho",
+                    //Circulo blanco
+                    Box(
                         modifier = Modifier
                             .size(90.dp)
                             .clip(CircleShape)
-                            .background(Color.White)
-                    )
+                            .background(Color.White),
+                        contentAlignment = Alignment.Center
+                    ){
+                        //Logo dentro del circulo blanco
+                        Image(
+                            painter = painterResource(Res.drawable.logoShaSho),
+                            contentDescription = "Logo ShaSho",
+                            contentScale = ContentScale.Fit, // Asegura la escala adecuada dentro del marco
+                            modifier = Modifier
+                                .size(90.dp)
+                                .padding(6.dp)
+                        )
+                    }
                 }
 
                 // SEGUNDA SECCION: TITULO DE LA LISTA
