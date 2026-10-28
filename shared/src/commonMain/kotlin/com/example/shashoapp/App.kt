@@ -63,6 +63,37 @@
     @Preview
     fun App() {
         MaterialTheme {
+
+            /*
+            MaterialTheme {
+    val navController = rememberNavController()
+
+    LaunchedEffect(toScreen) {
+        toScreen?.let {
+            navController.navigate(it) { launchSingleTop = true }
+        }
+    }
+
+    NavHost(navController, startDestination = Route.Home) {
+        composable<Route.Home> {
+            HomeScreen(
+                onNavigateToDetail = { message ->
+                    navController.navigate(Route.Detail(message))
+                }
+            )
+        }
+        composable<Route.Detail> { backStackEntry ->
+            val detail = backStackEntry.toRoute<Route.Detail>()
+            DetailScreen(
+                message = detail.message,
+                onBack = { navController.popBackStack() }
+            )
+        }
+    }
+}
+             */
+
+
             var showCreateMenu by remember {mutableStateOf(false)}
             val productos = remember {
                 mutableStateListOf<Producto>()
