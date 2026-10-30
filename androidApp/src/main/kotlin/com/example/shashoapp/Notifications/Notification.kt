@@ -14,7 +14,6 @@ import androidx.work.WorkerParameters
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.util.concurrent.TimeUnit
-import kotlinx.serialization.Serializable
 
 
 const val EXTRA_TO_SCREEN = "toScreen"
@@ -90,14 +89,4 @@ class NotificationWorker(appContext: Context, workerParameters: WorkerParameters
             .getSystemService(NotificationManager::class.java)
             .notify(notificationId, notification)
     }
-}
-
-@Serializable
-sealed interface Route {
-
-    @Serializable
-    data object Home : Route
-
-    @Serializable
-    data class Detail(val id: String) : Route
 }
