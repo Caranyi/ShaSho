@@ -3,6 +3,8 @@
     import androidx.compose.material3.MaterialTheme
     import androidx.compose.runtime.Composable
     import androidx.compose.runtime.remember
+    import androidx.navigation.compose.NavHost
+    import androidx.navigation.compose.composable
     import androidx.navigation.compose.rememberNavController
     import com.example.shashoapp.di.AppContainer
     import com.example.shashoapp.di.DefaultAppContainer
@@ -14,7 +16,14 @@
 
         val navController = rememberNavController()
 
-        NavHost(navController = navController, startDestination = Route.Car)
+        NavHost(navController = navController, startDestination = Route.Home) {
+            composable<Route.Home> {/**/}
+            composable<Route.Login> {/**/}
+            composable<Route.Register> {/**/}
+            composable<Route.Settings> {/**/}
+            composable<Route.Lista> {/**/}
+            composable<Route.Reparto> {/**/}
+        }
 
         MaterialTheme {
             val viewModel = remember {

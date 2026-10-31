@@ -9,5 +9,17 @@ sealed interface Route {
     data object Home : Route
 
     @Serializable
-    data class Detail(val id: String) : Route
+    data object Settings : Route
+
+    @Serializable
+    data object Login : Route
+
+    @Serializable
+    data object Register : Route
+
+    @Serializable
+    data class Lista(val id: Int) : Route
+
+    @Serializable
+    data class Reparto(val listaId: Int) : Route
 }
