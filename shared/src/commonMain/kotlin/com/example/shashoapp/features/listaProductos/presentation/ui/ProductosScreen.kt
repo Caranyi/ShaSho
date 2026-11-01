@@ -1,6 +1,6 @@
-package com.example.shashoapp.features.productos.presentation.ui
+package com.example.shashoapp.features.listaProductos.presentation.ui
 
-import BarraNav
+import com.example.shashoapp.features.BarraNavegacion.presentation.ui.BarraNav
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -35,6 +35,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.shashoapp.Route
 
 // Imports de recursos visuales (Drawables)
 import shashoapp.shared.generated.resources.Res
@@ -46,30 +48,34 @@ import shashoapp.shared.generated.resources.arrowLeft
 import shashoapp.shared.generated.resources.arrowRight
 
 // Imports de clases propias del proyecto
-import com.example.shashoapp.features.productos.domain.model.Producto
-import com.example.shashoapp.features.productos.presentation.ProductosAction
-import com.example.shashoapp.features.productos.presentation.ProductosState
-import com.example.shashoapp.features.productos.presentation.ProductosViewModel
+import com.example.shashoapp.features.listaProductos.presentation.ProductosAction
+import com.example.shashoapp.features.listaProductos.presentation.ProductosState
+import com.example.shashoapp.features.listaProductos.presentation.ProductosViewModel
 import org.jetbrains.compose.resources.painterResource
-import shashoapp.shared.generated.resources.logoShaSho
-import shashoapp.shared.generated.resources.arrowLeft
 import shashoapp.shared.generated.resources.filtro
-import shashoapp.shared.generated.resources.logoShaSho
 import shashoapp.shared.generated.resources.reparto
 
 @Composable
-fun ProductosScreenRoot(viewModel: ProductosViewModel) {
+fun ProductosScreenRoot(
+    viewModel: ProductosViewModel,
+    onVolver: () -> Unit,
+    onHome: () -> Unit
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     ProductosScreen(
         state = state,
-        onAction = viewModel::onAction
+        onAction = viewModel::onAction,
+        onVolver = onVolver,
+        onHome = onHome
     )
 }
 
 @Composable
 fun ProductosScreen(
     state: ProductosState,
-    onAction: (ProductosAction) -> Unit
+    onAction: (ProductosAction) -> Unit,
+    onVolver: () -> Unit,
+    onHome: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -112,7 +118,7 @@ fun ProductosScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { /* ir a lista anterior */ }) {
+                IconButton(onClick = onVolver) {
                     Icon(
                         painter = painterResource(Res.drawable.arrowLeft),
                         contentDescription = "Anterior",
@@ -178,7 +184,7 @@ fun ProductosScreen(
                 }
             }
 
-            // SECCIÓN 4: LISTA DE PRODUCTOS Y BOTÓN DE AÑADIR
+            // SECCIÓN 4: LISTA DE PRODUCTOS
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -206,7 +212,7 @@ fun ProductosScreen(
                     ) {
                         itemsIndexed(
                             items = state.productosLista,
-                            key = { _, prod -> prod.id }
+                            key = { i, prod -> "${prod.id}_$i" }
                         ) { i, producto ->
                             ProductoItem(
                                 producto = producto,
@@ -234,24 +240,6 @@ fun ProductosScreen(
             }
         }
 
-        // BOTÓN FLOTANTE AÑADIR PRODUCTO
-        Button(
-            onClick = { onAction(ProductosAction.AbrirMenuCrear) },
-            shape = CircleShape,
-            contentPadding = PaddingValues(0.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF673AB7)),
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp)
-                .size(56.dp)
-        ) {
-            Text(
-                text = "+",
-                fontSize = 28.sp,
-                textAlign = TextAlign.Center
-            )
-        }
-
         // SECCIÓN 5: BARRA DE NAVEGACIÓN INFERIOR
         Box(
             modifier = Modifier
@@ -268,12 +256,12 @@ fun ProductosScreen(
                 BarraNav(
                     icon = Res.drawable.home,
                     label = "Inicio",
-                    onClick = { /* Acción ir a inicio */ }
+                    onClick = onHome
                 )
                 BarraNav(
                     icon = Res.drawable.addCircle,
                     label = "Crear",
-                    onClick = { onAction(ProductosAction.AbrirMenuCrear) }
+                    onClick = { /* Acción de crear una lista */}
                 )
                 BarraNav(
                     icon = Res.drawable.settings,
@@ -283,7 +271,25 @@ fun ProductosScreen(
             }
         }
 
-        // SECCIÓN 6: DESPLEGABLE DE AÑADIR CATÁLOGO DE PRODUCTOS
+        // SECCIÓN 6: BOTÓN FLOTANTE AÑADIR PRODUCTO
+        Button(
+            onClick = { onAction(ProductosAction.AbrirMenuCrear) },
+            shape = CircleShape,
+            contentPadding = PaddingValues(0.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF673AB7)),
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(bottom=90.dp, end=16.dp)
+                .size(56.dp)
+        ) {
+            Text(
+                text = "+",
+                fontSize = 28.sp,
+                textAlign = TextAlign.Center
+            )
+        }
+
+        // SECCIÓN 7: DESPLEGABLE DE AÑADIR CATÁLOGO DE PRODUCTOS
         if (state.showCreateMenu) {
             AnnyadirCatalogue(
                 catalogo = state.productosDisponibles,

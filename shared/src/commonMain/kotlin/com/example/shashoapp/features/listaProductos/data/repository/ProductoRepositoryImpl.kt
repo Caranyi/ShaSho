@@ -1,5 +1,5 @@
-package com.example.shashoapp.features.productos.data.repository import com.example.shashoapp.features.productos.domain.model.Producto
-import com.example.shashoapp.features.productos.domain.repository.ProductoRepository
+package com.example.shashoapp.features.listaProductos.data.repository import com.example.shashoapp.features.listaProductos.domain.model.Producto
+import com.example.shashoapp.features.listaProductos.domain.repository.ProductoRepository
 
 class ProductoRepositoryImpl : ProductoRepository {
     override suspend fun getProductosDisponibles(): List<Producto>{

@@ -1,12 +1,13 @@
-package com.example.shashoapp.features.productos.domain.model
+package com.example.shashoapp.features.listaProductos.domain.model
 
 data class Producto(
     val id: Int,
     val nombre: String,
     val precio: Double,
-    val imagen: String = "",
     val isChecked: Boolean = false,
-    val cantidad: Int = 1
+    val cantidad: Int = 1,
+    val tienda: String = "",
+    val tipo: String = ""
 ){
     val precioFormateado: String
         get() = "${precio.toString()}€"

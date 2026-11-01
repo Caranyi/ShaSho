@@ -1,9 +1,9 @@
-package com.example.shashoapp.features.productos.presentation
+package com.example.shashoapp.features.listaProductos.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shashoapp.features.productos.domain.model.Producto
-import com.example.shashoapp.features.productos.domain.usecase.GetProductosDisponiblesUseCase
+import com.example.shashoapp.features.listaProductos.domain.model.Producto
+import com.example.shashoapp.features.listaProductos.domain.usecase.GetProductosDisponiblesUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

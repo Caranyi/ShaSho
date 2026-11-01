@@ -1,4 +1,4 @@
-package com.example.shashoapp.features.productos.presentation.ui
+package com.example.shashoapp.features.listaProductos.presentation.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.shashoapp.features.productos.domain.model.Producto
+import com.example.shashoapp.features.listaProductos.domain.model.Producto
 
 @Composable
 fun ProductoItem(

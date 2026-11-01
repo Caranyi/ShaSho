@@ -1,6 +1,6 @@
-package com.example.shashoapp.features.productos.presentation
+package com.example.shashoapp.features.listaProductos.presentation
 
-import com.example.shashoapp.features.productos.domain.model.Producto
+import com.example.shashoapp.features.listaProductos.domain.model.Producto
 
 sealed interface ProductosAction{
     data object AbrirMenuCrear: ProductosAction
