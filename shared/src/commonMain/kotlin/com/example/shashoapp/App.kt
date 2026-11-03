@@ -9,6 +9,8 @@
     import androidx.navigation.toRoute
     import com.example.shashoapp.di.AppContainer
     import com.example.shashoapp.di.DefaultAppContainer
+    import com.example.shashoapp.features.Bienvenida.presentation.ui.BienvenidaScreen
+    import com.example.shashoapp.features.Bienvenida.presentation.ui.BienvenidaScreenRoot
     import com.example.shashoapp.features.listaListas.presentation.ListasViewModel
     import com.example.shashoapp.features.listaProductos.presentation.ProductosViewModel
     import com.example.shashoapp.features.listaProductos.presentation.ui.ProductosScreenRoot
@@ -19,7 +21,15 @@
         MaterialTheme{
             val navController = rememberNavController()
 
-            NavHost(navController = navController, startDestination = Route.Home) {
+            NavHost(navController = navController, startDestination = Route.Bienvenida) {
+
+                composable<Route.Bienvenida>{
+                    BienvenidaScreenRoot(
+                        onLoginClick = {navController.navigate(Route.Home)},
+                        onRegisterClick =  {navController.navigate(Route.Home)}
+                    )
+                }
+
                 composable<Route.Home> {
                     val viewModel = remember {
                         ListasViewModel(appContainer.getListasUseCase)
