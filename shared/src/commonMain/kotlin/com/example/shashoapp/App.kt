@@ -11,6 +11,11 @@
     import com.example.shashoapp.di.DefaultAppContainer
     import com.example.shashoapp.features.Bienvenida.presentation.ui.BienvenidaScreen
     import com.example.shashoapp.features.Bienvenida.presentation.ui.BienvenidaScreenRoot
+    import com.example.shashoapp.features.auth.domain.usecase.RegisterUseCase
+    import com.example.shashoapp.features.auth.presentation.login.LoginViewModel
+    import com.example.shashoapp.features.auth.presentation.login.ui.LoginScreenRoot
+    import com.example.shashoapp.features.auth.presentation.register.RegisterViewModel
+    import com.example.shashoapp.features.auth.presentation.register.ui.RegisterScreenRoot
     import com.example.shashoapp.features.listaListas.presentation.ListasViewModel
     import com.example.shashoapp.features.listaProductos.presentation.ProductosViewModel
     import com.example.shashoapp.features.listaProductos.presentation.ui.ProductosScreenRoot
@@ -25,8 +30,8 @@
 
                 composable<Route.Bienvenida>{
                     BienvenidaScreenRoot(
-                        onLoginClick = {navController.navigate(Route.Home)},
-                        onRegisterClick =  {navController.navigate(Route.Home)}
+                        onLoginClick = {navController.navigate(Route.Login)},
+                        onRegisterClick =  {navController.navigate(Route.Register)}
                     )
                 }
 
@@ -62,8 +67,34 @@
                         }
                     )
                 }
-                composable<Route.Login> {/**/}
-                composable<Route.Register> {/**/}
+                composable<Route.Login> {
+                    val viewModel = LoginViewModel(appContainer.loginUseCase)
+                    LoginScreenRoot(
+                        viewModel = viewModel,
+                        onNavigateToHome = {
+                            navController.navigate(Route.Home) {
+                                popUpTo(Route.Bienvenida) {inclusive = true}
+                            }
+                        },
+                        onNavigateToRegister = {
+                            navController.navigate(Route.Register)
+                        }
+                    )
+                }
+                composable<Route.Register> {
+                    val viewModel = RegisterViewModel(appContainer.registerUseCase)
+                    RegisterScreenRoot(
+                        viewModel = viewModel,
+                        onNavigateToHome = {
+                            navController.navigate(Route.Home) {
+                                popUpTo(Route.Bienvenida) {inclusive = true}
+                            }
+                        },
+                        onNavigateToLogin = {
+                            navController.navigate(Route.Login)
+                        }
+                    )
+                }
                 composable<Route.Settings> {/**/}
                 composable<Route.Reparto> {/**/}
             }

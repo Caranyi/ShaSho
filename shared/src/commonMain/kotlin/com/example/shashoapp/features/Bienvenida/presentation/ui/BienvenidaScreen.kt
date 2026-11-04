@@ -43,22 +43,27 @@ import shashoapp.shared.generated.resources.reparto
 @Composable
 fun BienvenidaScreenRoot(
     onLoginClick: () -> Unit,
-    onRegisterClick: () -> Unit
+    onRegisterClick: () -> Unit,
+    modifier: Modifier = Modifier
 ){
     BienvenidaScreen(
         onLoginClick = onLoginClick,
-        onRegisterClick = onRegisterClick
+        onRegisterClick = onRegisterClick,
+        modifier = modifier
     )
 }
 
 @Composable
-fun BienvenidaScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
+fun BienvenidaScreen(
+    onLoginClick: () -> Unit,
+    onRegisterClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .background(Color.White)
     ) {
-
-
         Column(
             modifier = Modifier
                 .background(Color.White)
@@ -118,7 +123,7 @@ fun BienvenidaScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
                 }
 
                 Button(
-                    onClick = onLoginClick,
+                    onClick = onRegisterClick,
                     modifier = Modifier.weight(1f)
                 ){
                     Text("Registrarse");
