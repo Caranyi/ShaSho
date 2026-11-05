@@ -18,6 +18,7 @@ kotlinx-coroutines = "1.11.0"
 material3 = "1.12.0-alpha03"
 work = "2.12.0"
 navigationCompose="2.9.2"
+ktor = "3.2.3"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -42,6 +43,9 @@ wrappers-browser = { module = "org.jetbrains.kotlin-wrappers:kotlin-browser", ve
 kotlinx-serialization-json = {module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref="kotlinx-serialization"}
 worker-runtime = {module = "androidx.work:work-runtime-ktx", version.ref = "work"}
 navigation-compose={module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose"}
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

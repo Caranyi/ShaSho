@@ -28,6 +28,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shashoapp.features.listaProductos.presentation.ProductosAction
@@ -44,12 +45,14 @@ import shashoapp.shared.generated.resources.reparto
 fun BienvenidaScreenRoot(
     onLoginClick: () -> Unit,
     onRegisterClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    conexionOk: Boolean? = null
 ){
     BienvenidaScreen(
         onLoginClick = onLoginClick,
         onRegisterClick = onRegisterClick,
-        modifier = modifier
+        modifier = modifier,
+        conexionOk = conexionOk
     )
 }
 
@@ -57,7 +60,8 @@ fun BienvenidaScreenRoot(
 fun BienvenidaScreen(
     onLoginClick: () -> Unit,
     onRegisterClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    conexionOk: Boolean? = null
 ) {
     Box(
         modifier = Modifier
@@ -106,7 +110,19 @@ fun BienvenidaScreen(
                 )
             }
 
-            // SECCIÓN 3: ZONA DE BOTONES
+            // SECCION 3: ESTADO CONEXION AL SERVIDOR
+            Text(
+                text = when (conexionOk) {
+                    null -> "Conectando con el servidor..."
+                    true -> "Conectado a la base de datos"
+                    false -> "Sin conexión con el servidor"
+                },
+                fontSize = 13.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(), //para que funcione el centrar, no quitar
+            )
+
+            // SECCIÓN 4: ZONA DE BOTONES
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

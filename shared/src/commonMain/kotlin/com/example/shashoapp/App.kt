@@ -2,7 +2,12 @@
 
     import androidx.compose.material3.MaterialTheme
     import androidx.compose.runtime.Composable
+    import androidx.compose.runtime.LaunchedEffect
+    import androidx.compose.runtime.getValue
+    import androidx.compose.runtime.mutableStateOf
     import androidx.compose.runtime.remember
+    import androidx.compose.runtime.setValue
+    import com.example.shashoapp.core.ApiServidor
     import androidx.navigation.compose.NavHost
     import androidx.navigation.compose.composable
     import androidx.navigation.compose.rememberNavController
@@ -26,12 +31,18 @@
         MaterialTheme{
             val navController = rememberNavController()
 
+            var conexionOk by remember { mutableStateOf<Boolean?>(null) }
+            LaunchedEffect(Unit) {
+                conexionOk = ApiServidor.ping()
+            }
+
             NavHost(navController = navController, startDestination = Route.Bienvenida) {
 
                 composable<Route.Bienvenida>{
                     BienvenidaScreenRoot(
                         onLoginClick = {navController.navigate(Route.Login)},
-                        onRegisterClick =  {navController.navigate(Route.Register)}
+                        onRegisterClick =  {navController.navigate(Route.Register)},
+                        conexionOk = conexionOk
                     )
                 }
 
