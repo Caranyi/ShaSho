@@ -6,10 +6,12 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
 import io.ktor.http.parameters
 import kotlin.coroutines.cancellation.CancellationException
-
+//para las listas
+import io.ktor.client.request.parameter
 
 object ApiServidor {
 
+    //la url (servidor)
     private val baseUrl: String get() = ServidorConfig.BASE_URL
 
     //COMPROBAR CONEXION (aAPP)
@@ -32,4 +34,13 @@ object ApiServidor {
         )
         return respuesta.bodyAsText().toInt()
     }
+
+    //LISTAS DEL USUARIO (LISTAREPOSITORYIMPL)
+    suspend fun getListas(idUsuario: Int): String {
+        val respuesta = httpClient.get("$baseUrl/listas") {
+            parameter("idUsuario", idUsuario)
+        }
+        return respuesta.bodyAsText()
+    }
+
 }
