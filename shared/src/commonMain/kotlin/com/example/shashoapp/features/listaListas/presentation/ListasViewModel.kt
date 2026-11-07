@@ -10,7 +10,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ListasViewModel (
-    private val getListasUseCase: GetListasUseCase
+    private val getListasUseCase: GetListasUseCase,
+    private val idUsuario: Int?
 ): ViewModel(){
     private val _state = MutableStateFlow(ListasState())
 
@@ -32,7 +33,7 @@ class ListasViewModel (
     private fun cargarListas(){
         viewModelScope.launch{
             _state.update { it.copy(isLoading = true) }
-            val listas = getListasUseCase()
+            val listas = getListasUseCase(idUsuario)
             _state.update { it.copy(listas = listas, isLoading = false)}
         }
     }

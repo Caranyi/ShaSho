@@ -6,7 +6,7 @@ import com.example.shashoapp.features.listaListas.domain.repository.ListaReposit
 class GetListasUseCase (
     private val repository: ListaRepository
 ){
-    suspend operator fun invoke(): List<Lista>{
-        return repository.getListas();
+    suspend operator fun invoke(idUsuario: Int?): List<Lista>{
+        return repository.getListas(idUsuario);
     }
 }

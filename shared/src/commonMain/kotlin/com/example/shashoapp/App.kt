@@ -26,6 +26,7 @@
     import com.example.shashoapp.features.listaProductos.presentation.ui.ProductosScreenRoot
     import com.example.shashoapp.features.listalistas.presentation.ui.ListasScreenRoot
     import com.example.shashoapp.core.EstadoConexion
+    import com.example.shashoapp.core.SesionUsuario
 
     @Composable
     fun App(appContainer: AppContainer = DefaultAppContainer()) {
@@ -59,7 +60,10 @@
 
                 composable<Route.Home> {
                     val viewModel = remember {
-                        ListasViewModel(appContainer.getListasUseCase)
+                        ListasViewModel(
+                            getListasUseCase = appContainer.getListasUseCase, idUsuario = SesionUsuario.getIdUsuario()
+                        )
+
                     }
 
                     ListasScreenRoot(

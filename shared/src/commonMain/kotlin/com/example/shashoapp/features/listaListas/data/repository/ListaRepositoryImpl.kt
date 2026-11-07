@@ -4,7 +4,7 @@ import com.example.shashoapp.features.listaListas.domain.model.Lista
 import com.example.shashoapp.features.listaListas.domain.repository.ListaRepository
 
 class ListaRepositoryImpl : ListaRepository{
-    override suspend fun getListas(): List<Lista>{
+    override suspend fun getListas(idUsuario: Int?): List<Lista>{
         return listOf(
             Lista(id = 1, nombre = "Piso", 1, intArrayOf(1, 2, 3), 0),
             Lista(id = 2, nombre = "Viaje", 2, intArrayOf(1, 2, 3), 0),
