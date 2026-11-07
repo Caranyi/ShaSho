@@ -36,6 +36,17 @@
                 conexionOk = ApiServidor.ping()
             }
 
+            //Modo sin conexion (pasa a la pantalla de listas(home))
+            LaunchedEffect(Unit) {
+                conexionOk = ApiServidor.ping()
+                if (conexionOk == false) {
+                    navController.navigate(Route.Home) {
+                        popUpTo(Route.Bienvenida) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+            }
+
             NavHost(navController = navController, startDestination = Route.Bienvenida) {
 
                 composable<Route.Bienvenida>{
