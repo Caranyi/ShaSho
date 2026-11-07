@@ -25,6 +25,7 @@
     import com.example.shashoapp.features.listaProductos.presentation.ProductosViewModel
     import com.example.shashoapp.features.listaProductos.presentation.ui.ProductosScreenRoot
     import com.example.shashoapp.features.listalistas.presentation.ui.ListasScreenRoot
+    import com.example.shashoapp.core.EstadoConexion
 
     @Composable
     fun App(appContainer: AppContainer = DefaultAppContainer()) {
@@ -32,14 +33,13 @@
             val navController = rememberNavController()
 
             var conexionOk by remember { mutableStateOf<Boolean?>(null) }
-            LaunchedEffect(Unit) {
-                conexionOk = ApiServidor.ping()
-            }
 
             //Modo sin conexion (pasa a la pantalla de listas(home))
             LaunchedEffect(Unit) {
-                conexionOk = ApiServidor.ping()
-                if (conexionOk == false) {
+                val hayConexion = ApiServidor.ping()
+                conexionOk = hayConexion
+                EstadoConexion.setConexion(hayConexion) //para ver de donde cogemos los datos
+                if (!hayConexion) {
                     navController.navigate(Route.Home) {
                         popUpTo(Route.Bienvenida) { inclusive = true }
                         launchSingleTop = true
