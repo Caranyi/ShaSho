@@ -43,4 +43,13 @@ object ApiServidor {
         return respuesta.bodyAsText()
     }
 
+
+    //PRODUCTOS PARA UNA LISTA (PRODUCTOREPOSITORYIMPL)
+    suspend fun getProductos(idLista: Int): String {
+        val respuesta = httpClient.get("$baseUrl/productos") {
+            parameter("idLista", idLista)
+        }
+        return respuesta.bodyAsText()
+    }
+
 }

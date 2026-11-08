@@ -30,7 +30,7 @@ class DefaultAppContainer : AppContainer {
     override val getProductosDisponiblesUseCase: GetProductosDisponiblesUseCase by lazy {
         GetProductosDisponiblesUseCase(productoRepository)
     }
-    
+
     override val getProductosListaUseCase: GetProductosListaUseCase by lazy {
         GetProductosListaUseCase(productoRepository)
     }
