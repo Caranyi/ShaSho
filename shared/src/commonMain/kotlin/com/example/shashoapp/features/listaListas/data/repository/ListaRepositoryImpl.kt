@@ -8,36 +8,45 @@ import com.example.shashoapp.features.listaListas.domain.model.Lista
 import com.example.shashoapp.features.listaListas.domain.repository.ListaRepository
 import kotlinx.serialization.json.Json
 import kotlin.coroutines.cancellation.CancellationException
+import com.example.shashoapp.core.database.guardarArchivo
+import com.example.shashoapp.core.database.leerArchivo
 
 class ListaRepositoryImpl : ListaRepository{
-    /*
-    override suspend fun getListas(idUsuario: Int?): List<Lista>{
-        return listOf(
-            Lista(id = 1, nombre = "Piso", 1, intArrayOf(1, 2, 3), 0),
-            Lista(id = 2, nombre = "Viaje", 2, intArrayOf(1, 2, 3), 0),
-            Lista(id = 3, nombre = "Compra", 3, intArrayOf(1, 2, 3), 0)
-            )
-    }
 
-     */
+    //archivo de las listas
+    private val archivo = "listas.json"
+
     override suspend fun getListas(idUsuario: Int?): List<Lista>{
 
-        //OFFLINE/USUARIO NULL
-        if (!EstadoConexion.getConexion() || idUsuario == null) {
-            return emptyList()
+        //ONLINE: actualiza el archivo con lo que diga el servidor
+        if (EstadoConexion.getConexion()) {
+            try {
+                var texto = "[]"
+                //se revisa que haya un idUsuario
+                if (idUsuario != null) {
+                    texto = ApiServidor.getListas(idUsuario)
+                }
+                //actualiza el archivo
+                guardarArchivo(archivo, texto)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                //No pasa nada
+            }
         }
 
-
-        //ONLINE
-        //(lista vacia si hay cualquier error)
-        val texto = try {
-            ApiServidor.getListas(idUsuario)
-        } catch (e: CancellationException) {
-            throw e
+        //SIEMPRE: lee el archivo
+        //(lista vacia si no existe o esta mal)
+        val texto = leerArchivo(archivo)
+        if (texto == null) {
+            return emptyList()
+        }
+        try {
+            val listasDto = Json.decodeFromString<List<ListaDto>>(texto)
+            return listasDto.map { it.toDomain() }
         } catch (e: Exception) {
             return emptyList()
         }
-        //convierte en lista de listas la respuesta del servidor
-        return Json.decodeFromString<List<ListaDto>>(texto).map { it.toDomain() }
+
     }
 }
