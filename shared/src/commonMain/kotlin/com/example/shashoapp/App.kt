@@ -79,7 +79,11 @@
                     val route: Route.Lista = backStackEntry.toRoute()
 
                     val viewModel = remember(route.id){
-                        ProductosViewModel(appContainer.getProductosDisponiblesUseCase)
+                        ProductosViewModel(
+                            getProductosDisponiblesUseCase = appContainer.getProductosDisponiblesUseCase,
+                            getProductosListaUseCase = appContainer.getProductosListaUseCase,
+                            idLista = route.id
+                        )
                     }
 
                     ProductosScreenRoot(

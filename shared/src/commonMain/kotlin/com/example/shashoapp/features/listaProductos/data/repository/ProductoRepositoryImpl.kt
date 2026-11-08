@@ -9,4 +9,9 @@ class ProductoRepositoryImpl : ProductoRepository {
             Producto(3, "Docena de huevos", 2.30)
             )
     }
+
+    //se va a pedir asl servidor (modo online)
+    override suspend fun getProductosDeLista(idLista: Int): List<Producto> {
+        return emptyList()
+    }
 }

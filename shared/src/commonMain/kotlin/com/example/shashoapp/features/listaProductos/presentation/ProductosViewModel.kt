@@ -9,10 +9,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.example.shashoapp.features.listaProductos.domain.usecase.GetProductosListaUseCase
 
 
 class ProductosViewModel(
-    private val getProductosDisponiblesUseCase: GetProductosDisponiblesUseCase
+    private val getProductosDisponiblesUseCase: GetProductosDisponiblesUseCase,
+    private val getProductosListaUseCase: GetProductosListaUseCase,
+    private val idLista: Int
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProductosState())
@@ -20,6 +23,7 @@ class ProductosViewModel(
 
     init {
         cargarProductosDisponibles()
+        cargarProductosLista()
     }
 
     fun onAction(action:ProductosAction){
@@ -38,6 +42,14 @@ class ProductosViewModel(
         viewModelScope.launch {
             val disponibles = getProductosDisponiblesUseCase()
             _state.update { it.copy(productosDisponibles = disponibles) }
+        }
+    }
+
+    //cargar productos
+    private fun cargarProductosLista() {
+        viewModelScope.launch {
+            val productos = getProductosListaUseCase(idLista)
+            _state.update { it.copy(productosLista = productos) }
         }
     }
 

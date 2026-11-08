@@ -10,9 +10,11 @@ import com.example.shashoapp.features.listaListas.domain.usecase.GetListasUseCas
 import com.example.shashoapp.features.listaProductos.data.repository.ProductoRepositoryImpl
 import com.example.shashoapp.features.listaProductos.domain.repository.ProductoRepository
 import com.example.shashoapp.features.listaProductos.domain.usecase.GetProductosDisponiblesUseCase
+import com.example.shashoapp.features.listaProductos.domain.usecase.GetProductosListaUseCase
 
 interface AppContainer {
     val getProductosDisponiblesUseCase: GetProductosDisponiblesUseCase
+    val getProductosListaUseCase: GetProductosListaUseCase
     val getListasUseCase: GetListasUseCase
 
     val loginUseCase : LoginUseCase
@@ -27,6 +29,10 @@ class DefaultAppContainer : AppContainer {
 
     override val getProductosDisponiblesUseCase: GetProductosDisponiblesUseCase by lazy {
         GetProductosDisponiblesUseCase(productoRepository)
+    }
+    
+    override val getProductosListaUseCase: GetProductosListaUseCase by lazy {
+        GetProductosListaUseCase(productoRepository)
     }
 
     private val listaRepository: ListaRepository by lazy{
