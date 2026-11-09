@@ -9,6 +9,6 @@ class ListaRepositoryImpl : ListaRepository{
             Lista(id = 1, nombre = "Piso", 1, intArrayOf(1, 2, 3), 0),
             Lista(id = 2, nombre = "Viaje", 2, intArrayOf(1, 2, 3), 0),
             Lista(id = 3, nombre = "Compra", 3, intArrayOf(1, 2, 3), 0)
-            )
+        )
     }
 }

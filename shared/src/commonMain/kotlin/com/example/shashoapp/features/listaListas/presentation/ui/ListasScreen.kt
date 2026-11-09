@@ -51,7 +51,8 @@ import com.example.shashoapp.features.listaListas.presentation.ui.ListaItem
 @Composable
 fun ListasScreenRoot(
     viewModel: ListasViewModel,
-    onListaClick: (Lista) -> Unit
+    onListaClick: (Lista) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     ListasScreen(
@@ -61,46 +62,24 @@ fun ListasScreenRoot(
                 is ListasAction.OnListaClick -> onListaClick(action.lista)
                 else -> viewModel.onAction(action)
             }
-        }
+        },
+        modifier = modifier
     )
 }
 
 @Composable
 fun ListasScreen(
     state: ListasState,
-    onAction: (ListasAction) -> Unit
+    onAction: (ListasAction) -> Unit,
+    modifier: Modifier = Modifier
+
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .background(Color.White)
                 .fillMaxSize()
         ) {
-            // CABECERA LOGO
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(140.dp)
-                    .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
-                    .background(Color(0xFF673AB7)),
-                contentAlignment = Alignment.Center
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(90.dp)
-                        .clip(CircleShape)
-                        .background(Color.White),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(Res.drawable.logoShaSho),
-                        contentDescription = "Logo ShaSho",
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier.size(90.dp).padding(6.dp)
-                    )
-                }
-            }
-
             // TÍTULO "MIS LISTAS"
             Row(
                 modifier = Modifier
@@ -145,36 +124,5 @@ fun ListasScreen(
             }
         }
 
-
-        // BARRA DE NAVEGACIÓN INFERIOR
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(74.dp)
-                .background(Color(0xFF673AB7))
-                .align(Alignment.BottomCenter)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxSize(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                BarraNav(
-                    icon = Res.drawable.home,
-                    label = "Inicio",
-                    onClick = { /* Ya estamos en el inicio */ }
-                )
-                BarraNav(
-                    icon = Res.drawable.addCircle,
-                    label = "Crear",
-                    onClick = { onAction(ListasAction.AbrirCrearLista) }
-                )
-                BarraNav(
-                    icon = Res.drawable.settings,
-                    label = "Ajustes",
-                    onClick = { /* Ajustes */ }
-                )
-            }
-        }
     }
 }

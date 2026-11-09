@@ -7,7 +7,7 @@ data class Producto(
     val isChecked: Boolean = false,
     val cantidad: Int = 1,
     val tienda: String = "",
-    val tipo: String = ""
+    val tipo: String = "",
 ){
     val precioFormateado: String
         get() = "${precio.toString()}€"
@@ -17,4 +17,7 @@ data class Producto(
 
     val dameCantidad: Int
         get() = cantidad;
+
+    val damePrecio: Double
+        get() = (dameCantidad * precio)
 }

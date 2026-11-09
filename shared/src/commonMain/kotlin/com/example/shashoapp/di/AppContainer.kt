@@ -1,5 +1,8 @@
 package com.example.shashoapp.di
 import com.example.shashoapp.Route
+import com.example.shashoapp.features.Reparto.data.repository.RepartoRepositorioImpl
+import com.example.shashoapp.features.Reparto.domain.repository.RepartoRepository
+import com.example.shashoapp.features.Reparto.domain.usecase.GetRepartoUseCase
 import com.example.shashoapp.features.auth.data.repository.AuthRepositoryImpl
 import com.example.shashoapp.features.auth.domain.repository.AuthRepository
 import com.example.shashoapp.features.auth.domain.usecase.LoginUseCase
@@ -9,11 +12,14 @@ import com.example.shashoapp.features.listaListas.domain.repository.ListaReposit
 import com.example.shashoapp.features.listaListas.domain.usecase.GetListasUseCase
 import com.example.shashoapp.features.listaProductos.data.repository.ProductoRepositoryImpl
 import com.example.shashoapp.features.listaProductos.domain.repository.ProductoRepository
+import com.example.shashoapp.features.listaProductos.domain.usecase.GetListaIdUseCase
 import com.example.shashoapp.features.listaProductos.domain.usecase.GetProductosDisponiblesUseCase
 
 interface AppContainer {
     val getProductosDisponiblesUseCase: GetProductosDisponiblesUseCase
     val getListasUseCase: GetListasUseCase
+    val getRepartoUseCase: GetRepartoUseCase
+    val getListaIdUseCase: GetListaIdUseCase
 
     val loginUseCase : LoginUseCase
 
@@ -37,8 +43,17 @@ class DefaultAppContainer : AppContainer {
         GetListasUseCase(listaRepository)
     }
 
-    private val authRepository: AuthRepository by lazy{
-        AuthRepositoryImpl()
+    override val getListaIdUseCase: GetListaIdUseCase by lazy{
+        GetListaIdUseCase(listaRepository)
+    }
+
+
+    private val repartoRepository: RepartoRepository by lazy{
+        RepartoRepositorioImpl()
+    }
+
+    override val getRepartoUseCase: GetRepartoUseCase by lazy{
+        GetRepartoUseCase(repartoRepository, listaRepository)
     }
 
     override val loginUseCase: LoginUseCase by lazy{
@@ -48,4 +63,12 @@ class DefaultAppContainer : AppContainer {
     override val registerUseCase: RegisterUseCase by lazy{
         RegisterUseCase(authRepository)
     }
+
+    private val authRepository: AuthRepository by lazy{
+        AuthRepositoryImpl()
+    }
+
+
+
+
 }

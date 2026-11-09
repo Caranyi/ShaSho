@@ -63,19 +63,23 @@ fun BienvenidaScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
+
     ) {
         Column(
             modifier = Modifier
                 .background(Color.White)
                 .fillMaxSize()
+
+
         ) {
             // SECCIÓN 1: ZONA MORADA CON LOGO
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(700.dp)
+                    .height(300.dp)
                     .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
                     .background(Color(0xFF673AB7)),
+
                 contentAlignment = Alignment.Center
             ) {
 

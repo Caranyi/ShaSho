@@ -3,16 +3,20 @@ package com.example.shashoapp.features.listaProductos.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shashoapp.features.listaProductos.domain.model.Producto
+import com.example.shashoapp.features.listaProductos.domain.usecase.GetListaIdUseCase
 import com.example.shashoapp.features.listaProductos.domain.usecase.GetProductosDisponiblesUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.publish
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 
 class ProductosViewModel(
-    private val getProductosDisponiblesUseCase: GetProductosDisponiblesUseCase
+    private val listaId: Int,
+    private val getProductosDisponiblesUseCase: GetProductosDisponiblesUseCase,
+    private val getListaIdUseCase: GetListaIdUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProductosState())
@@ -20,8 +24,8 @@ class ProductosViewModel(
 
     init {
         cargarProductosDisponibles()
+        cargarDetallesLista()
     }
-
     fun onAction(action:ProductosAction){
         when(action){
             ProductosAction.AbrirMenuCrear -> _state.update { it.copy(showCreateMenu = true) }
@@ -32,6 +36,17 @@ class ProductosViewModel(
             is ProductosAction.DecrementarCantidad -> decrementarCantidad(action.index)
             is ProductosAction.ConfirmarProductos -> confirmarProductos(action.nuevosProductos)
         }
+    }
+
+    private fun cargarDetallesLista(){
+        viewModelScope.launch {
+            val lista = getListaIdUseCase(listaId)
+
+
+            _state.update{it.copy(nombreLista = lista.nombre)}
+        }
+
+
     }
 
     private fun cargarProductosDisponibles() {

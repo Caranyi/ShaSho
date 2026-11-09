@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -59,14 +60,18 @@ import shashoapp.shared.generated.resources.reparto
 fun ProductosScreenRoot(
     viewModel: ProductosViewModel,
     onVolver: () -> Unit,
-    onHome: () -> Unit
+    onHome: () -> Unit,
+    onRepartir: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     ProductosScreen(
         state = state,
         onAction = viewModel::onAction,
         onVolver = onVolver,
-        onHome = onHome
+        onHome = onHome,
+        onRepartir = onRepartir,
+        modifier = modifier
     )
 }
 
@@ -75,41 +80,16 @@ fun ProductosScreen(
     state: ProductosState,
     onAction: (ProductosAction) -> Unit,
     onVolver: () -> Unit,
-    onHome: () -> Unit
+    onRepartir: ()-> Unit,
+    onHome: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .background(Color.White)
                 .fillMaxSize()
         ) {
-            // SECCIÓN 1: CABECERA MORADA CON LOGO
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(140.dp)
-                    .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
-                    .background(Color(0xFF673AB7)),
-                contentAlignment = Alignment.Center
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(90.dp)
-                        .clip(CircleShape)
-                        .background(Color.White),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(Res.drawable.logoShaSho),
-                        contentDescription = "Logo ShaSho",
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier
-                            .size(90.dp)
-                            .padding(6.dp)
-                    )
-                }
-            }
-
             // SECCIÓN 2: TÍTULO DE LA LISTA
             Row(
                 modifier = Modifier
@@ -128,16 +108,16 @@ fun ProductosScreen(
                 }
 
                 Text(
-                    text = "PISO",
+                    text = "${state.nombreLista}",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
                 )
 
-                IconButton(onClick = { /* ir a lista siguiente */ }) {
+                IconButton(onClick = onRepartir) {
                     Icon(
                         painter = painterResource(Res.drawable.arrowRight),
-                        contentDescription = "Siguiente",
+                        contentDescription = "Reparto",
                         tint = Color.Black,
                         modifier = Modifier.size(28.dp)
                     )
@@ -173,7 +153,7 @@ fun ProductosScreen(
                         )
                     }
 
-                    IconButton(onClick = { /* ir a filtro */ }) {
+                    IconButton(onClick = {  }) {
                         Icon(
                             painter = painterResource(Res.drawable.filtro),
                             contentDescription = "Filtrar productos lista",
@@ -239,38 +219,6 @@ fun ProductosScreen(
                 }
             }
         }
-
-        // SECCIÓN 5: BARRA DE NAVEGACIÓN INFERIOR
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(74.dp)
-                .background(Color(0xFF673AB7))
-                .align(Alignment.BottomCenter)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxSize(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                BarraNav(
-                    icon = Res.drawable.home,
-                    label = "Inicio",
-                    onClick = onHome
-                )
-                BarraNav(
-                    icon = Res.drawable.addCircle,
-                    label = "Crear",
-                    onClick = { /* Acción de crear una lista */}
-                )
-                BarraNav(
-                    icon = Res.drawable.settings,
-                    label = "Ajustes",
-                    onClick = { /* Acción ajustes */ }
-                )
-            }
-        }
-
         // SECCIÓN 6: BOTÓN FLOTANTE AÑADIR PRODUCTO
         Button(
             onClick = { onAction(ProductosAction.AbrirMenuCrear) },
