@@ -29,11 +29,20 @@
     import com.example.shashoapp.core.SesionUsuario
 
     @Composable
-    fun App(appContainer: AppContainer = DefaultAppContainer()) {
+    fun App(
+        appContainer: AppContainer = DefaultAppContainer(),
+        toScreen: Route? = null
+        ) {
         MaterialTheme{
             val navController = rememberNavController()
 
             var conexionOk by remember { mutableStateOf<Boolean?>(null) }
+
+            LaunchedEffect(toScreen) {
+                toScreen?.let {
+                    navController.navigate(it) {launchSingleTop = true}
+                }
+            }
 
             //Modo sin conexion (pasa a la pantalla de listas(home))
             LaunchedEffect(Unit) {
@@ -47,6 +56,7 @@
                     }
                 }
             }
+
 
             NavHost(navController = navController, startDestination = Route.Bienvenida) {
 
