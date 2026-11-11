@@ -5,5 +5,9 @@ import com.example.shashoapp.features.listaProductos.domain.model.Producto
 data class ProductosState(
     val productosLista: List<Producto> = emptyList(),
     val productosDisponibles: List<Producto> = emptyList(),
-    val showCreateMenu: Boolean = false
+    val showCreateMenu: Boolean = false,
+    //COMPARTIR LISTA
+    val mostrarCompartir: Boolean = false,
+    val correoCompartir: String = "",
+    val mensajeCompartir: String? = null
 )

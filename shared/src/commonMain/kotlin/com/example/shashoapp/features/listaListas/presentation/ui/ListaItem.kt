@@ -44,6 +44,15 @@ fun ListaItem(
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF673AB7)
                 )
+
+                //indica si la lista es compartida
+                if (lista.compartida) {
+                    Text(
+                        text = "Compartida",
+                        fontSize = 12.sp,
+                        color = Color.Gray
+                    )
+                }
             }
 
             Text(

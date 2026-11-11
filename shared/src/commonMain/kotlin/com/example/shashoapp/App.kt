@@ -92,6 +92,7 @@
                         ProductosViewModel(
                             getProductosDisponiblesUseCase = appContainer.getProductosDisponiblesUseCase,
                             getProductosListaUseCase = appContainer.getProductosListaUseCase,
+                            compartirListaUseCase = appContainer.compartirListaUseCase,
                             idLista = route.id
                         )
                     }

@@ -10,11 +10,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.example.shashoapp.features.listaProductos.domain.usecase.GetProductosListaUseCase
+import com.example.shashoapp.features.listaListas.domain.usecase.CompartirListaUseCase
 
 
 class ProductosViewModel(
     private val getProductosDisponiblesUseCase: GetProductosDisponiblesUseCase,
     private val getProductosListaUseCase: GetProductosListaUseCase,
+    private val compartirListaUseCase: CompartirListaUseCase,
     private val idLista: Int
 ) : ViewModel() {
 
@@ -35,6 +37,16 @@ class ProductosViewModel(
             is ProductosAction.IncrementarCantidad -> incrementarCantidad(action.index)
             is ProductosAction.DecrementarCantidad -> decrementarCantidad(action.index)
             is ProductosAction.ConfirmarProductos -> confirmarProductos(action.nuevosProductos)
+
+            //COMPARTIR LISTA
+            ProductosAction.AbrirCompartir -> _state.update { it.copy(mostrarCompartir = true) }
+            ProductosAction.CerrarCompartir -> _state.update {
+                it.copy(mostrarCompartir = false, correoCompartir = "", mensajeCompartir = null)
+            }
+            is ProductosAction.OnCorreoChange -> _state.update {
+                it.copy(correoCompartir = action.correo, mensajeCompartir = null)
+            }
+            ProductosAction.ConfirmarCompartir -> confirmarCompartir()
         }
     }
 
@@ -103,6 +115,24 @@ class ProductosViewModel(
                 }
             }
             actual.copy(productosLista = lista, showCreateMenu = false)
+        }
+    }
+
+    //compartir lista
+    private fun confirmarCompartir() {
+        val correo = _state.value.correoCompartir
+        if (correo.isBlank()) {
+            _state.update { it.copy(mensajeCompartir = "Introduce un correo") }
+            return
+        }
+        viewModelScope.launch {
+            compartirListaUseCase(idLista, correo)
+                .onSuccess {
+                    _state.update { it.copy(mostrarCompartir = false, correoCompartir = "", mensajeCompartir = null) }
+                }
+                .onFailure { error ->
+                    _state.update { it.copy(mensajeCompartir = error.message) }
+                }
         }
     }
 }

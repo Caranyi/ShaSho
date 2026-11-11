@@ -5,7 +5,8 @@ data class Lista (
     val nombre: String,
     val id_creador: Int,
     val ids_usuarios: IntArray = intArrayOf(),
-    val cantidadProductos: Int
+    val cantidadProductos: Int,
+    val compartida: Boolean = false
     ){
 
     val dameNumUsuarios: Int

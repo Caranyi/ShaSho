@@ -11,11 +11,13 @@ import com.example.shashoapp.features.listaProductos.data.repository.ProductoRep
 import com.example.shashoapp.features.listaProductos.domain.repository.ProductoRepository
 import com.example.shashoapp.features.listaProductos.domain.usecase.GetProductosDisponiblesUseCase
 import com.example.shashoapp.features.listaProductos.domain.usecase.GetProductosListaUseCase
+import com.example.shashoapp.features.listaListas.domain.usecase.CompartirListaUseCase
 
 interface AppContainer {
     val getProductosDisponiblesUseCase: GetProductosDisponiblesUseCase
     val getProductosListaUseCase: GetProductosListaUseCase
     val getListasUseCase: GetListasUseCase
+    val compartirListaUseCase: CompartirListaUseCase
 
     val loginUseCase : LoginUseCase
 
@@ -41,6 +43,10 @@ class DefaultAppContainer : AppContainer {
 
     override val getListasUseCase: GetListasUseCase by lazy{
         GetListasUseCase(listaRepository)
+    }
+
+    override val compartirListaUseCase: CompartirListaUseCase by lazy {
+        CompartirListaUseCase(listaRepository)
     }
 
     private val authRepository: AuthRepository by lazy{

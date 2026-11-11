@@ -52,4 +52,16 @@ object ApiServidor {
         return respuesta.bodyAsText()
     }
 
+    //COMPARTIR LISTA (LISTAREPOSITORYIMPL)
+    suspend fun compartirLista(idLista: Int, correo: String): Int {
+        val respuesta = httpClient.submitForm(
+            url = "$baseUrl/compartir",
+            formParameters = parameters {
+                append("idLista", idLista.toString())
+                append("correo", correo)
+            }
+        )
+        return respuesta.bodyAsText().toInt()
+    }
+
 }

@@ -49,4 +49,31 @@ class ListaRepositoryImpl : ListaRepository{
         }
 
     }
+
+    override suspend fun compartirLista(idLista: Int, correo: String): Result<Unit> {
+
+        //ERROR DE CONEXION
+        if (!EstadoConexion.getConexion()) {
+            return Result.failure(Exception("No hay conexión con el servidor"))
+        }
+
+        //CONEXION
+        var codigo: Int
+        try {
+            codigo = ApiServidor.compartirLista(idLista, correo)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            return Result.failure(Exception("No hay conexión con el servidor"))
+        }
+
+        //RESPUESTAS DE ERROR
+        if (codigo == -1) {
+            return Result.failure(IllegalArgumentException("No existe ningún usuario con ese correo"))
+        }
+        if (codigo == 0) {
+            return Result.failure(IllegalArgumentException("Ese usuario ya está en la lista"))
+        }
+        return Result.success(Unit)
+    }
 }

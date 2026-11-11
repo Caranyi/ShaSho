@@ -55,6 +55,12 @@ import org.jetbrains.compose.resources.painterResource
 import shashoapp.shared.generated.resources.filtro
 import shashoapp.shared.generated.resources.reparto
 
+//compartir listas
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
+
+
 @Composable
 fun ProductosScreenRoot(
     viewModel: ProductosViewModel,
@@ -164,6 +170,15 @@ fun ProductosScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    //COMPARTIR LISTA
+                    TextButton(onClick = { onAction(ProductosAction.AbrirCompartir) }) {
+                        Text(
+                            text = "+ Persona",
+                            fontSize = 14.sp,
+                            color = Color.Black
+                        )
+                    }
+
                     IconButton(onClick = { /* ir a reparto */ }) {
                         Icon(
                             painter = painterResource(Res.drawable.reparto),
@@ -298,6 +313,42 @@ fun ProductosScreen(
                 },
                 onDismissRequest = {
                     onAction(ProductosAction.CerrarMenuCrear)
+                }
+            )
+        }
+
+        // SECCION 8: COMPARTIR LISTA
+        if (state.mostrarCompartir) {
+            AlertDialog(
+                onDismissRequest = { onAction(ProductosAction.CerrarCompartir) },
+                title = { Text("Añadir persona") },
+                text = {
+                    Column {
+                        OutlinedTextField(
+                            value = state.correoCompartir,
+                            onValueChange = { onAction(ProductosAction.OnCorreoChange(it)) },
+                            label = { Text("Correo") },
+                            singleLine = true
+                        )
+                        state.mensajeCompartir?.let { mensaje ->
+                            Text(
+                                text = mensaje,
+                                color = Color.Red,
+                                fontSize = 13.sp,
+                                modifier = Modifier.padding(top = 8.dp)
+                            )
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { onAction(ProductosAction.ConfirmarCompartir) }) {
+                        Text("Añadir")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { onAction(ProductosAction.CerrarCompartir) }) {
+                        Text("Cancelar")
+                    }
                 }
             )
         }
