@@ -12,7 +12,7 @@ sealed interface Route {
     data object Home : Route
 
     @Serializable
-    data object Settings : Route
+    data object Ajustes : Route
 
     @Serializable
     data object Login : Route

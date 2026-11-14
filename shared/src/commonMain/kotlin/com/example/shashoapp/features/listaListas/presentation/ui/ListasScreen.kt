@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.shashoapp.features.Ajustes.presentation.AjustesAction
 
 import org.jetbrains.compose.resources.painterResource
 import shashoapp.shared.generated.resources.Res
@@ -51,7 +52,8 @@ import com.example.shashoapp.features.listaListas.presentation.ui.ListaItem
 @Composable
 fun ListasScreenRoot(
     viewModel: ListasViewModel,
-    onListaClick: (Lista) -> Unit
+    onListaClick: (Lista) -> Unit,
+    onAjustes: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     ListasScreen(
@@ -61,14 +63,16 @@ fun ListasScreenRoot(
                 is ListasAction.OnListaClick -> onListaClick(action.lista)
                 else -> viewModel.onAction(action)
             }
-        }
+        },
+        onAjustes = onAjustes
     )
 }
 
 @Composable
 fun ListasScreen(
     state: ListasState,
-    onAction: (ListasAction) -> Unit
+    onAction: (ListasAction) -> Unit,
+    onAjustes: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -172,7 +176,7 @@ fun ListasScreen(
                 BarraNav(
                     icon = Res.drawable.settings,
                     label = "Ajustes",
-                    onClick = { /* Ajustes */ }
+                    onClick = onAjustes
                 )
             }
         }

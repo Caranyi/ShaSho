@@ -27,6 +27,9 @@
     import com.example.shashoapp.features.listalistas.presentation.ui.ListasScreenRoot
     import com.example.shashoapp.core.EstadoConexion
     import com.example.shashoapp.core.SesionUsuario
+    import com.example.shashoapp.features.Ajustes.presentation.AjustesAction
+    import com.example.shashoapp.features.Ajustes.presentation.AjustesViewModel
+    import com.example.shashoapp.features.Ajustes.presentation.ui.AjustesScreenRoot
 
     @Composable
     fun App(
@@ -80,6 +83,12 @@
                         viewModel = viewModel,
                         onListaClick = {
                             lista -> navController.navigate(Route.Lista(id = lista.id))
+                        },
+
+                        onAjustes = {
+                            navController.navigate(Route.Ajustes){
+                                launchSingleTop = true
+                            }
                         }
                     )
                 }
@@ -105,6 +114,12 @@
 
                         onHome = {
                             navController.popBackStack(Route.Home, inclusive = false) //asi vuelve a home y cierra todas las demás pantallas menos ella
+                        },
+
+                        onAjustes = {
+                            navController.navigate(Route.Ajustes) {
+                                launchSingleTop = true
+                            }
                         }
                     )
                 }
@@ -136,7 +151,24 @@
                         }
                     )
                 }
-                composable<Route.Settings> {/**/}
+                composable<Route.Ajustes> {
+                    val viewModel = remember { AjustesViewModel() }
+
+                    AjustesScreenRoot(
+                        viewModel = viewModel,
+                        onIrHome = {
+                            navController.popBackStack(Route.Home, inclusive = false)
+                        },
+                        onCerrarSesion = {
+                            navController.navigate(Route.Bienvenida) {
+                                popUpTo(0) {inclusive = true}
+                            }
+                        }
+                    )
+
+                }
+
+
                 composable<Route.Reparto> {/**/}
             }
         }

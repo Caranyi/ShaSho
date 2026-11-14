@@ -65,14 +65,16 @@ import androidx.compose.material3.TextButton
 fun ProductosScreenRoot(
     viewModel: ProductosViewModel,
     onVolver: () -> Unit,
-    onHome: () -> Unit
+    onHome: () -> Unit,
+    onAjustes: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     ProductosScreen(
         state = state,
         onAction = viewModel::onAction,
         onVolver = onVolver,
-        onHome = onHome
+        onHome = onHome,
+        onAjustes = onAjustes
     )
 }
 
@@ -81,7 +83,8 @@ fun ProductosScreen(
     state: ProductosState,
     onAction: (ProductosAction) -> Unit,
     onVolver: () -> Unit,
-    onHome: () -> Unit
+    onHome: () -> Unit,
+    onAjustes: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -140,14 +143,6 @@ fun ProductosScreen(
                     color = Color.Black
                 )
 
-                IconButton(onClick = { /* ir a lista siguiente */ }) {
-                    Icon(
-                        painter = painterResource(Res.drawable.arrowRight),
-                        contentDescription = "Siguiente",
-                        tint = Color.Black,
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
             }
 
             // SECCIÓN 3: IDENTIFICADOR DE LISTA Y BOTONES DE FILTRADO Y REPARTO
@@ -173,7 +168,7 @@ fun ProductosScreen(
                     //COMPARTIR LISTA
                     TextButton(onClick = { onAction(ProductosAction.AbrirCompartir) }) {
                         Text(
-                            text = "+ Persona",
+                            text = "Añadir persona",
                             fontSize = 14.sp,
                             color = Color.Black
                         )
@@ -281,7 +276,7 @@ fun ProductosScreen(
                 BarraNav(
                     icon = Res.drawable.settings,
                     label = "Ajustes",
-                    onClick = { /* Acción ajustes */ }
+                    onClick = onAjustes
                 )
             }
         }

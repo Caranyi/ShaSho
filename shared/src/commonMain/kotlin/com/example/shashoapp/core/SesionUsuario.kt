@@ -9,4 +9,8 @@ object SesionUsuario {
     fun setIdUsuario(id: Int?) {
         idUsuario = id
     }
+
+    fun cerrarSesion() {
+        idUsuario = null;
+    }
 }
