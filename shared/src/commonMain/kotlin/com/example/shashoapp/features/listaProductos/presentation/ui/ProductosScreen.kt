@@ -27,7 +27,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -56,21 +55,29 @@ import org.jetbrains.compose.resources.painterResource
 import shashoapp.shared.generated.resources.filtro
 import shashoapp.shared.generated.resources.reparto
 
+//compartir listas
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
+
+
 @Composable
 fun ProductosScreenRoot(
     viewModel: ProductosViewModel,
+    listaNombre: String,
     onVolver: () -> Unit,
     onHome: () -> Unit,
-    onRepartir: () -> Unit,
+    onReparto: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     ProductosScreen(
         state = state,
+        listaNombre = listaNombre,
         onAction = viewModel::onAction,
         onVolver = onVolver,
         onHome = onHome,
-        onRepartir = onRepartir,
+        onReparto = onReparto,
         modifier = modifier
     )
 }
@@ -78,9 +85,10 @@ fun ProductosScreenRoot(
 @Composable
 fun ProductosScreen(
     state: ProductosState,
+    listaNombre: String,
     onAction: (ProductosAction) -> Unit,
     onVolver: () -> Unit,
-    onRepartir: ()-> Unit,
+    onReparto:() -> Unit,
     onHome: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -108,16 +116,16 @@ fun ProductosScreen(
                 }
 
                 Text(
-                    text = "${state.nombreLista}",
+                    text = listaNombre,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
                 )
 
-                IconButton(onClick = onRepartir) {
+                IconButton(onClick = { /* ir a lista siguiente */ }) {
                     Icon(
                         painter = painterResource(Res.drawable.arrowRight),
-                        contentDescription = "Reparto",
+                        contentDescription = "Siguiente",
                         tint = Color.Black,
                         modifier = Modifier.size(28.dp)
                     )
@@ -144,7 +152,16 @@ fun ProductosScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = { /* ir a reparto */ }) {
+                    //COMPARTIR LISTA
+                    TextButton(onClick = { onAction(ProductosAction.AbrirCompartir) }) {
+                        Text(
+                            text = "+ Persona",
+                            fontSize = 14.sp,
+                            color = Color.Black
+                        )
+                    }
+
+                    IconButton(onClick = onReparto) {
                         Icon(
                             painter = painterResource(Res.drawable.reparto),
                             contentDescription = "Repartir pagos lista",
@@ -153,7 +170,7 @@ fun ProductosScreen(
                         )
                     }
 
-                    IconButton(onClick = {  }) {
+                    IconButton(onClick = { }) {
                         Icon(
                             painter = painterResource(Res.drawable.filtro),
                             contentDescription = "Filtrar productos lista",
@@ -219,6 +236,7 @@ fun ProductosScreen(
                 }
             }
         }
+
         // SECCIÓN 6: BOTÓN FLOTANTE AÑADIR PRODUCTO
         Button(
             onClick = { onAction(ProductosAction.AbrirMenuCrear) },
@@ -239,13 +257,57 @@ fun ProductosScreen(
 
         // SECCIÓN 7: DESPLEGABLE DE AÑADIR CATÁLOGO DE PRODUCTOS
         if (state.showCreateMenu) {
-            AnnyadirCatalogue(
-                catalogo = state.productosDisponibles,
-                productosConfirmados = { listaNuevos ->
-                    onAction(ProductosAction.ConfirmarProductos(listaNuevos))
-                },
+            CrearProducto(
                 onDismissRequest = {
                     onAction(ProductosAction.CerrarMenuCrear)
+                },
+                onGuardar = {
+                    nombre, tipo, cantidad, precio, tienda ->
+                        onAction(
+                            ProductosAction.GuardarProducto(
+                                nombre,
+                                tipo,
+                                cantidad,
+                                precio,
+                                tienda
+                            )
+                        )
+                }
+            )
+        }
+
+        // SECCION 8: COMPARTIR LISTA
+        if (state.mostrarCompartir) {
+            AlertDialog(
+                onDismissRequest = { onAction(ProductosAction.CerrarCompartir) },
+                title = { Text("Añadir persona") },
+                text = {
+                    Column {
+                        OutlinedTextField(
+                            value = state.correoCompartir,
+                            onValueChange = { onAction(ProductosAction.OnCorreoChange(it)) },
+                            label = { Text("Correo") },
+                            singleLine = true
+                        )
+                        state.mensajeCompartir?.let { mensaje ->
+                            Text(
+                                text = mensaje,
+                                color = Color.Red,
+                                fontSize = 13.sp,
+                                modifier = Modifier.padding(top = 8.dp)
+                            )
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { onAction(ProductosAction.ConfirmarCompartir) }) {
+                        Text("Añadir")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { onAction(ProductosAction.CerrarCompartir) }) {
+                        Text("Cancelar")
+                    }
                 }
             )
         }

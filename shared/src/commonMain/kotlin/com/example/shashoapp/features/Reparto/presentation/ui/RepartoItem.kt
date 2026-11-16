@@ -61,18 +61,12 @@ fun RepartoItem(
 
             Column(
                 horizontalAlignment = Alignment.End
-            ){
-                OutlinedTextField(
-                    value = participante.porcentaje.toString(),
-                    onValueChange = { nuevoValor ->
-                        onPorcentajeChanged(nuevoValor.toIntOrNull() ?: 0)
-                    },
-                    modifier = modifier.width(100.dp),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number
-                    ),
-                    suffix = {Text("%")},
+            ) {
+                Text(
+                    text = "${participante.pagado} €",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
                 )
             }
         }

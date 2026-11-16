@@ -58,7 +58,6 @@ fun RepartoScreenRoot(
         state = state,
         onVolver = onVolver,
         onHome = onHome,
-        onAction = viewModel::onAction,
         modifier = modifier
     )
 }
@@ -68,7 +67,6 @@ fun RepartoScreen(
     state: RepartoState,
     onVolver: () -> Unit,
     onHome: () -> Unit,
-    onAction: (RepartoAction) -> Unit,
     modifier: Modifier = Modifier
 ){
     Box(modifier = modifier.fillMaxSize()) {
@@ -102,16 +100,7 @@ fun RepartoScreen(
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
                 )
-
-                Text(
-                    text = "Queda: ${state.porcentajeRestante}%",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = if(state.porcentajeRestante == 0) Color(0xFF673AB7) else Color(0xFFFF0000)
-                )
-
             }
-
 
             // LISTA DE TARJETAS
             Box(
@@ -132,12 +121,8 @@ fun RepartoScreen(
                         RepartoItem(
                             participante = participante,
                             onCardClick = {},
-                            onPorcentajeChanged = {
-                                nuevoValor ->
-                                    onAction(RepartoAction.OnPorcentajeChanged(participante.usuarioId, nuevoValor))
-                            }
+                            onPorcentajeChanged = {}
                         )
-
                     }
                     item {
                         Spacer(modifier = Modifier.height(80.dp))

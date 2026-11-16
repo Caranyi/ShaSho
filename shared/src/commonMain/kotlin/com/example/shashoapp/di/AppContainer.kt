@@ -12,18 +12,28 @@ import com.example.shashoapp.features.listaListas.domain.repository.ListaReposit
 import com.example.shashoapp.features.listaListas.domain.usecase.GetListasUseCase
 import com.example.shashoapp.features.listaProductos.data.repository.ProductoRepositoryImpl
 import com.example.shashoapp.features.listaProductos.domain.repository.ProductoRepository
-import com.example.shashoapp.features.listaProductos.domain.usecase.GetListaIdUseCase
 import com.example.shashoapp.features.listaProductos.domain.usecase.GetProductosDisponiblesUseCase
+import com.example.shashoapp.features.listaProductos.domain.usecase.GetProductosListaUseCase
+import com.example.shashoapp.features.listaListas.domain.usecase.CompartirListaUseCase
+import com.example.shashoapp.features.listaListas.domain.usecase.CrearListaUseCase
+import com.example.shashoapp.features.listaListas.domain.usecase.SincronizarListasUseCase
+import com.example.shashoapp.features.listaProductos.domain.usecase.ActualizarMarcadosUseCase
+import com.example.shashoapp.features.listaProductos.domain.usecase.CrearProductosUseCase
 
 interface AppContainer {
     val getProductosDisponiblesUseCase: GetProductosDisponiblesUseCase
+    val getProductosListaUseCase: GetProductosListaUseCase
     val getListasUseCase: GetListasUseCase
-    val getRepartoUseCase: GetRepartoUseCase
-    val getListaIdUseCase: GetListaIdUseCase
-
+    val compartirListaUseCase: CompartirListaUseCase
     val loginUseCase : LoginUseCase
-
     val registerUseCase : RegisterUseCase
+    val crearListaUseCase: CrearListaUseCase
+    val sincronizarListasUseCase: SincronizarListasUseCase
+    val crearProductosUseCase: CrearProductosUseCase
+    val actualizarMarcadosUseCase: ActualizarMarcadosUseCase
+    val getRepartoUSeCase: GetRepartoUseCase
+
+
 }
 
 class DefaultAppContainer : AppContainer {
@@ -35,6 +45,10 @@ class DefaultAppContainer : AppContainer {
         GetProductosDisponiblesUseCase(productoRepository)
     }
 
+    override val getProductosListaUseCase: GetProductosListaUseCase by lazy {
+        GetProductosListaUseCase(productoRepository)
+    }
+
     private val listaRepository: ListaRepository by lazy{
         ListaRepositoryImpl()
     }
@@ -43,17 +57,12 @@ class DefaultAppContainer : AppContainer {
         GetListasUseCase(listaRepository)
     }
 
-    override val getListaIdUseCase: GetListaIdUseCase by lazy{
-        GetListaIdUseCase(listaRepository)
+    override val compartirListaUseCase: CompartirListaUseCase by lazy {
+        CompartirListaUseCase(listaRepository)
     }
 
-
-    private val repartoRepository: RepartoRepository by lazy{
-        RepartoRepositorioImpl()
-    }
-
-    override val getRepartoUseCase: GetRepartoUseCase by lazy{
-        GetRepartoUseCase(repartoRepository, listaRepository)
+    private val authRepository: AuthRepository by lazy{
+        AuthRepositoryImpl()
     }
 
     override val loginUseCase: LoginUseCase by lazy{
@@ -64,11 +73,30 @@ class DefaultAppContainer : AppContainer {
         RegisterUseCase(authRepository)
     }
 
-    private val authRepository: AuthRepository by lazy{
-        AuthRepositoryImpl()
+    override val crearListaUseCase: CrearListaUseCase by lazy {
+        CrearListaUseCase(listaRepository)
     }
 
+    override val sincronizarListasUseCase: SincronizarListasUseCase by lazy{
+        SincronizarListasUseCase(listaRepository)
+    }
 
+    override val crearProductosUseCase: CrearProductosUseCase by lazy {
+        CrearProductosUseCase(productoRepository)
+    }
 
+    override val actualizarMarcadosUseCase by lazy {
+        ActualizarMarcadosUseCase(productoRepository)
+    }
+
+    private val repartoRepository: RepartoRepository by lazy{
+        RepartoRepositorioImpl()
+    }
+
+    override val getRepartoUSeCase: GetRepartoUseCase by lazy {
+        GetRepartoUseCase(repository = repartoRepository,
+            listaRepository = listaRepository,
+            getProductosListaUseCase)
+    }
 
 }

@@ -7,21 +7,9 @@ import com.example.shashoapp.features.Reparto.domain.repository.RepartoRepositor
 
 class RepartoRepositorioImpl : RepartoRepository{
     override suspend fun getParticipantes(idsUsuarios: IntArray): List<Participante> {
-        var porcentajeBase: Int
-        if(idsUsuarios.isNotEmpty()){
-            porcentajeBase = 100/idsUsuarios.size
+        return idsUsuarios.map {
+            id->
+            Participante(usuarioId = id, nombre = "U $id", pagado = 0.0)
         }
-
-        else 
-            porcentajeBase = 0
-
-
-        val listaParticipantes = mutableStateListOf<Participante>()
-
-        for(id in idsUsuarios){
-            listaParticipantes.add(Participante(usuarioId = id, nombre = "U $id", porcentaje = porcentajeBase))
-        }
-
-        return listaParticipantes
     }
 }

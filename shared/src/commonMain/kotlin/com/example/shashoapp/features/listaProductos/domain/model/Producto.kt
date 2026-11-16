@@ -1,5 +1,7 @@
 package com.example.shashoapp.features.listaProductos.domain.model
 
+import com.example.shashoapp.features.auth.domain.model.Usuario
+
 data class Producto(
     val id: Int,
     val nombre: String,
@@ -8,6 +10,7 @@ data class Producto(
     val cantidad: Int = 1,
     val tienda: String = "",
     val tipo: String = "",
+    val idUsuarioMark: Int? = null
 ){
     val precioFormateado: String
         get() = "${precio.toString()}€"
@@ -17,7 +20,4 @@ data class Producto(
 
     val dameCantidad: Int
         get() = cantidad;
-
-    val damePrecio: Double
-        get() = (dameCantidad * precio)
 }

@@ -9,6 +9,6 @@ class GetListaIdUseCase(
     private val listaRepository: ListaRepository
 ){
     suspend operator fun invoke(idLista: Int): Lista {
-        return listaRepository.getListas().first { it.id == idLista }
+        return listaRepository.getListas(idLista).first { it.id == idLista }
     }
 }

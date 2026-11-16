@@ -28,29 +28,9 @@ class RepartoViewModel(
         when(action){
             is RepartoAction.CargarReparto -> cargarReparto()
             is RepartoAction.GuardarReparto -> guardarReparto()
-            is RepartoAction.OnPorcentajeChanged -> actualizarPorcentaje(action.usuarioId, action.nuevoPorcentaje)
         }
     }
 
-    private fun actualizarPorcentaje(usuarioId: Int, nuevoValor: Int){
-        val participantes = _state.value.participantes
-
-        val porcentajeAct = participantes.find{it.usuarioId == usuarioId}?.porcentaje ?:0
-
-        val maximm = _state.value.porcentajeRestante + porcentajeAct
-
-        val fin = nuevoValor.coerceIn(0, maximm)
-
-        val lMod = _state.value.participantes.toMutableList()
-
-        val i = lMod.indexOfFirst { it.usuarioId == usuarioId }
-        if(i != -1){
-            lMod[i] = lMod[i].copy(porcentaje = fin)
-        }
-
-        _state.update { it.copy(participantes = lMod) }
-
-    }
 
     private fun guardarReparto(){
         viewModelScope.launch {

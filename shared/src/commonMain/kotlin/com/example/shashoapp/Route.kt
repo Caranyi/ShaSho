@@ -4,13 +4,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed interface Route {
-
-    @Serializable
-    data object Home : Route
-
-
     @Serializable
     data object Bienvenida : Route
+    @Serializable
+    data object Home : Route
 
     @Serializable
     data object Settings : Route
@@ -22,7 +19,7 @@ sealed interface Route {
     data object Register : Route
 
     @Serializable
-    data class Lista(val id: Int) : Route
+    data class Lista(val id: Int, val nombre: String) : Route
 
     @Serializable
     data class Reparto(val listaId: Int) : Route

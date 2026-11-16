@@ -7,9 +7,7 @@ data class RepartoState(
     val isLoading: Boolean = false,
 
 ){
-    val getTotalPorcentaje: Int
-        get() = participantes.sumOf { it.porcentaje}
-    val porcentajeRestante: Int
-        get() = 100 - getTotalPorcentaje
+   val totalPagado: Double
+       get() = participantes.sumOf { it.pagado }
 
 }

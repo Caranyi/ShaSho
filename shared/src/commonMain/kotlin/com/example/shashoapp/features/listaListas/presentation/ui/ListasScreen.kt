@@ -46,6 +46,7 @@ import com.example.shashoapp.features.listaListas.domain.model.Lista
 import com.example.shashoapp.features.listaListas.presentation.ListasAction
 import com.example.shashoapp.features.listaListas.presentation.ListasState
 import com.example.shashoapp.features.listaListas.presentation.ListasViewModel
+import com.example.shashoapp.features.listaListas.presentation.ui.CrearLista
 import com.example.shashoapp.features.listaListas.presentation.ui.ListaItem
 
 @Composable
@@ -71,8 +72,7 @@ fun ListasScreenRoot(
 fun ListasScreen(
     state: ListasState,
     onAction: (ListasAction) -> Unit,
-    modifier: Modifier = Modifier
-
+    modifier: Modifier
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         Column(
@@ -122,7 +122,17 @@ fun ListasScreen(
                     }
                 }
             }
-        }
 
+            if(state.mostrarCrear){
+                CrearLista(
+                    onDismiss = {
+                        onAction(ListasAction.CerrarCrearLista)
+                    },
+                    onGuardar = { nombre ->
+                        onAction(ListasAction.GuardarLista(nombre))
+                    }
+                )
+            }
+        }
     }
 }

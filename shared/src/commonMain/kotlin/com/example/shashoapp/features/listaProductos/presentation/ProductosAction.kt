@@ -9,4 +9,13 @@ sealed interface ProductosAction{
     data class IncrementarCantidad(val index:Int) : ProductosAction
     data class DecrementarCantidad(val index:Int) : ProductosAction
     data class ConfirmarProductos(val nuevosProductos: List<Producto>) : ProductosAction
+    //COMPARTIR LISTA
+    data object AbrirCompartir: ProductosAction
+    data object CerrarCompartir: ProductosAction
+    data class OnCorreoChange(val correo: String): ProductosAction
+    data object ConfirmarCompartir: ProductosAction
+
+    data class GuardarProducto(val nombre: String, val tipo: String, val cantidad: Int,
+        val precio: Double, val tienda: String
+    ) : ProductosAction
 }

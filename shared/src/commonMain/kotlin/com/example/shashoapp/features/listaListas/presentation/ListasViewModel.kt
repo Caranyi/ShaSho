@@ -2,15 +2,25 @@ package com.example.shashoapp.features.listaListas.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.shashoapp.features.listaListas.domain.model.Lista
+import com.example.shashoapp.features.listaListas.domain.usecase.CrearListaUseCase
 import com.example.shashoapp.features.listaListas.domain.usecase.GetListasUseCase
+import com.example.shashoapp.features.listaListas.domain.usecase.SincronizarListasUseCase
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.example.shashoapp.features.listaProductos.domain.usecase.GetProductosListaUseCase
 
 class ListasViewModel (
-    private val getListasUseCase: GetListasUseCase
+    private val getListasUseCase: GetListasUseCase,
+    private val idUsuario: Int?,
+    private val crearListaUseCase: CrearListaUseCase,
+    private val sincronizarListasUseCase: SincronizarListasUseCase,
+    private val getProductosListaUseCase: GetProductosListaUseCase
+
 ): ViewModel(){
     private val _state = MutableStateFlow(ListasState())
 
@@ -22,17 +32,61 @@ class ListasViewModel (
 
     fun onAction(action:ListasAction){
         when(action){
-            is ListasAction.OnListaClick -> { }
-            is ListasAction.AbrirCrearLista -> {/**/}
+            is ListasAction.OnListaClick -> {}
+            is ListasAction.AbrirCrearLista -> {
+                _state.update { it.copy(mostrarCrear = true) }
+            }
+            is ListasAction.CerrarCrearLista -> {
+                println("ACCIÓN GUARDAR RECIBIDA")
+                _state.update { it.copy(mostrarCrear = false) }
+            }
+            is ListasAction.GuardarLista -> { guardarLista(action.nombre)}
         }
 
+    }
+
+    private fun guardarLista(nombre: String){
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true)}
+
+            try {
+                println("CREANDO LISTA: $nombre")
+                println("USUARIO: $idUsuario")
+
+                crearListaUseCase(nombre, idUsuario)
+
+                println("LISTA GUARDADA EN LOCAL")
+
+                val listas = listasNumProductos()
+
+                println("LISTAS RECUPERADAS: ${listas.size}")
+
+
+                _state.update { it.copy(listas = listas, isLoading = false, mostrarCrear = false) }
+
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception){
+                _state.update { it.copy(isLoading = false)}
+            }
+        }
+    }
+
+    private suspend fun listasNumProductos(): List<Lista> {
+        return getListasUseCase(idUsuario).map {
+            lista -> lista.copy(
+                cantidadProductos = getProductosListaUseCase(lista.id).size
+            )
+        }
     }
 
 
     private fun cargarListas(){
         viewModelScope.launch{
+            sincronizarListasUseCase(idUsuario)
+
             _state.update { it.copy(isLoading = true) }
-            val listas = getListasUseCase()
+            val listas = listasNumProductos()
             _state.update { it.copy(listas = listas, isLoading = false)}
         }
     }

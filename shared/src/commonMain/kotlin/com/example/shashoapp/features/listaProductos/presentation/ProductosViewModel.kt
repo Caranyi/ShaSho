@@ -2,21 +2,28 @@ package com.example.shashoapp.features.listaProductos.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.shashoapp.core.SesionUsuario
 import com.example.shashoapp.features.listaProductos.domain.model.Producto
-import com.example.shashoapp.features.listaProductos.domain.usecase.GetListaIdUseCase
 import com.example.shashoapp.features.listaProductos.domain.usecase.GetProductosDisponiblesUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.publish
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.example.shashoapp.features.listaProductos.domain.usecase.GetProductosListaUseCase
+import com.example.shashoapp.features.listaListas.domain.usecase.CompartirListaUseCase
+import com.example.shashoapp.features.listaProductos.domain.usecase.ActualizarMarcadosUseCase
+import com.example.shashoapp.features.listaProductos.domain.usecase.CrearProductosUseCase
+import kotlin.coroutines.cancellation.CancellationException
 
 
 class ProductosViewModel(
-    private val listaId: Int,
     private val getProductosDisponiblesUseCase: GetProductosDisponiblesUseCase,
-    private val getListaIdUseCase: GetListaIdUseCase
+    private val getProductosListaUseCase: GetProductosListaUseCase,
+    private val compartirListaUseCase: CompartirListaUseCase,
+    private val idLista: Int,
+    private val crearProductosUseCase: CrearProductosUseCase,
+    private val actualizarMarcadosUseCase: ActualizarMarcadosUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProductosState())
@@ -24,8 +31,9 @@ class ProductosViewModel(
 
     init {
         cargarProductosDisponibles()
-        cargarDetallesLista()
+        cargarProductosLista()
     }
+
     fun onAction(action:ProductosAction){
         when(action){
             ProductosAction.AbrirMenuCrear -> _state.update { it.copy(showCreateMenu = true) }
@@ -35,18 +43,45 @@ class ProductosViewModel(
             is ProductosAction.IncrementarCantidad -> incrementarCantidad(action.index)
             is ProductosAction.DecrementarCantidad -> decrementarCantidad(action.index)
             is ProductosAction.ConfirmarProductos -> confirmarProductos(action.nuevosProductos)
+
+            //COMPARTIR LISTA
+            ProductosAction.AbrirCompartir -> _state.update { it.copy(mostrarCompartir = true) }
+            ProductosAction.CerrarCompartir -> _state.update {
+                it.copy(mostrarCompartir = false, correoCompartir = "", mensajeCompartir = null)
+            }
+            is ProductosAction.OnCorreoChange -> _state.update {
+                it.copy(correoCompartir = action.correo, mensajeCompartir = null)
+            }
+            ProductosAction.ConfirmarCompartir -> confirmarCompartir()
+
+            is ProductosAction.GuardarProducto -> {guardarProducto(action)}
+
         }
     }
 
-    private fun cargarDetallesLista(){
-        viewModelScope.launch {
-            val lista = getListaIdUseCase(listaId)
+    private fun guardarProducto(
+        producto: ProductosAction.GuardarProducto
+    ){
+       viewModelScope.launch {
+           try {
+               crearProductosUseCase(
+                   idLista = idLista,
+                   nombre = producto.nombre,
+                   tipo = producto.tipo,
+                   cantidad = producto.cantidad,
+                   precio = producto.precio,
+                   tienda = producto.tienda
+               )
 
+               val productos = getProductosListaUseCase(idLista)
 
-            _state.update{it.copy(nombreLista = lista.nombre)}
-        }
-
-
+               _state.update { it.copy(productosLista = productos, showCreateMenu = false) }
+           } catch (e: CancellationException){
+               throw  e
+           } catch (e: Exception){
+               println ("Error")
+           }
+       }
     }
 
     private fun cargarProductosDisponibles() {
@@ -56,14 +91,41 @@ class ProductosViewModel(
         }
     }
 
+    //cargar productos
+    private fun cargarProductosLista() {
+        viewModelScope.launch {
+            val productos = getProductosListaUseCase(idLista)
+            _state.update { it.copy(productosLista = productos) }
+        }
+    }
+
     private fun toggleChecked(i: Int) {
+        val idUsuario = SesionUsuario.getIdUsuario() ?: return
+        val producto = _state.value.productosLista.getOrNull(i) ?: return
+
+        val marcado = !producto.isChecked
+        val idMarcador = if (marcado) idUsuario else null
+
         _state.update { actual ->
             val lista = actual.productosLista.toMutableList()
             if (i in lista.indices) {
-                val prod = lista[i]
-                lista[i] = prod.copy(isChecked = !prod.isChecked)
+                lista[i] = lista[i].copy(
+                    isChecked = marcado,
+                    idUsuarioMark = idMarcador
+                )
             }
             actual.copy(productosLista = lista)
+        }
+
+
+        viewModelScope.launch {
+            try {
+                actualizarMarcadosUseCase(
+                    idLista, producto.id, marcado, idMarcador
+                )
+            } catch (e: CancellationException){
+                throw e
+            } catch(e: Exception){}
         }
     }
 
@@ -106,6 +168,24 @@ class ProductosViewModel(
                 }
             }
             actual.copy(productosLista = lista, showCreateMenu = false)
+        }
+    }
+
+    //compartir lista
+    private fun confirmarCompartir() {
+        val correo = _state.value.correoCompartir
+        if (correo.isBlank()) {
+            _state.update { it.copy(mensajeCompartir = "Introduce un correo") }
+            return
+        }
+        viewModelScope.launch {
+            compartirListaUseCase(idLista, correo)
+                .onSuccess {
+                    _state.update { it.copy(mostrarCompartir = false, correoCompartir = "", mensajeCompartir = null) }
+                }
+                .onFailure { error ->
+                    _state.update { it.copy(mensajeCompartir = error.message) }
+                }
         }
     }
 }
