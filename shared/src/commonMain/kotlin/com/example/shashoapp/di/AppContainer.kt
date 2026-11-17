@@ -17,8 +17,10 @@ import com.example.shashoapp.features.listaProductos.domain.usecase.GetProductos
 import com.example.shashoapp.features.listaListas.domain.usecase.CompartirListaUseCase
 import com.example.shashoapp.features.listaListas.domain.usecase.CrearListaUseCase
 import com.example.shashoapp.features.listaListas.domain.usecase.SincronizarListasUseCase
+import com.example.shashoapp.features.listaProductos.domain.usecase.ActualizaCantidadesUseCase
 import com.example.shashoapp.features.listaProductos.domain.usecase.ActualizarMarcadosUseCase
 import com.example.shashoapp.features.listaProductos.domain.usecase.CrearProductosUseCase
+import com.example.shashoapp.features.listaProductos.domain.usecase.EliminarProductoUseCase
 
 interface AppContainer {
     val getProductosDisponiblesUseCase: GetProductosDisponiblesUseCase
@@ -32,7 +34,8 @@ interface AppContainer {
     val crearProductosUseCase: CrearProductosUseCase
     val actualizarMarcadosUseCase: ActualizarMarcadosUseCase
     val getRepartoUSeCase: GetRepartoUseCase
-
+    val eliminarProductoUseCase: EliminarProductoUseCase
+    val actualizaCantidadesUseCase: ActualizaCantidadesUseCase
 
 }
 
@@ -99,4 +102,11 @@ class DefaultAppContainer : AppContainer {
             getProductosListaUseCase)
     }
 
+    override val eliminarProductoUseCase by lazy {
+        EliminarProductoUseCase(productoRepository)
+    }
+
+    override val actualizaCantidadesUseCase by lazy {
+        ActualizaCantidadesUseCase(productoRepository)
+    }
 }

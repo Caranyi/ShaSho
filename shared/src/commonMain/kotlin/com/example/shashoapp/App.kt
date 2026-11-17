@@ -31,6 +31,9 @@
     import com.example.shashoapp.features.listalistas.presentation.ui.ListasScreenRoot
     import com.example.shashoapp.core.EstadoConexion
     import com.example.shashoapp.core.SesionUsuario
+    import com.example.shashoapp.features.Ajustes.presentation.AjustesAction
+    import com.example.shashoapp.features.Ajustes.presentation.AjustesViewModel
+    import com.example.shashoapp.features.Ajustes.presentation.ui.AjustesScreenRoot
     import com.example.shashoapp.features.Reparto.presentation.RepartoViewModel
     import com.example.shashoapp.features.Reparto.presentation.ui.RepartoScreenRoot
     import com.example.shashoapp.features.TirasyBarra.presentation.MainScafold
@@ -92,7 +95,7 @@
                     MainScafold(
                         onInicio = { navController.popBackStack(Route.Home, false) },
                         onCrear = {viewModel.onAction(ListasAction.AbrirCrearLista)},
-                        onAjustes = {}
+                        onAjustes = {navController.navigate(Route.Ajustes)}
                     ) {
                             inner->
                         ListasScreenRoot(
@@ -117,27 +120,23 @@
                             compartirListaUseCase = appContainer.compartirListaUseCase,
                             crearProductosUseCase = appContainer.crearProductosUseCase,
                             actualizarMarcadosUseCase = appContainer.actualizarMarcadosUseCase,
+                            eliminarProductoUseCase = appContainer.eliminarProductoUseCase,
+                            actualizaCantidadesUseCase = appContainer.actualizaCantidadesUseCase,
                             idLista = route.id
                         )
                     }
                     MainScafold(
-                        onInicio = { navController.popBackStack(Route.Home, false) },
+                        onInicio = { navController.popBackStack(Route.Home, false)},
                         onCrear = {},
-                        onAjustes = {}
+                        onAjustes = {navController.navigate(Route.Ajustes)}
                     ) {
                         inner ->
                         ProductosScreenRoot(
                             viewModel = viewModel,
-                            onVolver = {
-                                navController.popBackStack() //asi solo retrocede una pantalla de la pila
-                            },
-
-                            onHome = {
-                                navController.popBackStack(Route.Home, inclusive = false) //asi vuelve a home y cierra todas las demás pantallas menos ella
-                            },
+                            onVolver = { navController.popBackStack()}, //asi solo retrocede una pantalla de la pila },
+                            onHome = { navController.popBackStack(Route.Home, inclusive = false)}, //asi vuelve a home y cierra todas las demás pantallas menos ella
                             modifier = Modifier.padding(inner),
                             onReparto = {navController.navigate(Route.Reparto(route.id))} ,
-
                             listaNombre = route.nombre
                         )
                     }
@@ -149,10 +148,10 @@
                     LoginScreenRoot(
                         viewModel = viewModel,
                         onNavigateToHome = {
-                            navController.navigate(Route.Home) {
-                                popUpTo(Route.Bienvenida) {inclusive = true}
+                            navController.navigate(Route.Home) { popUpTo(Route.Bienvenida) {inclusive = true}
                             }
                         },
+
                         onNavigateToRegister = {
                             navController.navigate(Route.Register)
                         }
@@ -187,7 +186,7 @@
                     MainScafold(
                         onInicio = {navController.popBackStack(Route.Home, false)},
                         onCrear = {},
-                        onAjustes = {}
+                        onAjustes = {navController.navigate(Route.Ajustes)}
                     ) {
                         inner ->
                         RepartoScreenRoot(
@@ -200,7 +199,22 @@
 
                 }
 
-                composable<Route.Settings> {/**/}
+                composable<Route.Ajustes> {
+                    val viewModel = remember { AjustesViewModel() }
+
+                    AjustesScreenRoot(
+                        viewModel = viewModel,
+                        onIrHome = {
+                            navController.popBackStack(Route.Home, inclusive = false)
+
+                        },
+                        onCerrarSesion = {
+                            navController.navigate(Route.Bienvenida) {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        }
+                    )
+                }
 
             }
         }

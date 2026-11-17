@@ -1,7 +1,9 @@
 package com.example.shashoapp.features.Reparto.presentation.ui
 
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,12 +15,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -39,6 +43,7 @@ import shashoapp.shared.generated.resources.Res
 import shashoapp.shared.generated.resources.arrowLeft
 import shashoapp.shared.generated.resources.logoShaSho
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import com.example.shashoapp.features.Reparto.domain.model.Participante
 import com.example.shashoapp.features.Reparto.presentation.RepartoAction
 import com.example.shashoapp.features.listaListas.presentation.ListasAction
@@ -82,7 +87,6 @@ fun RepartoScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp, vertical = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onVolver) {
@@ -94,6 +98,8 @@ fun RepartoScreen(
                     )
                 }
 
+                Spacer(modifier = Modifier.width(34.dp))
+
                 Text(
                     text = "REPARTO",
                     fontSize = 22.sp,
@@ -101,6 +107,8 @@ fun RepartoScreen(
                     color = Color.Black
                 )
             }
+
+
 
             // LISTA DE TARJETAS
             Box(

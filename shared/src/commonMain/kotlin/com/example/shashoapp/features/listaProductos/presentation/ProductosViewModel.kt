@@ -12,8 +12,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.example.shashoapp.features.listaProductos.domain.usecase.GetProductosListaUseCase
 import com.example.shashoapp.features.listaListas.domain.usecase.CompartirListaUseCase
+import com.example.shashoapp.features.listaProductos.domain.usecase.ActualizaCantidadesUseCase
 import com.example.shashoapp.features.listaProductos.domain.usecase.ActualizarMarcadosUseCase
 import com.example.shashoapp.features.listaProductos.domain.usecase.CrearProductosUseCase
+import com.example.shashoapp.features.listaProductos.domain.usecase.EliminarProductoUseCase
 import kotlin.coroutines.cancellation.CancellationException
 
 
@@ -23,7 +25,9 @@ class ProductosViewModel(
     private val compartirListaUseCase: CompartirListaUseCase,
     private val idLista: Int,
     private val crearProductosUseCase: CrearProductosUseCase,
-    private val actualizarMarcadosUseCase: ActualizarMarcadosUseCase
+    private val actualizarMarcadosUseCase: ActualizarMarcadosUseCase,
+    private val eliminarProductoUseCase: EliminarProductoUseCase,
+    private val actualizaCantidadesUseCase: ActualizaCantidadesUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProductosState())
@@ -55,6 +59,7 @@ class ProductosViewModel(
             ProductosAction.ConfirmarCompartir -> confirmarCompartir()
 
             is ProductosAction.GuardarProducto -> {guardarProducto(action)}
+            is ProductosAction.EliminarProducto -> eliminarProducto(action.idProducto)
 
         }
     }
@@ -130,28 +135,30 @@ class ProductosViewModel(
     }
 
     private fun incrementarCantidad(i: Int) {
-        _state.update { actual ->
-            val lista = actual.productosLista.toMutableList()
-            if (i in lista.indices) {
-                val prod = lista[i]
-                lista[i] = prod.copy(cantidad = prod.dameCantidad + 1)
-            }
-            actual.copy(productosLista = lista)
-        }
-    }
+        val producto = _state.value.productosLista.getOrNull(i) ?: return
+        val nuevaCantidad = producto.cantidad + 1
 
-    private fun decrementarCantidad(i: Int) {
         _state.update { actual ->
-            val lista = actual.productosLista.toMutableList()
-            if (i in lista.indices) {
-                val prod = lista[i]
-                if (prod.dameCantidad > 1) {
-                    lista[i] = prod.copy(cantidad = prod.dameCantidad - 1)
-                } else {
-                    lista.removeAt(i)
-                }
+           actual.copy(
+               productosLista = actual.productosLista.map {
+                   if(it.id == producto.id){
+                       it.copy(cantidad = nuevaCantidad)
+                   }
+                   else {
+                       it
+                   }
+               }
+           )
+        }
+
+        viewModelScope.launch {
+            try {
+                actualizaCantidadesUseCase (idLista, producto.id, nuevaCantidad)
+            } catch (e: CancellationException){
+                throw e
+            } catch (e: Exception){
+
             }
-            actual.copy(productosLista = lista)
         }
     }
 
@@ -186,6 +193,53 @@ class ProductosViewModel(
                 .onFailure { error ->
                     _state.update { it.copy(mensajeCompartir = error.message) }
                 }
+        }
+    }
+
+    private fun decrementarCantidad(i: Int){
+        val producto = _state.value.productosLista.getOrNull(i) ?: return
+
+        if(producto.cantidad > 1){
+            val nuevaCantidad = producto.cantidad - 1
+            _state.update {
+                actual ->
+                actual.copy(
+                    productosLista = actual.productosLista.map{
+                        if(it.id == producto.id){
+                            it.copy(cantidad = nuevaCantidad)
+                        } else {
+                            it
+                        }
+                    }
+                )
+            }
+
+            viewModelScope.launch {
+                try {
+                    actualizaCantidadesUseCase(idLista, producto.id, nuevaCantidad)
+                } catch (e: CancellationException){
+                    throw e
+                } catch (e: Exception){
+
+                }
+            }
+
+        } else {
+           eliminarProducto(producto.id)
+        }
+     }
+
+
+    private fun eliminarProducto(idProducto: Int) {
+        viewModelScope.launch {
+            eliminarProductoUseCase(idLista, idProducto)
+
+            _state.update {
+                actual ->
+                actual.copy(
+                    productosLista = actual.productosLista.filterNot { it.id == idProducto}
+                )
+            }
         }
     }
 }

@@ -1,4 +1,6 @@
-package com.example.shashoapp.features.listaProductos.data.repository import com.example.shashoapp.features.listaProductos.domain.model.Producto
+package com.example.shashoapp.features.listaProductos.data.repository
+
+import com.example.shashoapp.features.listaProductos.domain.model.Producto
 import com.example.shashoapp.features.listaProductos.domain.repository.ProductoRepository
 
 //imports para la conexion
@@ -8,14 +10,11 @@ import com.example.shashoapp.features.listaProductos.data.model.ProductoDto
 import com.example.shashoapp.features.listaProductos.data.model.toDomain
 import kotlinx.serialization.json.Json
 import kotlin.coroutines.cancellation.CancellationException
-import kotlinx.serialization.encodeToString
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-
-//imports para leer y guardar
 import com.example.shashoapp.core.database.guardarArchivo
 import com.example.shashoapp.core.database.leerArchivo
-import kotlinx.serialization.decodeFromString
+
 
 class ProductoRepositoryImpl : ProductoRepository {
     private val mutexPendientes = Mutex()
@@ -133,6 +132,54 @@ class ProductoRepositoryImpl : ProductoRepository {
 
                 return@withLock
             }
+        }
+    }
+
+
+    override suspend fun actualizarCantidad(idLista: Int, idProducto: Int, nuevaCantidad: Int) {
+        if (nuevaCantidad < 1)
+            return
+
+        mutexPendientes.withLock {
+            val archivo =
+                if(idProducto < 0) {
+                    productosPendientes(idLista)
+                } else {
+                    "productos_$idLista.json"
+                }
+
+            val productos = Json.decodeFromString<List<ProductoDto>>(leerArchivo(archivo) ?: "[]")
+
+            val actualizados = productos.map {
+                producto ->
+                if(producto.id == idProducto) {
+                    producto.copy(cantidad = nuevaCantidad)
+                } else {
+                    producto
+                }
+            }
+
+            guardarArchivo(
+                archivo,
+                Json.encodeToString(actualizados)
+            )
+        }
+
+    }
+
+    override suspend fun eliminarProducto(idLista: Int, idProducto: Int) {
+        mutexPendientes.withLock {
+            val archivo =
+                if(idProducto < 0){
+                    productosPendientes(idLista)
+                } else {
+                    "productos_$idLista.json"
+                }
+
+            val productos = Json.decodeFromString<List<ProductoDto>>(leerArchivo(archivo) ?: "[]")
+            val elim = productos.filterNot { it.id == idProducto }
+
+            guardarArchivo(archivo, Json.encodeToString(elim))
         }
     }
 

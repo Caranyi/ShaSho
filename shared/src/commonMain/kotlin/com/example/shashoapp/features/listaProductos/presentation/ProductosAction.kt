@@ -18,4 +18,6 @@ sealed interface ProductosAction{
     data class GuardarProducto(val nombre: String, val tipo: String, val cantidad: Int,
         val precio: Double, val tienda: String
     ) : ProductosAction
+
+    data class EliminarProducto(val idProducto: Int) : ProductosAction
 }

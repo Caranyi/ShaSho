@@ -10,9 +10,6 @@ sealed interface Route {
     data object Home : Route
 
     @Serializable
-    data object Settings : Route
-
-    @Serializable
     data object Login : Route
 
     @Serializable
@@ -20,6 +17,9 @@ sealed interface Route {
 
     @Serializable
     data class Lista(val id: Int, val nombre: String) : Route
+
+    @Serializable
+    data object Ajustes : Route
 
     @Serializable
     data class Reparto(val listaId: Int) : Route

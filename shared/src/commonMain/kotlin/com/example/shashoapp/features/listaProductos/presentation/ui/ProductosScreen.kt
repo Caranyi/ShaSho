@@ -3,6 +3,7 @@ package com.example.shashoapp.features.listaProductos.presentation.ui
 import com.example.shashoapp.features.BarraNavegacion.presentation.ui.BarraNav
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
@@ -59,6 +61,8 @@ import shashoapp.shared.generated.resources.reparto
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 
 
 @Composable
@@ -92,6 +96,7 @@ fun ProductosScreen(
     onHome: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -103,7 +108,6 @@ fun ProductosScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp, vertical = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onVolver) {
@@ -115,21 +119,14 @@ fun ProductosScreen(
                     )
                 }
 
+                Spacer(modifier = Modifier.width(34.dp))
+
                 Text(
                     text = listaNombre,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
                 )
-
-                IconButton(onClick = { /* ir a lista siguiente */ }) {
-                    Icon(
-                        painter = painterResource(Res.drawable.arrowRight),
-                        contentDescription = "Siguiente",
-                        tint = Color.Black,
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
             }
 
             // SECCIÓN 3: IDENTIFICADOR DE LISTA Y BOTONES DE FILTRADO Y REPARTO
@@ -170,14 +167,6 @@ fun ProductosScreen(
                         )
                     }
 
-                    IconButton(onClick = { }) {
-                        Icon(
-                            painter = painterResource(Res.drawable.filtro),
-                            contentDescription = "Filtrar productos lista",
-                            tint = Color.Black,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
                 }
             }
 
@@ -226,6 +215,9 @@ fun ProductosScreen(
                                 },
                                 decrementarCantidad = {
                                     onAction(ProductosAction.DecrementarCantidad(i))
+                                },
+                                onEliminar = {
+                                    onAction(ProductosAction.EliminarProducto(producto.id))
                                 }
                             )
                         }

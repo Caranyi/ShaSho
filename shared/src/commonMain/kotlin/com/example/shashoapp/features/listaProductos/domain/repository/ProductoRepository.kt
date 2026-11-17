@@ -12,10 +12,9 @@ interface ProductoRepository {
     suspend fun crearProducto(idLista: Int, nombre: String, tipo: String,
                               cantidad: Int, precio: Double, tienda: String)
 
-    suspend fun actualizaMarcado(
-        idLista: Int,
-        idProducto: Int,
-        marcado: Boolean,
-        idUsuarioMark: Int?
-    )
+    suspend fun actualizaMarcado(idLista: Int, idProducto: Int, marcado: Boolean, idUsuarioMark: Int?)
+
+    suspend fun actualizarCantidad(idLista: Int, idProducto: Int, nuevaCantidad: Int)
+
+    suspend fun eliminarProducto(idLista: Int, idProducto: Int)
 }
