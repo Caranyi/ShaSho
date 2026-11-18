@@ -114,7 +114,8 @@ fun ListasScreen(
                     ) { i,lista ->
                         ListaItem(
                             lista = lista,
-                            onClick = { onAction(ListasAction.OnListaClick(lista)) }
+                            onClick = { onAction(ListasAction.OnListaClick(lista)) },
+                            onEliminar = {onAction(ListasAction.EliminarLista(lista.id))}
                         )
                     }
                     item {

@@ -90,7 +90,8 @@
                             sincronizarListasUseCase = appContainer.sincronizarListasUseCase,
                             crearListaUseCase = appContainer.crearListaUseCase,
                             getProductosListaUseCase = appContainer.getProductosListaUseCase,
-                            idUsuario = SesionUsuario.getIdUsuario()
+                            eliminarListaUseCase = appContainer.eliminarListaUseCase,
+                            idUsuario = idUsuario
                         )
                     }
 

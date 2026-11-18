@@ -74,7 +74,7 @@ fun CrearProducto (
             OutlinedTextField(
                 value = nombre,
                 onValueChange = {nombre = it},
-                label = {Text("Nombre del produtcto")},
+                label = {Text("Nombre del producto")},
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )

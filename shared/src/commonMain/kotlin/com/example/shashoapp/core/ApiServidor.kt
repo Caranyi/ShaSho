@@ -97,6 +97,16 @@ object ApiServidor {
         return respuesta.bodyAsText().toInt()
     }
 
+    suspend fun eliminarLista(idLista: Int): Boolean{
+        val respuesta = httpClient.submitForm(
+            url = "$baseUrl/listas/eliminar",
+            formParameters = parameters {
+                append("idLista", idLista.toString())
+            }
+        )
+        return respuesta.bodyAsText().trim() == "true"
+    }
+
     suspend fun crearProducto(
         idLista: Int,
         nombre: String,
@@ -123,6 +133,17 @@ object ApiServidor {
 
         val texto = respuesta.bodyAsText().trim()
         return texto.toIntOrNull() ?: -1
+    }
+
+    suspend fun eliminarProducto(idLista: Int, idProducto: Int) : Boolean{
+        val respuesta = httpClient.submitForm(
+            url = "$baseUrl/productos/eliminar",
+            formParameters = parameters{
+                append("idLista", idLista.toString())
+                append("idProducto", idProducto.toString())
+            }
+        )
+        return respuesta.bodyAsText().trim() == "true"
     }
 
 

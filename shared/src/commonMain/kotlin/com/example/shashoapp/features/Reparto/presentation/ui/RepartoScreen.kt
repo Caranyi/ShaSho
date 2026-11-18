@@ -124,7 +124,7 @@ fun RepartoScreen(
                 ) {
                     itemsIndexed(
                         items = state.participantes,
-                        key = { i, participantes -> "${participantes.usuarioId}_$i"}
+                        key = { i, participantes -> "${participantes.nombre}_$i"}
                     ) { i, participante->
                         RepartoItem(
                             participante = participante,

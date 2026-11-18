@@ -2,8 +2,10 @@ package com.example.shashoapp.features.listaListas.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.shashoapp.core.ApiServidor.eliminarLista
 import com.example.shashoapp.features.listaListas.domain.model.Lista
 import com.example.shashoapp.features.listaListas.domain.usecase.CrearListaUseCase
+import com.example.shashoapp.features.listaListas.domain.usecase.EliminarListaUseCase
 import com.example.shashoapp.features.listaListas.domain.usecase.GetListasUseCase
 import com.example.shashoapp.features.listaListas.domain.usecase.SincronizarListasUseCase
 import kotlinx.coroutines.CancellationException
@@ -19,7 +21,8 @@ class ListasViewModel (
     private val idUsuario: Int?,
     private val crearListaUseCase: CrearListaUseCase,
     private val sincronizarListasUseCase: SincronizarListasUseCase,
-    private val getProductosListaUseCase: GetProductosListaUseCase
+    private val getProductosListaUseCase: GetProductosListaUseCase,
+    private val eliminarListaUseCase: EliminarListaUseCase
 
 ): ViewModel(){
     private val _state = MutableStateFlow(ListasState())
@@ -41,8 +44,21 @@ class ListasViewModel (
                 _state.update { it.copy(mostrarCrear = false) }
             }
             is ListasAction.GuardarLista -> { guardarLista(action.nombre)}
+            is ListasAction.EliminarLista -> {eliminarLista(action.idLista)}
         }
 
+    }
+
+    private fun eliminarLista(idLista: Int){
+        viewModelScope.launch{
+            eliminarListaUseCase(idLista)
+
+            _state.update { estadoActual ->
+                estadoActual.copy(
+                    listas = estadoActual.listas.filterNot{it.id == idLista}
+                )
+            }
+        }
     }
 
     private fun guardarLista(nombre: String){

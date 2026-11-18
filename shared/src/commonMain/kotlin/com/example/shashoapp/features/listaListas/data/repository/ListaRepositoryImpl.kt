@@ -2,6 +2,7 @@ package com.example.shashoapp.features.listaListas.data.repository
 
 import com.example.shashoapp.core.ApiServidor
 import com.example.shashoapp.core.EstadoConexion
+import com.example.shashoapp.core.SesionUsuario
 import com.example.shashoapp.features.listaListas.data.model.ListaDto
 import com.example.shashoapp.features.listaListas.data.model.toDomain
 import com.example.shashoapp.features.listaListas.domain.model.Lista
@@ -13,6 +14,7 @@ import com.example.shashoapp.core.database.leerArchivo
 import kotlinx.serialization.encodeToString
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.serialization.decodeFromString
 
 class ListaRepositoryImpl : ListaRepository{
 
@@ -120,6 +122,29 @@ class ListaRepositoryImpl : ListaRepository{
                 Json.encodeToString(pendientes + nuevaLista)
             )
 
+        }
+    }
+
+    override suspend fun eliminarLista(idLista:Int){
+        if(EstadoConexion.getConexion() && idLista > 0){
+            try{
+                ApiServidor.eliminarLista(idLista)
+            }catch(e : CancellationException){
+                throw e
+            }catch(e:Exception){
+
+            }
+        }
+
+        mutexPendientes.withLock {
+            val idUsuario = SesionUsuario.getIdUsuario() ?: return
+            val archivo = "listas_$idUsuario.json"
+
+            val texto = leerArchivo(archivo) ?: return
+            val listas = Json.decodeFromString<List<ListaDto>>(texto)
+            val filtradas = listas.filterNot { it.id == idLista }
+
+            guardarArchivo(archivo, Json.encodeToString(filtradas))
         }
     }
 

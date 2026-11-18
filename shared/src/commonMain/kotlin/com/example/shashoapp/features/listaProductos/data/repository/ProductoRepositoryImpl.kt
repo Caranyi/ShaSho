@@ -191,6 +191,16 @@ class ProductoRepositoryImpl : ProductoRepository {
     }
 
     override suspend fun eliminarProducto(idLista: Int, idProducto: Int) {
+
+        if(EstadoConexion.getConexion() && idProducto > 0){
+            try{
+                ApiServidor.eliminarProducto(idLista, idProducto)
+            }catch(e : CancellationException) {
+                throw e
+            }catch(e : Exception){
+            }
+        }
+
         mutexPendientes.withLock {
             val archivo =
                 if(idProducto < 0){

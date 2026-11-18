@@ -7,5 +7,7 @@ sealed interface ListasAction {
     data object AbrirCrearLista : ListasAction
     data object CerrarCrearLista: ListasAction
 
+    data class EliminarLista(val idLista:Int) : ListasAction
+
     data class GuardarLista(val nombre: String) : ListasAction
 }

@@ -16,7 +16,9 @@ import com.example.shashoapp.features.listaProductos.domain.usecase.GetProductos
 import com.example.shashoapp.features.listaProductos.domain.usecase.GetProductosListaUseCase
 import com.example.shashoapp.features.listaListas.domain.usecase.CompartirListaUseCase
 import com.example.shashoapp.features.listaListas.domain.usecase.CrearListaUseCase
+import com.example.shashoapp.features.listaListas.domain.usecase.EliminarListaUseCase
 import com.example.shashoapp.features.listaListas.domain.usecase.SincronizarListasUseCase
+import com.example.shashoapp.features.listaListas.presentation.ListasAction
 import com.example.shashoapp.features.listaProductos.domain.usecase.ActualizaCantidadesUseCase
 import com.example.shashoapp.features.listaProductos.domain.usecase.ActualizarMarcadosUseCase
 import com.example.shashoapp.features.listaProductos.domain.usecase.CrearProductosUseCase
@@ -30,6 +32,8 @@ interface AppContainer {
     val loginUseCase : LoginUseCase
     val registerUseCase : RegisterUseCase
     val crearListaUseCase: CrearListaUseCase
+
+    val eliminarListaUseCase: EliminarListaUseCase
     val sincronizarListasUseCase: SincronizarListasUseCase
     val crearProductosUseCase: CrearProductosUseCase
     val actualizarMarcadosUseCase: ActualizarMarcadosUseCase
@@ -78,6 +82,10 @@ class DefaultAppContainer : AppContainer {
 
     override val crearListaUseCase: CrearListaUseCase by lazy {
         CrearListaUseCase(listaRepository)
+    }
+
+    override val eliminarListaUseCase: EliminarListaUseCase by lazy{
+        EliminarListaUseCase(listaRepository)
     }
 
     override val sincronizarListasUseCase: SincronizarListasUseCase by lazy{

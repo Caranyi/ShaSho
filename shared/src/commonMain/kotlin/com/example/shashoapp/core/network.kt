@@ -6,7 +6,7 @@ import io.ktor.client.plugins.HttpTimeout
 
 
 object ServidorConfig {
-    var BASE_URL: String = "http://192.168.1.42:8080"
+    var BASE_URL: String = "http://10.8.105.240:8080"
 }
 
 
