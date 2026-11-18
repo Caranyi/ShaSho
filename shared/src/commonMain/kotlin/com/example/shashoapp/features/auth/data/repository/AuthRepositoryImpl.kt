@@ -24,14 +24,29 @@ class AuthRepositoryImpl : AuthRepository {
         //GUARDA EL ID DEL USUARIO
         SesionUsuario.setIdUsuario(id)
 
-        return Result.success(Usuario(id = id, nombre = "", correo = correo, contraseya = contrasenya))
+        return Result.success(Usuario(id = id, nombre = "", correo = correo, contrasenya = contrasenya))
     }
 
 
-    //REGISTER (PENDIENTE)
+    //REGISTER
     override suspend fun register(nombre: String, correo: String, contrasenya: String): Result<Usuario> {
-        return runCatching {
-            Usuario(id = 2, nombre = nombre, correo = correo, contraseya = contrasenya)
+        val id = try {
+            ApiServidor.registro(correo, correo, contrasenya)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            return Result.failure(Exception("Error al conectar con el servidor"))
         }
+        if (id == -1) {
+            return Result.failure(IllegalArgumentException("El correo ya está registrado"))
+        }
+        if(id <= 0){
+            return Result.failure(Exception("No se pudo crear la cuenta"))
+        }
+
+        //GUARDA EL ID DEL USUARIO
+        SesionUsuario.setIdUsuario(id)
+
+        return Result.success(Usuario(id = id, nombre = nombre, correo = correo, contrasenya = contrasenya))
     }
 }

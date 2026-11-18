@@ -53,7 +53,7 @@ fun MainScafold(
 
                 BarraNav(
                     icon = Res.drawable.addCircle,
-                    label = "Perfil",
+                    label = "Añadir lista",
                     onClick = onCrear
                 )
 

@@ -149,25 +149,6 @@ fun AjustesScreen(
                     }
                 }
 
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))
-                ){
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ){
-                        Text(
-                            "Modo Oscuro",
-                            fontSize = 16.sp
-                        )
-                        Switch(
-                            checked = state.modoOscuro,
-                            onCheckedChange = {onAction(AjustesAction.onActivarModoOscuro(it))}
-                        )
-                    }
-                }
 
                 Spacer(modifier = Modifier.height(24.dp))
 

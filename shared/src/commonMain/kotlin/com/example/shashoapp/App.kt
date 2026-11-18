@@ -82,7 +82,9 @@
                 }
 
                 composable<Route.Home> {
-                    val viewModel = remember {
+                    val idUsuario = SesionUsuario.getIdUsuario()
+
+                    val viewModel = remember(idUsuario) {
                         ListasViewModel(
                             getListasUseCase = appContainer.getListasUseCase,
                             sincronizarListasUseCase = appContainer.sincronizarListasUseCase,
@@ -202,18 +204,25 @@
                 composable<Route.Ajustes> {
                     val viewModel = remember { AjustesViewModel() }
 
-                    AjustesScreenRoot(
-                        viewModel = viewModel,
-                        onIrHome = {
-                            navController.popBackStack(Route.Home, inclusive = false)
+                    MainScafold(
+                        onInicio = {navController.popBackStack(Route.Home, false)},
+                        onCrear = {},
+                        onAjustes = {navController.navigate(Route.Ajustes)}
+                    ){
+                        AjustesScreenRoot(
+                            viewModel = viewModel,
+                            onIrHome = {
+                                navController.popBackStack(Route.Home, inclusive = false)
 
-                        },
-                        onCerrarSesion = {
-                            navController.navigate(Route.Bienvenida) {
-                                popUpTo(0) { inclusive = true }
+                            },
+                            onCerrarSesion = {
+                                navController.navigate(Route.Bienvenida) {
+                                    popUpTo(0) { inclusive = true }
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
+
                 }
 
             }

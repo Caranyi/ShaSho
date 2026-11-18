@@ -185,8 +185,9 @@ class ProductosViewModel(
             _state.update { it.copy(mensajeCompartir = "Introduce un correo") }
             return
         }
+        val correo_limpio = correo.trim().lowercase()
         viewModelScope.launch {
-            compartirListaUseCase(idLista, correo)
+            compartirListaUseCase(idLista, correo_limpio)
                 .onSuccess {
                     _state.update { it.copy(mostrarCompartir = false, correoCompartir = "", mensajeCompartir = null) }
                 }

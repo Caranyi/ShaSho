@@ -57,7 +57,7 @@ class ListasViewModel (
 
                 println("LISTA GUARDADA EN LOCAL")
 
-                val listas = listasNumProductos()
+                val listas = getListasUseCase(idUsuario)
 
                 println("LISTAS RECUPERADAS: ${listas.size}")
 
@@ -72,22 +72,28 @@ class ListasViewModel (
         }
     }
 
-    private suspend fun listasNumProductos(): List<Lista> {
-        return getListasUseCase(idUsuario).map {
-            lista -> lista.copy(
-                cantidadProductos = getProductosListaUseCase(lista.id).size
-            )
-        }
-    }
-
-
     private fun cargarListas(){
         viewModelScope.launch{
-            sincronizarListasUseCase(idUsuario)
-
             _state.update { it.copy(isLoading = true) }
-            val listas = listasNumProductos()
-            _state.update { it.copy(listas = listas, isLoading = false)}
+
+            try{
+                val listasLocales = getListasUseCase(idUsuario)
+                _state.update { it.copy(listas = listasLocales, isLoading = false)}
+            }catch(e:CancellationException){
+                throw e
+            }catch (e: Exception){
+                _state.update{it.copy(isLoading = false)}
+            }
+
+            try{
+                sincronizarListasUseCase(idUsuario)
+                val listasActualizadas = getListasUseCase(idUsuario)
+                _state.update { it.copy(listas = listasActualizadas) }
+            }  catch(e:Exception){
+                println("No se pudieron sincronizar las listas: ${e.message}")
+            }
+
+
         }
     }
 }

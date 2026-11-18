@@ -71,6 +71,20 @@ class ProductoRepositoryImpl : ProductoRepository {
         precio: Double,
         tienda: String
     ) {
+
+        if(EstadoConexion.getConexion()){
+            try{
+                val nuevoId = ApiServidor.crearProducto(idLista, nombre, precio, tienda, tipo,cantidad)
+                if(nuevoId > 0){
+                    val texto = ApiServidor.getProductos(idLista)
+                    guardarArchivo("productos_$idLista.json", texto)
+                    return
+                }
+            }catch(e:CancellationException){
+                throw e
+            }catch(e:Exception){
+            }
+        }
         mutexPendientes.withLock {
             val archivo = productosPendientes(idLista)
 
@@ -100,6 +114,15 @@ class ProductoRepositoryImpl : ProductoRepository {
         marcado: Boolean,
         idUsuarioMark: Int?
     ) {
+
+        if(EstadoConexion.getConexion() && idProducto > 0){
+            try{
+                ApiServidor.actualizarMarcado(idLista, idProducto, marcado, idUsuarioMark)
+            }catch(e: io.ktor.utils.io.CancellationException){
+                throw e
+            }catch(e: Exception){
+            }
+        }
         mutexPendientes.withLock {
             val archivos = listOf(
                 "productos_$idLista.json",

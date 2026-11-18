@@ -17,7 +17,7 @@ import kotlinx.coroutines.sync.withLock
 class ListaRepositoryImpl : ListaRepository{
 
     //archivo de las listas
-    private val archivo = "listas.json"
+    private fun archivo_listas(idUsuario:Int?) = "listas_${idUsuario ?: 0}.json"
     private val mutexPendientes = Mutex()
 
     //Necesitamos una frunción que: no habiendo conexión, me guarde las listas en local
@@ -27,23 +27,17 @@ class ListaRepositoryImpl : ListaRepository{
     override suspend fun getListas(idUsuario: Int?): List<Lista>{
 
         val usuario = idUsuario ?: return emptyList()
+        val archivo = archivo_listas(usuario)
 
         //ONLINE: actualiza el archivo con lo que diga el servidor
         if (EstadoConexion.getConexion()) {
             try {
-                var texto = ApiServidor.getListas(usuario)
-                guardarArchivo(archivo, texto)
-
-                //se revisa que haya un idUsuario
-                if (idUsuario != null) {
-                    texto = ApiServidor.getListas(idUsuario)
-                }
-                //actualiza el archivo
+                val texto = ApiServidor.getListas(usuario)
                 guardarArchivo(archivo, texto)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                //No pasa nada
+                //No pasa nada, continua con lo guardado en local si falla la red
             }
         }
 
@@ -68,29 +62,27 @@ class ListaRepositoryImpl : ListaRepository{
 
     override suspend fun compartirLista(idLista: Int, correo: String): Result<Unit> {
 
-        //ERROR DE CONEXION
-        if (!EstadoConexion.getConexion()) {
-            return Result.failure(Exception("No hay conexión con el servidor"))
-        }
-
         //CONEXION
-        var codigo: Int
-        try {
-            codigo = ApiServidor.compartirLista(idLista, correo)
+        var codigo: Int = try {
+            ApiServidor.compartirLista(idLista, correo)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            return Result.failure(Exception("No hay conexión con el servidor"))
+            return Result.failure(Exception("Error al conectar con la API: ${e.message}"))
         }
 
-        //RESPUESTAS DE ERROR
+        //RESPUESTAS
+        if(codigo == 1)
+            return Result.success(Unit)
         if (codigo == -1) {
             return Result.failure(IllegalArgumentException("No existe ningún usuario con ese correo"))
         }
         if (codigo == 0) {
             return Result.failure(IllegalArgumentException("Ese usuario ya está en la lista"))
         }
-        return Result.success(Unit)
+        else{
+            return Result.failure(Exception("Error en el servidor al compartir la lista"))
+        }
     }
 
     override suspend fun crearLista(nombre: String, idCreador: Int?) {
@@ -132,6 +124,8 @@ class ListaRepositoryImpl : ListaRepository{
     }
 
     override  suspend fun sincronizarPendientes(idUsuario: Int?){
+        val archivo = archivo_listas(idUsuario)
+
         //devolvemos null -> porque sino, no se puede crear
         if(idUsuario == null)
             return
@@ -174,6 +168,6 @@ class ListaRepositoryImpl : ListaRepository{
 
     }
 
-    //R
+
 
 }

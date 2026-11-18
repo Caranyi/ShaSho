@@ -25,9 +25,6 @@ class AjustesViewModel : ViewModel() {
 
     fun onAction(action : AjustesAction){
         when(action){
-            is AjustesAction.onActivarModoOscuro -> {
-                _state.update { it.copy(modoOscuro = action.activado) }
-            }
             is AjustesAction.onActivarNotificaciones -> {
                 _state.update {it.copy(notificacionesActivas = action.activadas)}
             }

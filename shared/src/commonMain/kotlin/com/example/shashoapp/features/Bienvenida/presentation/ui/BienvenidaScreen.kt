@@ -103,7 +103,7 @@ fun BienvenidaScreen(
             ) {
 
                 Text(
-                    text = "BIENVENIDO SHASHO/A!",
+                    text = "BIENVENIDO A SHASHO!",
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black

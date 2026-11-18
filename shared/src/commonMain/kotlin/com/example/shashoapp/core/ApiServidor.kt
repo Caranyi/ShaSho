@@ -37,6 +37,18 @@ object ApiServidor {
         return respuesta.bodyAsText().toInt()
     }
 
+    suspend fun registro(nombre: String, correo: String, contrasenya: String): Int{
+        val respuesta = httpClient.submitForm(
+            url = "$baseUrl/registro",
+            formParameters = parameters{
+                append("nombre", nombre)
+                append("correo", correo)
+                append("contrasenya", contrasenya)
+            }
+        )
+        return respuesta.bodyAsText().toInt()
+    }
+
     //LISTAS DEL USUARIO (LISTAREPOSITORYIMPL)
     suspend fun getListas(idUsuario: Int): String {
         val respuesta = httpClient.get("$baseUrl/listas") {
@@ -63,7 +75,8 @@ object ApiServidor {
                 append("correo", correo)
             }
         )
-        return respuesta.bodyAsText().toInt()
+        val texto = respuesta.bodyAsText().trim()
+        return texto.toIntOrNull() ?: -2
     }
 
     suspend fun crearLista(
@@ -82,6 +95,34 @@ object ApiServidor {
             throw Exception("no se ha podido crear lista")
         }
         return respuesta.bodyAsText().toInt()
+    }
+
+    suspend fun crearProducto(
+        idLista: Int,
+        nombre: String,
+        precio: Double,
+        tienda: String,
+        tipo: String,
+        cantidad: Int
+    ): Int {
+        val respuesta = httpClient.submitForm(
+            url = "$baseUrl/productos",
+            formParameters = parameters {
+                append("idLista", idLista.toString())
+                append("nombre", nombre)
+                append("precio", precio.toString())
+                append("tienda", tienda)
+                append("tipo", tipo)
+                append("cantidad", cantidad.toString())
+            }
+        )
+
+        if (!respuesta.status.isSuccess()) {
+            throw Exception("No se ha podido crear el producto")
+        }
+
+        val texto = respuesta.bodyAsText().trim()
+        return texto.toIntOrNull() ?: -1
     }
 
 
