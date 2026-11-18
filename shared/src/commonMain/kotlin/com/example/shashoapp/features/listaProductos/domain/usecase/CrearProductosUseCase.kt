@@ -1,5 +1,7 @@
 package com.example.shashoapp.features.listaProductos.domain.usecase
 
+import com.example.shashoapp.core.AppPreferences
+import com.example.shashoapp.core.TextosApp
 import com.example.shashoapp.features.listaListas.domain.repository.ListaRepository
 import com.example.shashoapp.features.listaProductos.domain.repository.ProductoRepository
 
@@ -14,14 +16,16 @@ class CrearProductosUseCase(
         precio: Double,
         tienda: String
     ){
+        val textos = TextosApp.get(AppPreferences.idioma.value)
+
         require(nombre.isNotBlank()){
-            "nombre no puede estar vacío"
+            textos.errorNombreProductoVacio
         }
         require(cantidad > 0){
-            "La cantidad debe ser mayor que 0"
+            textos.errorCantidadMayorCero
         }
         require(precio >= 0){
-            "El precio non puede ser negativo"
+            textos.errorPrecioNegativo
         }
 
         repository.crearProducto(

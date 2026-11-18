@@ -2,7 +2,9 @@ package com.example.shashoapp.features.listaProductos.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.shashoapp.core.AppPreferences
 import com.example.shashoapp.core.SesionUsuario
+import com.example.shashoapp.core.TextosApp
 import com.example.shashoapp.features.listaProductos.domain.model.Producto
 import com.example.shashoapp.features.listaProductos.domain.usecase.GetProductosDisponiblesUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -182,7 +184,8 @@ class ProductosViewModel(
     private fun confirmarCompartir() {
         val correo = _state.value.correoCompartir
         if (correo.isBlank()) {
-            _state.update { it.copy(mensajeCompartir = "Introduce un correo") }
+            val textos = TextosApp.get(AppPreferences.idioma.value)
+            _state.update { it.copy(mensajeCompartir = textos.errorIntroduceCorreo) }
             return
         }
         val correo_limpio = correo.trim().lowercase()

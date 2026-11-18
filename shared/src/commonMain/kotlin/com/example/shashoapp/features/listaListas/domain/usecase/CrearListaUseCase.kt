@@ -1,5 +1,7 @@
 package com.example.shashoapp.features.listaListas.domain.usecase
 
+import com.example.shashoapp.core.AppPreferences
+import com.example.shashoapp.core.TextosApp
 import com.example.shashoapp.features.listaListas.domain.repository.ListaRepository
 
 class CrearListaUseCase(
@@ -9,12 +11,14 @@ class CrearListaUseCase(
         nombre: String,
         idCreador: Int?
     ){
+        val textos = TextosApp.get(AppPreferences.idioma.value)
+
         require(nombre.isNotBlank()){
-            "´Nombre´ no puede estar en blanco"
+            textos.errorNombreListaVacio
         }
 
         requireNotNull(idCreador) {
-            "´IdUsuario no se encuentra"
+            textos.errorUsuarioNoEncontrado
         }
 
         repository.crearLista(nombre.trim(), idCreador)

@@ -51,6 +51,17 @@ class ListasViewModel (
         }
 
     }
+    private fun compartirLista(idLista: Int, correo: String) {
+        viewModelScope.launch {
+            compartirListaUseCase(idLista, correo)
+        }
+    }
+
+    private fun getProductosLista(idLista: Int) {
+        viewModelScope.launch {
+            getProductosListaUseCase(idLista)
+        }
+    }
 
     private fun compartirLista(idLista: Int, correo: String){
         viewModelScope.launch {

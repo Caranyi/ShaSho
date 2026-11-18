@@ -85,7 +85,11 @@
 
                     val viewModel = remember(idUsuario) {
                         ListasViewModel(
+<<<<<<< Updated upstream
                             compartirListaUseCase = appContainer.compartirListaUseCase,
+=======
+                            compartirListasUseCase = appContainer.compartirListaUseCase,
+>>>>>>> Stashed changes
                             getListasUseCase = appContainer.getListasUseCase,
                             sincronizarListasUseCase = appContainer.sincronizarListasUseCase,
                             crearListaUseCase = appContainer.crearListaUseCase,
