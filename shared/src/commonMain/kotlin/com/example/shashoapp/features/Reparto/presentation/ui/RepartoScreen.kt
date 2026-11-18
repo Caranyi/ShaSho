@@ -44,6 +44,8 @@ import shashoapp.shared.generated.resources.arrowLeft
 import shashoapp.shared.generated.resources.logoShaSho
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import com.example.shashoapp.core.AppPreferences
+import com.example.shashoapp.core.TextosApp
 import com.example.shashoapp.features.Reparto.domain.model.Participante
 import com.example.shashoapp.features.Reparto.presentation.RepartoAction
 import com.example.shashoapp.features.listaListas.presentation.ListasAction
@@ -74,6 +76,9 @@ fun RepartoScreen(
     onHome: () -> Unit,
     modifier: Modifier = Modifier
 ){
+    val idioma by AppPreferences.idioma.collectAsStateWithLifecycle()
+    val textos = TextosApp.get(idioma)
+
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -92,7 +97,7 @@ fun RepartoScreen(
                 IconButton(onClick = onVolver) {
                     Icon(
                         painter = painterResource(Res.drawable.arrowLeft),
-                        contentDescription = "Anterior",
+                        contentDescription = textos.anterior,
                         tint = Color.Black,
                         modifier = Modifier.size(28.dp)
                     )
@@ -101,7 +106,7 @@ fun RepartoScreen(
                 Spacer(modifier = Modifier.width(34.dp))
 
                 Text(
-                    text = "REPARTO",
+                    text = textos.repartoTitulo,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black

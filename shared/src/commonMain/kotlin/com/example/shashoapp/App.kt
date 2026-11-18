@@ -11,11 +11,13 @@
     import androidx.compose.runtime.setValue
     import androidx.compose.ui.Modifier
     import androidx.compose.ui.modifier.modifierLocalOf
+    import androidx.lifecycle.compose.collectAsStateWithLifecycle
     import com.example.shashoapp.core.ApiServidor
     import androidx.navigation.compose.NavHost
     import androidx.navigation.compose.composable
     import androidx.navigation.compose.rememberNavController
     import androidx.navigation.toRoute
+    import com.example.shashoapp.core.AppPreferences
     import com.example.shashoapp.di.AppContainer
     import com.example.shashoapp.di.DefaultAppContainer
     import com.example.shashoapp.features.Bienvenida.presentation.ui.BienvenidaScreen
@@ -46,6 +48,13 @@
         appContainer: AppContainer = DefaultAppContainer(),
         toScreen: Route? = null
         ) {
+
+        val idiomaActual by AppPreferences.idioma.collectAsStateWithLifecycle()
+
+        LaunchedEffect(Unit) {
+            AppPreferences.cargarPreferencias()
+        }
+
         MaterialTheme{
             val navController = rememberNavController()
 
@@ -209,18 +218,18 @@
                         onInicio = {navController.popBackStack(Route.Home, false)},
                         onCrear = {},
                         onAjustes = {navController.navigate(Route.Ajustes)}
-                    ){
+                    ){ inner ->
                         AjustesScreenRoot(
                             viewModel = viewModel,
                             onIrHome = {
                                 navController.popBackStack(Route.Home, inclusive = false)
-
                             },
                             onCerrarSesion = {
                                 navController.navigate(Route.Bienvenida) {
                                     popUpTo(0) { inclusive = true }
                                 }
-                            }
+                            },
+                            modifier = Modifier.padding(inner)
                         )
                     }
 

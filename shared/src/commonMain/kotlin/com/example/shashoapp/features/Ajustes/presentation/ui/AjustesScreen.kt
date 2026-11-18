@@ -22,8 +22,11 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shashoapp.Route
+import com.example.shashoapp.core.TextosApp
 import com.example.shashoapp.features.Ajustes.presentation.AjustesAction
 import com.example.shashoapp.features.Ajustes.presentation.AjustesState
 import com.example.shashoapp.features.Ajustes.presentation.AjustesViewModel
@@ -56,7 +60,8 @@ import shashoapp.shared.generated.resources.settings
 fun AjustesScreenRoot(
     viewModel: AjustesViewModel,
     onIrHome: () -> Unit,
-    onCerrarSesion: () -> Unit
+    onCerrarSesion: () -> Unit,
+    modifier: Modifier = Modifier
 ){
     val state by viewModel.state.collectAsStateWithLifecycle()
     AjustesScreen(
@@ -69,7 +74,8 @@ fun AjustesScreenRoot(
                 viewModel.onAction(action)
             }
         },
-        onIrHome = onIrHome
+        onIrHome = onIrHome,
+        modifier = modifier
     )
 }
 
@@ -77,8 +83,11 @@ fun AjustesScreenRoot(
 fun AjustesScreen(
     state: AjustesState,
     onAction: (AjustesAction) -> Unit,
-    onIrHome: () -> Unit
+    onIrHome: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
+    val textos = TextosApp.get(state.idiomaActual)
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -98,7 +107,7 @@ fun AjustesScreen(
             ) {
 
                 Text(
-                    text = "Ajustes",
+                    text = textos.ajustes,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
@@ -118,13 +127,13 @@ fun AjustesScreen(
                 ){
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = "Usuario #${state.idUsuario}",
+                            text = "${textos.usuarioPrefix}${state.idUsuario ?: "-"}",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = if (state.enLinea) "Modo en línea activado" else "Modo sin conexión",
+                            text = if (state.enLinea) textos.modoOnline else textos.modoOffline,
                             fontSize = 18.sp,
                             color = Color.Gray
                         )
@@ -141,11 +150,51 @@ fun AjustesScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ){
-                        Text("Notificaciones", fontSize = 16.sp)
+                        Text(textos.notificaciones, fontSize = 16.sp)
                         Switch(
                             checked = state.notificacionesActivas,
                             onCheckedChange = { onAction(AjustesAction.onActivarNotificaciones(it))}
                         )
+                    }
+                }
+
+                Card (
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(textos.idiomaLabel, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                        Box {
+                            OutlinedButton(
+                                onClick = {onAction(AjustesAction.onToggleMenuIdioma)}
+                            ) {
+                                Text(
+                                    text = if (state.idiomaActual == "en") textos.ingles else textos.espanol,
+                                    color = Color(0xFF673AB7),
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+
+                            DropdownMenu(
+                                expanded = state.menuIdiomaAbierto,
+                                onDismissRequest = {onAction(AjustesAction.onCerrarMenuIdioma)}
+                            ) {
+                                DropdownMenuItem(
+                                    text = {Text(textos.espanol)},
+                                    onClick = {onAction(AjustesAction.onCambiarIdioma("es"))}
+                                )
+                                DropdownMenuItem(
+                                    text = {Text(textos.ingles)},
+                                    onClick = {onAction(AjustesAction.onCambiarIdioma("en"))}
+                                )
+                            }
+                        }
                     }
                 }
 

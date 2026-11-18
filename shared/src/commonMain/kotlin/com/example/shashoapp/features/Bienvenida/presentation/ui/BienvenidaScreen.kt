@@ -22,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,6 +32,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.shashoapp.core.AppPreferences
+import com.example.shashoapp.core.TextosApp
 import com.example.shashoapp.features.listaProductos.presentation.ProductosAction
 import com.example.shashoapp.features.listaProductos.presentation.ui.ProductoItem
 import org.jetbrains.compose.resources.painterResource
@@ -63,6 +67,9 @@ fun BienvenidaScreen(
     modifier: Modifier = Modifier,
     conexionOk: Boolean? = null
 ) {
+    val idioma by AppPreferences.idioma.collectAsStateWithLifecycle()
+    val textos = TextosApp.get(idioma)
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -103,7 +110,7 @@ fun BienvenidaScreen(
             ) {
 
                 Text(
-                    text = "BIENVENIDO A SHASHO!",
+                    text = textos.bienvenidaTitulo,
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
@@ -113,9 +120,9 @@ fun BienvenidaScreen(
             // SECCION 3: ESTADO CONEXION AL SERVIDOR
             Text(
                 text = when (conexionOk) {
-                    null -> "Conectando con el servidor..."
-                    true -> "Conectado a la base de datos"
-                    false -> "Sin conexión con el servidor"
+                    null -> textos.conectandoServidor
+                    true -> textos.conectadoBd
+                    false -> textos.sinConexionServidor
                 },
                 fontSize = 13.sp,
                 textAlign = TextAlign.Center,
@@ -135,14 +142,14 @@ fun BienvenidaScreen(
                     onClick = onLoginClick,
                     modifier = Modifier.weight(1f)
                 ){
-                    Text("Iniciar sesión");
+                    Text(textos.iniciarSesion);
                 }
 
                 Button(
                     onClick = onRegisterClick,
                     modifier = Modifier.weight(1f)
                 ){
-                    Text("Registrarse");
+                    Text(textos.registrarse);
                 }
             }
         }

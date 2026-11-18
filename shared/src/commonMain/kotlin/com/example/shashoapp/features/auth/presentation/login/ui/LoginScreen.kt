@@ -9,6 +9,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.shashoapp.core.AppPreferences
+import com.example.shashoapp.core.TextosApp
 import com.example.shashoapp.features.auth.presentation.login.LoginAction
 import com.example.shashoapp.features.auth.presentation.login.LoginState
 import com.example.shashoapp.features.auth.presentation.login.LoginViewModel
@@ -42,6 +44,9 @@ fun LoginScreen(
     onAction: (LoginAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val idioma by AppPreferences.idioma.collectAsStateWithLifecycle()
+    val textos = TextosApp.get(idioma)
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -50,7 +55,7 @@ fun LoginScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Iniciar Sesión",
+            text = textos.iniciarSesion,
             style = MaterialTheme.typography.headlineLarge
         )
         Spacer(modifier = Modifier.height(32.dp))
@@ -58,7 +63,7 @@ fun LoginScreen(
         OutlinedTextField(
             value = state.correo,
             onValueChange = {onAction(LoginAction.OnCorreoChanged(it))},
-            label = {Text("Correo electrónico")},
+            label = {Text(textos.correoElectronico)},
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -67,7 +72,7 @@ fun LoginScreen(
         OutlinedTextField(
             value = state.contrasenya,
             onValueChange = {onAction(LoginAction.OnContrasenyaChanged(it))},
-            label = {Text("Contraseña")},
+            label = {Text(textos.contrasenya)},
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -94,13 +99,13 @@ fun LoginScreen(
                 )
             }
             else {
-                Text("Entrar")
+                Text(textos.entrar)
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
 
         TextButton(onClick = {onAction(LoginAction.OnIrARegistroClick)}) {
-            Text("¿No tienes cuenta? Regístrate aquí")
+            Text(textos.noTienesCuenta)
         }
     }
 }

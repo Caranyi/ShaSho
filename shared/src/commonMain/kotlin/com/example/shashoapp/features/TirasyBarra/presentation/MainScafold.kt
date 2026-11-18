@@ -12,11 +12,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.shashoapp.core.AppPreferences
+import com.example.shashoapp.core.TextosApp
 import com.example.shashoapp.features.BarraNavegacion.presentation.ui.BarraNav
 import shashoapp.shared.generated.resources.Res
 import shashoapp.shared.generated.resources.addCircle
@@ -31,6 +35,9 @@ fun MainScafold(
     onAjustes: () -> Unit,
     content: @Composable (PaddingValues) -> Unit
 ) {
+    val idioma by AppPreferences.idioma.collectAsStateWithLifecycle()
+    val textos = TextosApp.get(idioma)
+
     Scaffold (
         topBar = {
             Tira(onClickLogo = onInicio)
@@ -47,19 +54,19 @@ fun MainScafold(
             ){
                 BarraNav(
                     icon = Res.drawable.home,
-                    label = "inicio",
+                    label = textos.inicio,
                     onClick = onInicio
                 )
 
                 BarraNav(
                     icon = Res.drawable.addCircle,
-                    label = "Añadir lista",
+                    label = textos.anadirLista,
                     onClick = onCrear
                 )
 
                 BarraNav(
                     icon = Res.drawable.settings,
-                    label = "Ajustes",
+                    label = textos.ajustes,
                     onClick = onAjustes
                 )
             }

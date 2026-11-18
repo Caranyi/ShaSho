@@ -33,6 +33,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.shashoapp.core.AppPreferences
+import com.example.shashoapp.core.TextosApp
 
 import org.jetbrains.compose.resources.painterResource
 import shashoapp.shared.generated.resources.Res
@@ -74,6 +76,9 @@ fun ListasScreen(
     onAction: (ListasAction) -> Unit,
     modifier: Modifier
 ) {
+    val idioma by AppPreferences.idioma.collectAsStateWithLifecycle()
+    val textos = TextosApp.get(idioma)
+
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -89,7 +94,7 @@ fun ListasScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "MIS LISTAS",
+                    text = textos.misListas,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black

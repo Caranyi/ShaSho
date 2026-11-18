@@ -29,6 +29,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.shashoapp.core.AppPreferences
+import com.example.shashoapp.core.TextosApp
 import com.example.shashoapp.features.listaProductos.domain.model.Producto
 
 @Composable
@@ -47,6 +50,9 @@ fun ProductoItem(
     decrementarCantidad: () -> Unit,
     onEliminar: () -> Unit
 ) {
+    val idioma by AppPreferences.idioma.collectAsStateWithLifecycle()
+    val textos = TextosApp.get(idioma)
+
     var muestraDialogoConfirmacionEliminar by remember{
         mutableStateOf(false)
     }
@@ -127,9 +133,9 @@ fun ProductoItem(
             if(muestraDialogoConfirmacionEliminar) {
                 AlertDialog(
                     onDismissRequest = {  muestraDialogoConfirmacionEliminar = false},
-                    title = {Text("Eliminar producto")},
+                    title = {Text(textos.eliminarProductoTitulo)},
                     text = {
-                        Text("Quieres eliminar ${producto.nombre}?")
+                        Text("${textos.quieresEliminar} ${producto.nombre}?")
                     },
 
                     confirmButton = {
@@ -139,7 +145,7 @@ fun ProductoItem(
                                 onEliminar()
                             }
                         ) {
-                            Text("Eliminar", color = Color.Red)
+                            Text(textos.eliminar, color = Color.Red)
                         }
                     },
 
@@ -147,7 +153,7 @@ fun ProductoItem(
                         TextButton(
                             onClick = { muestraDialogoConfirmacionEliminar = false}
                         ) {
-                            Text("Cancelar")
+                            Text(textos.cancelar)
                         }
                     }
                 )

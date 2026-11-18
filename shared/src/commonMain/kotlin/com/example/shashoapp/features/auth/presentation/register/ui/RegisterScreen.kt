@@ -9,6 +9,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.shashoapp.core.AppPreferences
+import com.example.shashoapp.core.TextosApp
 import com.example.shashoapp.features.auth.presentation.register.RegisterAction
 import com.example.shashoapp.features.auth.presentation.register.RegisterState
 import com.example.shashoapp.features.auth.presentation.register.RegisterViewModel
@@ -42,6 +44,9 @@ fun RegisterScreen(
     onAction: (RegisterAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val idioma by AppPreferences.idioma.collectAsStateWithLifecycle()
+    val textos = TextosApp.get(idioma)
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -50,7 +55,7 @@ fun RegisterScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Crear Cuenta",
+            text = textos.crearCuenta,
             style = MaterialTheme.typography.headlineLarge
         )
         Spacer(modifier = Modifier.height(32.dp))
@@ -58,7 +63,7 @@ fun RegisterScreen(
         OutlinedTextField(
             value = state.nombre,
             onValueChange = {onAction(RegisterAction.OnNombreChanged(it))},
-            label = {Text("Nombre completo")},
+            label = {Text(textos.nombreCompleto)},
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -67,7 +72,7 @@ fun RegisterScreen(
         OutlinedTextField(
             value = state.correo,
             onValueChange = {onAction(RegisterAction.OnCorreoChanged(it))},
-            label = {Text("Correo electrónico")},
+            label = {Text(textos.correoElectronico)},
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -76,7 +81,7 @@ fun RegisterScreen(
         OutlinedTextField(
             value = state.contrasenya,
             onValueChange = {onAction(RegisterAction.OnContrasenyaChanged(it))},
-            label = {Text("Contraseña")},
+            label = {Text(textos.contrasenya)},
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -103,13 +108,13 @@ fun RegisterScreen(
                 )
             }
             else {
-                Text("Registrarse")
+                Text(textos.registrarse)
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
 
         TextButton(onClick = {onAction(RegisterAction.OnIrALoginClick)}) {
-            Text("¿Ya tienes cuenta? Inicia sesión")
+            Text(textos.yaTienesCuenta)
         }
     }
 }

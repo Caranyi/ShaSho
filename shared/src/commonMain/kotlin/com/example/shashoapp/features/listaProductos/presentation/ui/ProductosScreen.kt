@@ -63,6 +63,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.example.shashoapp.core.AppPreferences
+import com.example.shashoapp.core.TextosApp
 
 
 @Composable
@@ -96,6 +98,8 @@ fun ProductosScreen(
     onHome: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val idioma by AppPreferences.idioma.collectAsStateWithLifecycle()
+    val textos = TextosApp.get(idioma)
 
     Box(modifier = modifier.fillMaxSize()) {
         Column(
@@ -113,7 +117,7 @@ fun ProductosScreen(
                 IconButton(onClick = onVolver) {
                     Icon(
                         painter = painterResource(Res.drawable.arrowLeft),
-                        contentDescription = "Anterior",
+                        contentDescription = textos.anterior,
                         tint = Color.Black,
                         modifier = Modifier.size(28.dp)
                     )
@@ -139,7 +143,7 @@ fun ProductosScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "LISTA",
+                    text = textos.listaCabecera,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
@@ -152,7 +156,7 @@ fun ProductosScreen(
                     //COMPARTIR LISTA
                     TextButton(onClick = { onAction(ProductosAction.AbrirCompartir) }) {
                         Text(
-                            text = "+ Persona",
+                            text = textos.anadirPersona,
                             fontSize = 14.sp,
                             color = Color.Black
                         )
@@ -161,7 +165,7 @@ fun ProductosScreen(
                     IconButton(onClick = onReparto) {
                         Icon(
                             painter = painterResource(Res.drawable.reparto),
-                            contentDescription = "Repartir pagos lista",
+                            contentDescription = textos.repartoTitulo,
                             tint = Color.Black,
                             modifier = Modifier.size(20.dp)
                         )
@@ -185,7 +189,7 @@ fun ProductosScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "La lista está vacía.\n Añade un producto con +",
+                            text = textos.listaVacia,
                             color = Color.Gray,
                             fontSize = 16.sp
                         )
@@ -272,13 +276,13 @@ fun ProductosScreen(
         if (state.mostrarCompartir) {
             AlertDialog(
                 onDismissRequest = { onAction(ProductosAction.CerrarCompartir) },
-                title = { Text("Añadir persona") },
+                title = { Text(textos.anadirPersona) },
                 text = {
                     Column {
                         OutlinedTextField(
                             value = state.correoCompartir,
                             onValueChange = { onAction(ProductosAction.OnCorreoChange(it)) },
-                            label = { Text("Correo") },
+                            label = { Text(textos.correo) },
                             singleLine = true
                         )
                         state.mensajeCompartir?.let { mensaje ->
@@ -293,12 +297,12 @@ fun ProductosScreen(
                 },
                 confirmButton = {
                     TextButton(onClick = { onAction(ProductosAction.ConfirmarCompartir) }) {
-                        Text("Añadir")
+                        Text(textos.anadir)
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { onAction(ProductosAction.CerrarCompartir) }) {
-                        Text("Cancelar")
+                        Text(textos.cancelar)
                     }
                 }
             )
