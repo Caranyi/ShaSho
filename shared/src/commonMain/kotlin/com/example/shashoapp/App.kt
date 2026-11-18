@@ -63,7 +63,6 @@
                 conexionOk = hayConexion
                 EstadoConexion.setConexion(hayConexion) //para ver de donde cogemos los datos
                 if (!hayConexion) {
-                    SesionUsuario.setIdUsuario(1)
                     navController.navigate(Route.Home) {
                         popUpTo(Route.Bienvenida) { inclusive = true }
                         launchSingleTop = true
@@ -86,6 +85,7 @@
 
                     val viewModel = remember(idUsuario) {
                         ListasViewModel(
+                            compartirListaUseCase = appContainer.compartirListaUseCase,
                             getListasUseCase = appContainer.getListasUseCase,
                             sincronizarListasUseCase = appContainer.sincronizarListasUseCase,
                             crearListaUseCase = appContainer.crearListaUseCase,
