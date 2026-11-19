@@ -32,6 +32,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.shashoapp.core.AppPreferences
+import com.example.shashoapp.core.TextosApp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,6 +42,9 @@ fun CrearProducto (
     onDismissRequest: () -> Unit,
     onGuardar: (String, String, Int, Double, String ) -> Unit
 ){
+    val idioma by AppPreferences.idioma.collectAsStateWithLifecycle()
+    val textos = TextosApp.get(idioma)
+
     var nombre by rememberSaveable { mutableStateOf("") }
     var tipo by rememberSaveable { mutableStateOf("") }
     var cantidad by rememberSaveable { mutableStateOf("1") }
@@ -48,8 +54,8 @@ fun CrearProducto (
     var menuAbierto by rememberSaveable { mutableStateOf(false) }
 
     val tipos = listOf(
-        "alimentación",
-        "otros"
+        "alimentación" to textos.alimentacion,
+        "otros" to textos.otros
     )
 
     ModalBottomSheet(
@@ -67,14 +73,14 @@ fun CrearProducto (
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ){
             Text(
-                text = "Añadir producto",
+                text = textos.anadirProducto,
                 style = MaterialTheme.typography.titleLarge
             )
 
             OutlinedTextField(
                 value = nombre,
                 onValueChange = {nombre = it},
-                label = {Text("Nombre del producto")},
+                label = {Text(textos.nombreProducto)},
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -84,24 +90,19 @@ fun CrearProducto (
                     onClick = { menuAbierto = true },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        text = if (tipo.isEmpty()) {
-                            "Seleccionar tipo"
-                        } else {
-                            tipo
-                        }
-                    )
+                    val etiquetaActual = tipos.firstOrNull {it.first == tipo}?.second ?: textos.seleccionarTipo
+                    Text(text = etiquetaActual)
                 }
 
                 DropdownMenu(
                     expanded = menuAbierto,
                     onDismissRequest = { menuAbierto = false }
                 ) {
-                    tipos.forEach { opcion ->
+                    tipos.forEach { (valorServidor, etiquetaVisible) ->
                         DropdownMenuItem(
-                            text = { Text(opcion) },
+                            text = { Text(etiquetaVisible) },
                             onClick = {
-                                tipo = opcion
+                                tipo = valorServidor
                                 menuAbierto = false
                             }
                         )
@@ -118,7 +119,7 @@ fun CrearProducto (
                             }
                     },
 
-                    label = { Text("Cantidad")},
+                    label = { Text(textos.cantidad)},
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number
                     ),
@@ -129,7 +130,7 @@ fun CrearProducto (
                 OutlinedTextField(
                     value = precio,
                     onValueChange = {precio = it},
-                    label = { Text("Precio")},
+                    label = { Text(textos.precio)},
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number
                     ),
@@ -140,7 +141,7 @@ fun CrearProducto (
                 OutlinedTextField(
                     value = tienda,
                     onValueChange = {tienda = it},
-                    label = {Text("Tienda")},
+                    label = {Text(textos.tienda)},
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -152,7 +153,7 @@ fun CrearProducto (
                     TextButton(
                         onClick = onDismissRequest
                     ){
-                        Text("Cancelar")
+                        Text(textos.cancelar)
                     }
 
                     Button(
@@ -177,7 +178,7 @@ fun CrearProducto (
                                 && (precio.replace(',','.').toDoubleOrNull() ?: -1.0) >= 0.0
 
                     ){
-                        Text("Añadir")
+                        Text(textos.anadir)
                     }
                 }
         }

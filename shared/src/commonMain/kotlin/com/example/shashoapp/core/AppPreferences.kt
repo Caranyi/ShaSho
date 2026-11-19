@@ -15,11 +15,11 @@ object AppPreferences {
 
     suspend fun cargarPreferencias() {
         leerArchivo("pref_idioma.txt")?.let {
-                guardado -> if (guardado == "es" || guardado == "en") {
-            _idioma.value = guardado }
+            guardado -> if (guardado == "es" || guardado == "en") {
+                _idioma.value = guardado }
         }
         leerArchivo("pref_notificaciones.txt")?.let {
-                guardado -> _notificacionesActivas.value = guardado.toBooleanStrictOrNull() ?: true
+            guardado -> _notificacionesActivas.value = guardado.toBooleanStrictOrNull() ?: true
         }
     }
 

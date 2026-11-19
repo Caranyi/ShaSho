@@ -23,7 +23,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shashoapp.Route
+import com.example.shashoapp.core.AppPreferences
+import com.example.shashoapp.core.TextosApp
 import com.example.shashoapp.features.listaListas.domain.model.Lista
 
 @Composable
@@ -34,6 +37,8 @@ fun ListaItem(
     modifier: Modifier = Modifier
 
 ){
+    val idioma by AppPreferences.idioma.collectAsStateWithLifecycle()
+    val textos = TextosApp.get(idioma)
 
     var muestraDialogoConfirmacionEliminar by remember{
         mutableStateOf(false)
@@ -63,7 +68,7 @@ fun ListaItem(
                 //indica si la lista es compartida
                 if (lista.compartida) {
                     Text(
-                        text = "Compartida",
+                        text = textos.compartida,
                         fontSize = 12.sp,
                         color = Color.Gray
                     )
@@ -85,9 +90,9 @@ fun ListaItem(
             if(muestraDialogoConfirmacionEliminar) {
                 AlertDialog(
                     onDismissRequest = {  muestraDialogoConfirmacionEliminar = false},
-                    title = {Text("Eliminar producto")},
+                    title = {Text(textos.eliminarListaTitulo)},
                     text = {
-                        Text("Quieres eliminar ${lista.nombre}?")
+                        Text("${textos.quieresEliminar} ${lista.nombre}?")
                     },
 
                     confirmButton = {
@@ -97,7 +102,7 @@ fun ListaItem(
                                 onEliminar()
                             }
                         ) {
-                            Text("Eliminar", color = Color.Red)
+                            Text(textos.eliminar, color = Color.Red)
                         }
                     },
 
@@ -105,7 +110,7 @@ fun ListaItem(
                         TextButton(
                             onClick = { muestraDialogoConfirmacionEliminar = false}
                         ) {
-                            Text("Cancelar")
+                            Text(textos.cancelar)
                         }
                     }
                 )

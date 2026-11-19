@@ -1,5 +1,7 @@
 package com.example.shashoapp.core
 
+import kotlin.String
+
 data class Texts(
     // para la pantalla de bienvenida
     val bienvenidaTitulo: String,
@@ -217,7 +219,6 @@ object TextosApp {
         errorPrecioNegativo = "Price cannot be negative",
         errorCamposLoginObligatorios = "Email and password are required",
         errorTodosCamposObligatorios = "All fields are required"
-
     )
 
     fun get(codigoIdioma: String): Texts = if (codigoIdioma == "en") en else es

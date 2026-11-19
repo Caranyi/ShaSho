@@ -2,7 +2,6 @@ package com.example.shashoapp.features.listaListas.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.shashoapp.core.ApiServidor.eliminarLista
 import com.example.shashoapp.features.listaListas.domain.model.Lista
 import com.example.shashoapp.features.listaListas.domain.usecase.CompartirListaUseCase
@@ -23,8 +22,8 @@ class ListasViewModel (
     private val getListasUseCase: GetListasUseCase,
     private val idUsuario: Int?,
     private val crearListaUseCase: CrearListaUseCase,
-    private val getProductosListaUseCase: GetProductosListaUseCase,
     private val sincronizarListasUseCase: SincronizarListasUseCase,
+    private val getProductosListaUseCase: GetProductosListaUseCase,
     private val eliminarListaUseCase: EliminarListaUseCase
 
 ): ViewModel(){
@@ -52,13 +51,13 @@ class ListasViewModel (
 
     }
 
-    private fun compartirLista(idLista: Int, correo: String){
+    private fun compartirLista(idLista: Int, correo: String) {
         viewModelScope.launch {
             compartirListaUseCase(idLista, correo)
         }
     }
 
-    private fun getProductosLista(idLista: Int){
+    private fun getProductosLista(idLista: Int) {
         viewModelScope.launch {
             getProductosListaUseCase(idLista)
         }

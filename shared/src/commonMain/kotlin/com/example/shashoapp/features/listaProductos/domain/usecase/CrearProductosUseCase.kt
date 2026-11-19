@@ -17,7 +17,6 @@ class CrearProductosUseCase(
         tienda: String
     ){
         val textos = TextosApp.get(AppPreferences.idioma.value)
-
         require(nombre.isNotBlank()){
             textos.errorNombreProductoVacio
         }

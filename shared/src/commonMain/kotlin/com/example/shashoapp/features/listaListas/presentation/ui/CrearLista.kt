@@ -18,12 +18,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.shashoapp.core.AppPreferences
+import com.example.shashoapp.core.TextosApp
 
 @Composable
 fun CrearLista(
     onDismiss: () -> Unit,
     onGuardar: (String) -> Unit
 ) {
+    val idioma by AppPreferences.idioma.collectAsStateWithLifecycle()
+    val textos = TextosApp.get(idioma)
+
     var nombre by rememberSaveable {
         mutableStateOf("")
     }
@@ -31,18 +37,18 @@ fun CrearLista(
     AlertDialog(
         onDismiss,
         title = {
-            Text("Crear lista")
+            Text(textos.crearLista)
         },
         text = {
             Column{
-                Text("Datos")
+                Text(textos.datos)
 
                 Spacer(Modifier.height(16.dp))
 
                 OutlinedTextField(
                     value =  nombre,
                     onValueChange = {nombre = it},
-                    label = { Text("Nombre de la lista")}
+                    label = { Text(textos.nombreLista)}
                 )
             }
         },
@@ -52,7 +58,7 @@ fun CrearLista(
                 onClick = {onGuardar(nombre)},
                 enabled = nombre.isNotBlank()
             ){
-                Text("Guardar")
+                Text(textos.guardar)
             }
         },
 
@@ -60,7 +66,7 @@ fun CrearLista(
             TextButton(
                 onClick = onDismiss
             ){
-                Text("Cancelar")
+                Text(textos.cancelar)
             }
         }
     )
