@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shashoapp.core.ApiServidor.eliminarLista
 import com.example.shashoapp.features.listaListas.domain.model.Lista
+import com.example.shashoapp.features.listaListas.domain.usecase.CompartirListaUseCase
 import com.example.shashoapp.features.listaListas.domain.usecase.CrearListaUseCase
 import com.example.shashoapp.features.listaListas.domain.usecase.EliminarListaUseCase
 import com.example.shashoapp.features.listaListas.domain.usecase.GetListasUseCase
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 import com.example.shashoapp.features.listaProductos.domain.usecase.GetProductosListaUseCase
 
 class ListasViewModel (
+    private val compartirListaUseCase: CompartirListaUseCase,
     private val getListasUseCase: GetListasUseCase,
     private val idUsuario: Int?,
     private val crearListaUseCase: CrearListaUseCase,
@@ -47,6 +49,18 @@ class ListasViewModel (
             is ListasAction.EliminarLista -> {eliminarLista(action.idLista)}
         }
 
+    }
+
+    private fun compartirLista(idLista: Int, correo: String) {
+        viewModelScope.launch {
+            compartirListaUseCase(idLista, correo)
+        }
+    }
+
+    private fun getProductosLista(idLista: Int) {
+        viewModelScope.launch {
+            getProductosListaUseCase(idLista)
+        }
     }
 
     private fun eliminarLista(idLista: Int){

@@ -1,5 +1,7 @@
 package com.example.shashoapp.core
 
+import kotlin.String
+
 data class Texts(
     // para la pantalla de bienvenida
     val bienvenidaTitulo: String,
@@ -65,7 +67,17 @@ data class Texts(
 
     // para Notificación
     val notifTitulo: String,
-    val notifMensaje: String
+    val notifMensaje: String,
+
+    // para errores
+    val errorNombreListaVacio: String,
+    val errorUsuarioNoEncontrado: String,
+    val errorIntroduceCorreo: String,
+    val errorNombreProductoVacio: String,
+    val errorCantidadMayorCero: String,
+    val errorPrecioNegativo: String,
+    val errorCamposLoginObligatorios: String,
+    val errorTodosCamposObligatorios: String
 )
 
 object TextosApp {
@@ -127,7 +139,16 @@ object TextosApp {
         cerrarSesion = "Cerrar sesión",
 
         notifTitulo = "ShaSho",
-        notifMensaje = "¡Vuelve que tus listas se sienten solas!"
+        notifMensaje = "¡Vuelve que tus listas se sienten solas!",
+
+        errorNombreListaVacio = "El nombre no puede estar en blanco",
+        errorUsuarioNoEncontrado = "Usuario no encontrado",
+        errorIntroduceCorreo = "Introduce un correo",
+        errorNombreProductoVacio = "El nombre no puede estar vacío",
+        errorCantidadMayorCero = "La cantidad debe ser mayor que 0",
+        errorPrecioNegativo = "El precio no puede ser negativo",
+        errorCamposLoginObligatorios = "El correo y la contraseña son obligatorios",
+        errorTodosCamposObligatorios = "Todos los campos son obligatorios"
     )
 
     private val en = Texts(
@@ -188,7 +209,16 @@ object TextosApp {
         cerrarSesion = "Log out",
 
         notifTitulo = "ShaSho",
-        notifMensaje = "Come back, your lists feel lonely!"
+        notifMensaje = "Come back, your lists feel lonely!",
+
+        errorNombreListaVacio = "Name cannot be blank",
+        errorUsuarioNoEncontrado = "User not found",
+        errorIntroduceCorreo = "Enter an email",
+        errorNombreProductoVacio = "Name cannot be empty",
+        errorCantidadMayorCero = "Quantity must be greater than 0",
+        errorPrecioNegativo = "Price cannot be negative",
+        errorCamposLoginObligatorios = "Email and password are required",
+        errorTodosCamposObligatorios = "All fields are required"
     )
 
     fun get(codigoIdioma: String): Texts = if (codigoIdioma == "en") en else es
