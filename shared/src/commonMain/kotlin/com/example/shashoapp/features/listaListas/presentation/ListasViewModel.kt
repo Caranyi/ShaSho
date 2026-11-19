@@ -78,6 +78,7 @@ class ListasViewModel (
     private fun guardarLista(nombre: String){
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true)}
+            val usuarioActual = idUsuario ?: -1 // si no hay conexion ponemos como id por defecto -1
 
             try {
                 println("CREANDO LISTA: $nombre")
@@ -126,4 +127,8 @@ class ListasViewModel (
 
         }
     }
+
+
+
+
 }

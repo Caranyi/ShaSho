@@ -1,5 +1,4 @@
 package com.example.shashoapp.di
-import com.example.shashoapp.Route
 import com.example.shashoapp.features.Reparto.data.repository.RepartoRepositorioImpl
 import com.example.shashoapp.features.Reparto.domain.repository.RepartoRepository
 import com.example.shashoapp.features.Reparto.domain.usecase.GetRepartoUseCase
@@ -12,20 +11,17 @@ import com.example.shashoapp.features.listaListas.domain.repository.ListaReposit
 import com.example.shashoapp.features.listaListas.domain.usecase.GetListasUseCase
 import com.example.shashoapp.features.listaProductos.data.repository.ProductoRepositoryImpl
 import com.example.shashoapp.features.listaProductos.domain.repository.ProductoRepository
-import com.example.shashoapp.features.listaProductos.domain.usecase.GetProductosDisponiblesUseCase
 import com.example.shashoapp.features.listaProductos.domain.usecase.GetProductosListaUseCase
 import com.example.shashoapp.features.listaListas.domain.usecase.CompartirListaUseCase
 import com.example.shashoapp.features.listaListas.domain.usecase.CrearListaUseCase
 import com.example.shashoapp.features.listaListas.domain.usecase.EliminarListaUseCase
 import com.example.shashoapp.features.listaListas.domain.usecase.SincronizarListasUseCase
-import com.example.shashoapp.features.listaListas.presentation.ListasAction
 import com.example.shashoapp.features.listaProductos.domain.usecase.ActualizaCantidadesUseCase
 import com.example.shashoapp.features.listaProductos.domain.usecase.ActualizarMarcadosUseCase
 import com.example.shashoapp.features.listaProductos.domain.usecase.CrearProductosUseCase
 import com.example.shashoapp.features.listaProductos.domain.usecase.EliminarProductoUseCase
 
 interface AppContainer {
-    val getProductosDisponiblesUseCase: GetProductosDisponiblesUseCase
     val getProductosListaUseCase: GetProductosListaUseCase
     val getListasUseCase: GetListasUseCase
     val compartirListaUseCase: CompartirListaUseCase
@@ -46,10 +42,6 @@ interface AppContainer {
 class DefaultAppContainer : AppContainer {
     private val productoRepository: ProductoRepository by lazy {
         ProductoRepositoryImpl()
-    }
-
-    override val getProductosDisponiblesUseCase: GetProductosDisponiblesUseCase by lazy {
-        GetProductosDisponiblesUseCase(productoRepository)
     }
 
     override val getProductosListaUseCase: GetProductosListaUseCase by lazy {

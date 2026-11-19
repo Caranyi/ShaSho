@@ -5,15 +5,8 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
 
 
-object ServidorConfig {
-    var BASE_URL: String = "http://10.8.105.240:8080"
+expect object ServidorConfig {
+    val BASE_URL: String
 }
 
 
-val httpClient: HttpClient = HttpClient {
-    //TIEMPO DE ESPERA
-    install(HttpTimeout) {
-        connectTimeoutMillis = 5_000
-        requestTimeoutMillis = 10_000
-    }
-}

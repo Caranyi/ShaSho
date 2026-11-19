@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -63,7 +64,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.text.input.KeyboardType
 import com.example.shashoapp.core.AppPreferences
+import com.example.shashoapp.core.EstadoConexion
 import com.example.shashoapp.core.TextosApp
 
 
@@ -153,24 +156,26 @@ fun ProductosScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    //COMPARTIR LISTA
-                    TextButton(onClick = { onAction(ProductosAction.AbrirCompartir) }) {
-                        Text(
-                            text = textos.anadirPersona,
-                            fontSize = 14.sp,
-                            color = Color.Black
-                        )
-                    }
 
-                    IconButton(onClick = onReparto) {
-                        Icon(
-                            painter = painterResource(Res.drawable.reparto),
-                            contentDescription = textos.repartoTitulo,
-                            tint = Color.Black,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
+                    if(EstadoConexion.getConexion()){ //solo se puede repartir y compartir si hay conexion con la bd
+                        //COMPARTIR LISTA
+                        TextButton(onClick = { onAction(ProductosAction.AbrirCompartir) }) {
+                            Text(
+                                text = textos.anadirPersona,
+                                fontSize = 14.sp,
+                                color = Color.Black
+                            )
+                        }
 
+                        IconButton(onClick = onReparto) {
+                            Icon(
+                                painter = painterResource(Res.drawable.reparto),
+                                contentDescription = textos.repartoTitulo,
+                                tint = Color.Black,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
                 }
             }
 
@@ -283,7 +288,11 @@ fun ProductosScreen(
                             value = state.correoCompartir,
                             onValueChange = { onAction(ProductosAction.OnCorreoChange(it)) },
                             label = { Text(textos.correo) },
-                            singleLine = true
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Email,
+                                autoCorrect = false
+                            )
                         )
                         state.mensajeCompartir?.let { mensaje ->
                             Text(

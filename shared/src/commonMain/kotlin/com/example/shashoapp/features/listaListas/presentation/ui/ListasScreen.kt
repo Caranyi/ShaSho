@@ -1,4 +1,4 @@
-package com.example.shashoapp.features.listalistas.presentation.ui
+package com.example.shashoapp.features.listaListas.presentation.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

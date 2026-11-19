@@ -18,7 +18,7 @@ class AjustesViewModel : ViewModel() {
         AjustesState(
             idUsuario = SesionUsuario.getIdUsuario(),
             enLinea = EstadoConexion.getConexion(),
-            notificacionesActivas = AppPreferences.notificacionesActivas.value,
+            notificacionesActivas = if(EstadoConexion.getConexion()) AppPreferences.notificacionesActivas.value else false,
             idiomaActual = AppPreferences.idioma.value
         ))
     val state: StateFlow<AjustesState> = _state.asStateFlow()
@@ -47,7 +47,12 @@ class AjustesViewModel : ViewModel() {
                 }
             }
             is AjustesAction.onCerrarSesionClick -> {
-                SesionUsuario.cerrarSesion();
+                SesionUsuario.cerrarSesion()
+
+                viewModelScope.launch {
+                    AppPreferences.setIdUsuario(null)
+                }
+                _state.update { it.copy(idUsuario=null) }
             }
         }
     }

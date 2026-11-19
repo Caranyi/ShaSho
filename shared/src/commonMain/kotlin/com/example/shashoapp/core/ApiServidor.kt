@@ -1,6 +1,8 @@
 package com.example.shashoapp.core
 
 import com.example.shashoapp.features.listaProductos.domain.model.Producto
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
@@ -10,6 +12,14 @@ import kotlin.coroutines.cancellation.CancellationException
 //para las listas
 import io.ktor.client.request.parameter
 import io.ktor.http.append
+
+
+val httpClient: HttpClient = HttpClient {
+    install(HttpTimeout) {
+        connectTimeoutMillis = 5_000
+        requestTimeoutMillis = 10_000
+    }
+}
 
 object ApiServidor {
 

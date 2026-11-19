@@ -1,6 +1,7 @@
 package com.example.shashoapp.features.auth.data.repository
 
 import com.example.shashoapp.core.ApiServidor
+import com.example.shashoapp.core.AppPreferences
 import com.example.shashoapp.core.SesionUsuario
 import com.example.shashoapp.features.auth.domain.model.Usuario
 import com.example.shashoapp.features.auth.domain.repository.AuthRepository
@@ -23,6 +24,7 @@ class AuthRepositoryImpl : AuthRepository {
         }
         //GUARDA EL ID DEL USUARIO
         SesionUsuario.setIdUsuario(id)
+        AppPreferences.setIdUsuario(id)
 
         return Result.success(Usuario(id = id, nombre = "", correo = correo, contrasenya = contrasenya))
     }
@@ -46,6 +48,7 @@ class AuthRepositoryImpl : AuthRepository {
 
         //GUARDA EL ID DEL USUARIO
         SesionUsuario.setIdUsuario(id)
+        AppPreferences.setIdUsuario(id)
 
         return Result.success(Usuario(id = id, nombre = nombre, correo = correo, contrasenya = contrasenya))
     }

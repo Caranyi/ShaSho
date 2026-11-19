@@ -30,7 +30,7 @@
     import com.example.shashoapp.features.listaListas.presentation.ListasViewModel
     import com.example.shashoapp.features.listaProductos.presentation.ProductosViewModel
     import com.example.shashoapp.features.listaProductos.presentation.ui.ProductosScreenRoot
-    import com.example.shashoapp.features.listalistas.presentation.ui.ListasScreenRoot
+    import com.example.shashoapp.features.listaListas.presentation.ui.ListasScreenRoot
     import com.example.shashoapp.core.EstadoConexion
     import com.example.shashoapp.core.SesionUsuario
     import com.example.shashoapp.features.Ajustes.presentation.AjustesAction
@@ -41,6 +41,7 @@
     import com.example.shashoapp.features.TirasyBarra.presentation.MainScafold
     import com.example.shashoapp.features.listaListas.domain.usecase.CrearListaUseCase
     import com.example.shashoapp.features.listaListas.presentation.ListasAction
+    import kotlinx.coroutines.launch
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -50,34 +51,52 @@
         ) {
 
         val idiomaActual by AppPreferences.idioma.collectAsStateWithLifecycle()
+        val navController = rememberNavController()
+        var conexionOk by remember { mutableStateOf<Boolean?>(null)}
 
-        LaunchedEffect(Unit) {
+        LaunchedEffect(toScreen) {
             AppPreferences.cargarPreferencias()
-        }
+            val idGuardado = AppPreferences.idUsuario.value
 
-        MaterialTheme{
-            val navController = rememberNavController()
-
-            var conexionOk by remember { mutableStateOf<Boolean?>(null) }
-
-            LaunchedEffect(toScreen) {
-                toScreen?.let {
-                    navController.navigate(it) {launchSingleTop = true}
-                }
+            if(idGuardado != null && idGuardado > 0){
+                SesionUsuario.setIdUsuario(idGuardado)
             }
 
-            //Modo sin conexion (pasa a la pantalla de listas(home))
-            LaunchedEffect(Unit) {
-                val hayConexion = ApiServidor.ping()
-                conexionOk = hayConexion
-                EstadoConexion.setConexion(hayConexion) //para ver de donde cogemos los datos
-                if (!hayConexion) {
-                    navController.navigate(Route.Home) {
+            val hayConexion = ApiServidor.ping()
+            conexionOk = hayConexion
+            EstadoConexion.setConexion(hayConexion)
+
+            if(toScreen != null){
+                val usuarioActivo = SesionUsuario.getIdUsuario()
+                if(usuarioActivo == null && hayConexion){
+                    navController.navigate(Route.Login){
+                        popUpTo(Route.Bienvenida) { inclusive = true }
+                    }
+                }else{
+                    navController.navigate(toScreen) { launchSingleTop = true }
+                }
+                return@LaunchedEffect
+            }
+
+            if(hayConexion){
+                if(idGuardado != null && idGuardado > 0){
+                    navController.navigate(Route.Home){
                         popUpTo(Route.Bienvenida) { inclusive = true }
                         launchSingleTop = true
                     }
                 }
+            }else{
+                val idOffline = idGuardado ?: -1
+                SesionUsuario.setIdUsuario(idOffline)
+
+                navController.navigate(Route.Home){
+                    popUpTo(Route.Bienvenida){inclusive = true}
+                    launchSingleTop = true
+                }
             }
+        }
+
+        MaterialTheme{
 
             NavHost(navController = navController, startDestination = Route.Bienvenida) {
 
@@ -90,7 +109,7 @@
                 }
 
                 composable<Route.Home> {
-                    val idUsuario = SesionUsuario.getIdUsuario()
+                    val idUsuario = SesionUsuario.getIdUsuario() ?: -1 //en caso de estar offline el id de usuario será -1
 
                     val viewModel = remember(idUsuario) {
                         ListasViewModel(
@@ -127,7 +146,6 @@
 
                     val viewModel = remember(route.id){
                         ProductosViewModel(
-                            getProductosDisponiblesUseCase = appContainer.getProductosDisponiblesUseCase,
                             getProductosListaUseCase = appContainer.getProductosListaUseCase,
                             compartirListaUseCase = appContainer.compartirListaUseCase,
                             crearProductosUseCase = appContainer.crearProductosUseCase,

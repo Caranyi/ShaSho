@@ -9,7 +9,7 @@ import com.example.shashoapp.core.EstadoConexion
 import com.example.shashoapp.features.listaProductos.data.model.ProductoDto
 import com.example.shashoapp.features.listaProductos.data.model.toDomain
 import kotlinx.serialization.json.Json
-import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import com.example.shashoapp.core.database.guardarArchivo
@@ -20,14 +20,6 @@ class ProductoRepositoryImpl : ProductoRepository {
     private val mutexPendientes = Mutex()
 
     private fun productosPendientes(idLista: Int) = "productos_pendientes_$idLista.json"
-
-    override suspend fun getProductosDisponibles(): List<Producto>{
-        return listOf(
-            Producto(1, "Leche entera", 1.10),
-            Producto(2, "Pan de molde", 1.45),
-            Producto(3, "Docena de huevos", 2.30)
-        )
-    }
 
     //se va a pedir asl servidor (modo online)
     override suspend fun getProductosDeLista(idLista: Int): List<Producto> {
@@ -118,9 +110,10 @@ class ProductoRepositoryImpl : ProductoRepository {
         if(EstadoConexion.getConexion() && idProducto > 0){
             try{
                 ApiServidor.actualizarMarcado(idLista, idProducto, marcado, idUsuarioMark)
-            }catch(e: io.ktor.utils.io.CancellationException){
+            }catch(e: CancellationException){
                 throw e
             }catch(e: Exception){
+                println("Offline / servidor no disponible al actualizar marcado: ${e.message}")
             }
         }
         mutexPendientes.withLock {
@@ -132,13 +125,11 @@ class ProductoRepositoryImpl : ProductoRepository {
             for(a in archivos){
                 val texto = leerArchivo(a) ?: continue
 
-                val productos =
-                    Json.decodeFromString<List<ProductoDto>>(texto)
+                try{
+                    val productos = Json.decodeFromString<List<ProductoDto>>(texto)
+                    if(productos.none() {it.id == idProducto}) continue
 
-                if(productos.none() {it.id == idProducto}) continue
-
-                val actualizados = productos.map {
-                    producto ->
+                    val actualizados = productos.map { producto ->
                         if(producto.id == idProducto) {
                             producto.copy(checked = marcado,
                                 idUsuarioMark = idUsuarioMark)
@@ -146,14 +137,14 @@ class ProductoRepositoryImpl : ProductoRepository {
                         else{
                             producto
                         }
+                    }
+
+                    guardarArchivo (a, Json.encodeToString(actualizados))
+
+                    return@withLock
+                }catch(e : Exception){
+                    println("Error al deserializar")
                 }
-
-                guardarArchivo(
-                    a,
-                    Json.encodeToString(actualizados)
-                )
-
-                return@withLock
             }
         }
     }

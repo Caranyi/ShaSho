@@ -6,7 +6,6 @@ import com.example.shashoapp.core.AppPreferences
 import com.example.shashoapp.core.SesionUsuario
 import com.example.shashoapp.core.TextosApp
 import com.example.shashoapp.features.listaProductos.domain.model.Producto
-import com.example.shashoapp.features.listaProductos.domain.usecase.GetProductosDisponiblesUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,7 +21,6 @@ import kotlin.coroutines.cancellation.CancellationException
 
 
 class ProductosViewModel(
-    private val getProductosDisponiblesUseCase: GetProductosDisponiblesUseCase,
     private val getProductosListaUseCase: GetProductosListaUseCase,
     private val compartirListaUseCase: CompartirListaUseCase,
     private val idLista: Int,
@@ -36,7 +34,6 @@ class ProductosViewModel(
     val state: StateFlow<ProductosState> = _state.asStateFlow()
 
     init {
-        cargarProductosDisponibles()
         cargarProductosLista()
     }
 
@@ -91,12 +88,6 @@ class ProductosViewModel(
        }
     }
 
-    private fun cargarProductosDisponibles() {
-        viewModelScope.launch {
-            val disponibles = getProductosDisponiblesUseCase()
-            _state.update { it.copy(productosDisponibles = disponibles) }
-        }
-    }
 
     //cargar productos
     private fun cargarProductosLista() {
@@ -107,18 +98,16 @@ class ProductosViewModel(
     }
 
     private fun toggleChecked(i: Int) {
-        val idUsuario = SesionUsuario.getIdUsuario() ?: return
         val producto = _state.value.productosLista.getOrNull(i) ?: return
-
         val marcado = !producto.isChecked
-        val idMarcador = if (marcado) idUsuario else null
+        val usuarioActual = SesionUsuario.getIdUsuario()
 
         _state.update { actual ->
             val lista = actual.productosLista.toMutableList()
             if (i in lista.indices) {
                 lista[i] = lista[i].copy(
                     isChecked = marcado,
-                    idUsuarioMark = idMarcador
+                    idUsuarioMark = if(marcado) usuarioActual else null
                 )
             }
             actual.copy(productosLista = lista)
@@ -128,7 +117,7 @@ class ProductosViewModel(
         viewModelScope.launch {
             try {
                 actualizarMarcadosUseCase(
-                    idLista, producto.id, marcado, idMarcador
+                    idLista, producto.id, marcado, if(marcado) usuarioActual else null
                 )
             } catch (e: CancellationException){
                 throw e

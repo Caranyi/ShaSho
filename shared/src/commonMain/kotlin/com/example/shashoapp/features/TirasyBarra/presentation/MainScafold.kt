@@ -55,19 +55,22 @@ fun MainScafold(
                 BarraNav(
                     icon = Res.drawable.home,
                     label = textos.inicio,
-                    onClick = onInicio
+                    onClick = onInicio,
+                    modifier = Modifier.weight(1f)
                 )
 
                 BarraNav(
                     icon = Res.drawable.addCircle,
                     label = textos.anadirLista,
-                    onClick = onCrear
+                    onClick = onCrear,
+                    modifier = Modifier.weight(1f)
                 )
 
                 BarraNav(
                     icon = Res.drawable.settings,
                     label = textos.ajustes,
-                    onClick = onAjustes
+                    onClick = onAjustes,
+                    modifier = Modifier.weight(1f)
                 )
             }
 

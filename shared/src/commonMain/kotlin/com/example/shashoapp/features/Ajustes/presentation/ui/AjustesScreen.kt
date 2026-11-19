@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shashoapp.Route
+import com.example.shashoapp.core.EstadoConexion
 import com.example.shashoapp.core.TextosApp
 import com.example.shashoapp.features.Ajustes.presentation.AjustesAction
 import com.example.shashoapp.features.Ajustes.presentation.AjustesState
@@ -150,10 +151,11 @@ fun AjustesScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ){
-                        Text(textos.notificaciones, fontSize = 16.sp)
+                        Text(textos.notificaciones, fontSize = 16.sp, color = if(state.enLinea) Color.Black else Color.Gray)
                         Switch(
-                            checked = state.notificacionesActivas,
-                            onCheckedChange = { onAction(AjustesAction.onActivarNotificaciones(it))}
+                            checked = if(EstadoConexion.getConexion()) state.notificacionesActivas else false,
+                            onCheckedChange = { activado -> onAction(AjustesAction.onActivarNotificaciones(activado))},
+                            enabled = state.enLinea
                         )
                     }
                 }

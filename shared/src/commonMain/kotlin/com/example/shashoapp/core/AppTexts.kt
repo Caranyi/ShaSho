@@ -112,7 +112,7 @@ object TextosApp {
         eliminar = "Eliminar",
 
         listaCabecera = "LISTA",
-        anadirPersona = "+ Persona",
+        anadirPersona = "+ Personas",
         listaVacia = "La lista está vacía.\nAñade un producto con +",
         anadirProducto = "Añadir producto",
         nombreProducto = "Nombre del producto",

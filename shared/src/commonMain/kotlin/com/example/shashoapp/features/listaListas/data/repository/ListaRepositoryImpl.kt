@@ -1,5 +1,6 @@
 package com.example.shashoapp.features.listaListas.data.repository
 
+import androidx.compose.ui.text.toLowerCase
 import com.example.shashoapp.core.ApiServidor
 import com.example.shashoapp.core.EstadoConexion
 import com.example.shashoapp.core.SesionUsuario
@@ -22,7 +23,7 @@ class ListaRepositoryImpl : ListaRepository{
     private fun archivo_listas(idUsuario:Int?) = "listas_${idUsuario ?: 0}.json"
     private val mutexPendientes = Mutex()
 
-    //Necesitamos una frunción que: no habiendo conexión, me guarde las listas en local
+    //Necesitamos una función que: no habiendo conexión, me guarde las listas en local
         //para subirlas luego al server
     private fun listasPendientes(idUsuario: Int) = "listas_pendientes_$idUsuario.json"
 
@@ -52,7 +53,7 @@ class ListaRepositoryImpl : ListaRepository{
             emptyList()
         }
 
-        //Leemos las pendientes y...
+        //Leemos las pendientes
         val pendientes = mutexPendientes.withLock {
             Json.decodeFromString<List<ListaDto>>(
                 leerArchivo(listasPendientes(usuario)) ?: "[]"
@@ -63,23 +64,22 @@ class ListaRepositoryImpl : ListaRepository{
     }
 
     override suspend fun compartirLista(idLista: Int, correo: String): Result<Unit> {
+        val correoLimpio = correo.trim().lowercase()
 
         //CONEXION
         var codigo: Int = try {
-            ApiServidor.compartirLista(idLista, correo)
-        } catch (e: CancellationException) {
-            throw e
+            ApiServidor.compartirLista(idLista, correoLimpio)
         } catch (e: Exception) {
-            return Result.failure(Exception("Error al conectar con la API: ${e.message}"))
+            return Result.failure(Exception("Error al conectar con el servidor: ${e.message}"))
         }
 
         //RESPUESTAS
         if(codigo == 1)
             return Result.success(Unit)
-        if (codigo == -1) {
+        else if (codigo == -1) {
             return Result.failure(IllegalArgumentException("No existe ningún usuario con ese correo"))
         }
-        if (codigo == 0) {
+        else if (codigo == 0) {
             return Result.failure(IllegalArgumentException("Ese usuario ya está en la lista"))
         }
         else{
@@ -137,14 +137,30 @@ class ListaRepositoryImpl : ListaRepository{
         }
 
         mutexPendientes.withLock {
-            val idUsuario = SesionUsuario.getIdUsuario() ?: return
-            val archivo = "listas_$idUsuario.json"
+            val idUsuario = SesionUsuario.getIdUsuario() ?: -1
 
-            val texto = leerArchivo(archivo) ?: return
-            val listas = Json.decodeFromString<List<ListaDto>>(texto)
-            val filtradas = listas.filterNot { it.id == idLista }
+            val archivos = listOf(
+                "listas_$idUsuario.json",
+                "listas_pendientes_$idUsuario.json",
+                "listas_-1.json",
+                "listas_pendientes_-1.json"
+            )
 
-            guardarArchivo(archivo, Json.encodeToString(filtradas))
+            for (archivo in archivos) {
+                val texto = leerArchivo(archivo) ?: continue
+
+                try {
+                    val listas = Json.decodeFromString<List<ListaDto>>(texto)
+
+                    if (listas.any { it.id == idLista }) {
+                        val filtradas = listas.filterNot { it.id == idLista }
+                        guardarArchivo(archivo, Json.encodeToString(filtradas))
+                    }
+                } catch (e: Exception) {
+                    println("Error al procesar el borrado")
+                }
+            }
+
         }
     }
 
