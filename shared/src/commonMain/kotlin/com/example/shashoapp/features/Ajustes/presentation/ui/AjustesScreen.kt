@@ -207,7 +207,7 @@ fun AjustesScreen(
                     modifier = Modifier.fillMaxWidth().height(50.dp)
                 ){
                     Text(
-                        "Cerrar sesión",
+                        textos.cerrarSesion,
                         fontSize = 16.sp,
                         color = Color.White
                     )
