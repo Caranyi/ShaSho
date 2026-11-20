@@ -31,7 +31,7 @@ class AuthRepositoryImpl : AuthRepository {
     //REGISTER
     override suspend fun register(nombre: String, correo: String, contrasenya: String): Result<Usuario> {
         val id = try {
-            ApiServidor.registro(correo, correo, contrasenya)
+            ApiServidor.registro(nombre, correo, contrasenya)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
