@@ -154,6 +154,18 @@ class ProductoRepositoryImpl : ProductoRepository {
         if (nuevaCantidad < 1)
             return
 
+        if(EstadoConexion.getConexion() && idProducto > 0){
+            try{
+                ApiServidor.actualizarCantidad(nuevaCantidad, idLista, idProducto)
+            }
+            catch(e: CancellationException){
+                throw e
+            }
+            catch(e: Exception){
+
+            }
+        }
+
         mutexPendientes.withLock {
             val archivo =
                 if(idProducto < 0) {

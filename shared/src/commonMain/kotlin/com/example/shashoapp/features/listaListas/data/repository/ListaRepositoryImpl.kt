@@ -24,7 +24,7 @@ class ListaRepositoryImpl : ListaRepository{
     private val mutexPendientes = Mutex()
 
     //Necesitamos una función que: no habiendo conexión, me guarde las listas en local
-        //para subirlas luego al server
+    //para subirlas luego al server
     private fun listasPendientes(idUsuario: Int) = "listas_pendientes_$idUsuario.json"
 
     override suspend fun getListas(idUsuario: Int?): List<Lista>{
@@ -90,9 +90,9 @@ class ListaRepositoryImpl : ListaRepository{
     override suspend fun crearLista(nombre: String, idCreador: Int?) {
 
         //Necesitamos esos datos
-       val usuario = requireNotNull(idCreador){
-           "No hay usuario identificado"
-       }
+        val usuario = requireNotNull(idCreador){
+            "No hay usuario identificado"
+        }
 
         require(nombre.isNotBlank()){
             "El nombre no puede estar vacío"
@@ -170,19 +170,26 @@ class ListaRepositoryImpl : ListaRepository{
         //devolvemos null -> porque sino, no se puede crear
         if(idUsuario == null)
             return
+
+        if(idUsuario <= 0)
+            return
         if(!EstadoConexion.getConexion())
             return
-        //sacamos el archivo de pendientes
-        val archivoLocal = listasPendientes(idUsuario)
 
-        //si no hay, no lo tocamos
-        val t = leerArchivo(archivoLocal) ?: return
+        //cogemos del id usuario y de idusuario -1
+        val archivoUsuario = listasPendientes(idUsuario)
+        val archivoSinSesion = listasPendientes(-1)
 
-        val pendientes = Json.decodeFromString<List<ListaDto>>(t)
+        val pendientesUsuario = Json.decodeFromString<List<ListaDto>>(leerArchivo(archivoUsuario) ?: "[]")
+        val pendientesSinSesion = Json.decodeFromString<List<ListaDto>>(leerArchivo(archivoSinSesion) ?: "[]")
+
+        //union de ambos pendientes
+        val pendientes = pendientesUsuario + pendientesSinSesion
 
         if(pendientes.isEmpty()) return
 
         for(lista in pendientes) {
+            //se manda con idUsuario (el usuario conectado), aunque la lista se creara con -1
             val idDef = ApiServidor.crearLista(lista.nombre, idUsuario)
 
             check(idDef > 0) {
@@ -197,6 +204,14 @@ class ListaRepositoryImpl : ListaRepository{
                 archivo,
                 Json.encodeToString(
                     guardadas.filterNot {it.id == idDef} + listaCreada))
+
+            //se quita la lista de las pendientes
+            val archivoLocal: String
+            if (pendientesUsuario.contains(lista)) {
+                archivoLocal = archivoUsuario
+            } else {
+                archivoLocal = archivoSinSesion
+            }
 
             val restantes = Json.decodeFromString<List<ListaDto>>(leerArchivo(archivoLocal) ?: "[]").filterNot {it.id == lista.id}
 

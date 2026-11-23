@@ -178,4 +178,18 @@ object ApiServidor {
         }
     }
 
+    //actualizar cantidad de un producto en una lista
+    suspend fun actualizarCantidad(cantidad: Int, idLista: Int, idProducto: Int): Boolean {
+        val respuesta = httpClient.submitForm(
+            url = "$baseUrl/productos/cantidad",
+            formParameters = parameters {
+                append("cantidad", cantidad.toString())
+                append("idLista", idLista.toString())
+                append("idProducto", idProducto.toString())
+
+            }
+        )
+        return respuesta.bodyAsText().trim() == "true"
+    }
+
 }
