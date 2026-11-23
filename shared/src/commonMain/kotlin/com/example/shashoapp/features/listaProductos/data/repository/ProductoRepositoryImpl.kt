@@ -1,31 +1,28 @@
 package com.example.shashoapp.features.listaProductos.data.repository
 
-import com.example.shashoapp.features.listaProductos.domain.model.Producto
-import com.example.shashoapp.features.listaProductos.domain.repository.ProductoRepository
-
-//imports para la conexion
 import com.example.shashoapp.core.ApiServidor
 import com.example.shashoapp.core.EstadoConexion
+import com.example.shashoapp.core.database.guardarArchivo
+import com.example.shashoapp.core.database.leerArchivo
 import com.example.shashoapp.features.listaProductos.data.model.ProductoDto
 import com.example.shashoapp.features.listaProductos.data.model.toDomain
-import kotlinx.serialization.json.Json
+import com.example.shashoapp.features.listaProductos.domain.model.Producto
+import com.example.shashoapp.features.listaProductos.domain.repository.ProductoRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import com.example.shashoapp.core.database.guardarArchivo
-import com.example.shashoapp.core.database.leerArchivo
-
+import kotlinx.serialization.json.Json
 
 class ProductoRepositoryImpl : ProductoRepository {
     private val mutexPendientes = Mutex()
 
     private fun productosPendientes(idLista: Int) = "productos_pendientes_$idLista.json"
 
-    //se va a pedir asl servidor (modo online)
+    // se va a pedir al servidor (modo online)
     override suspend fun getProductosDeLista(idLista: Int): List<Producto> {
         val archivo = "productos_$idLista.json"
 
-        //ONLINE: actualiza el archivo con lo que tenga el servidor
+        // ONLINE: actualiza el archivo con lo que tenga el servidor
         if (EstadoConexion.getConexion()) {
             try {
                 val texto = ApiServidor.getProductos(idLista)
@@ -36,15 +33,15 @@ class ProductoRepositoryImpl : ProductoRepository {
             }
         }
 
-       val guardados = try {
-           Json.decodeFromString<List<ProductoDto>>(
-               leerArchivo(archivo) ?: "[]"
-           )
-       } catch (e: CancellationException){
-           throw e
-       } catch (e: Exception){
-           emptyList()
-       }
+        val guardados = try {
+            Json.decodeFromString<List<ProductoDto>>(
+                leerArchivo(archivo) ?: "[]"
+            )
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            emptyList()
+        }
 
         val pendientes = mutexPendientes.withLock {
             Json.decodeFromString<List<ProductoDto>>(
@@ -52,7 +49,7 @@ class ProductoRepositoryImpl : ProductoRepository {
             )
         }
 
-        return (guardados + pendientes).map {  it.toDomain() }
+        return (guardados + pendientes).map { it.toDomain() }
     }
 
     override suspend fun crearProducto(
@@ -63,27 +60,23 @@ class ProductoRepositoryImpl : ProductoRepository {
         precio: Double,
         tienda: String
     ) {
-
-        if(EstadoConexion.getConexion()){
-            try{
-                val nuevoId = ApiServidor.crearProducto(idLista, nombre, precio, tienda, tipo,cantidad)
-                if(nuevoId > 0){
+        if (EstadoConexion.getConexion()) {
+            try {
+                val nuevoId = ApiServidor.crearProducto(idLista, nombre, precio, tienda, tipo, cantidad)
+                if (nuevoId > 0) {
                     val texto = ApiServidor.getProductos(idLista)
                     guardarArchivo("productos_$idLista.json", texto)
                     return
                 }
-            }catch(e:CancellationException){
+            } catch (e: CancellationException) {
                 throw e
-            }catch(e:Exception){
+            } catch (e: Exception) {
             }
         }
         mutexPendientes.withLock {
             val archivo = productosPendientes(idLista)
-
             val texto = leerArchivo(archivo) ?: "[]"
-
             val pendientes = Json.decodeFromString<List<ProductoDto>>(texto)
-
             val nuevoId = minOf(0, pendientes.minOfOrNull { it.id } ?: 0) - 1
 
             val nuevoproducto = ProductoDto(
@@ -95,8 +88,10 @@ class ProductoRepositoryImpl : ProductoRepository {
                 cantidad = cantidad,
                 checked = false
             )
-            guardarArchivo(archivo,
-                Json.encodeToString(pendientes + nuevoproducto))
+            guardarArchivo(
+                archivo,
+                Json.encodeToString(pendientes + nuevoproducto)
+            )
         }
     }
 
@@ -106,13 +101,12 @@ class ProductoRepositoryImpl : ProductoRepository {
         marcado: Boolean,
         idUsuarioMark: Int?
     ) {
-
-        if(EstadoConexion.getConexion() && idProducto > 0){
-            try{
+        if (EstadoConexion.getConexion() && idProducto > 0) {
+            try {
                 ApiServidor.actualizarMarcado(idLista, idProducto, marcado, idUsuarioMark)
-            }catch(e: CancellationException){
+            } catch (e: CancellationException) {
                 throw e
-            }catch(e: Exception){
+            } catch (e: Exception) {
                 println("Offline / servidor no disponible al actualizar marcado: ${e.message}")
             }
         }
@@ -122,53 +116,49 @@ class ProductoRepositoryImpl : ProductoRepository {
                 productosPendientes(idLista)
             )
 
-            for(a in archivos){
+            for (a in archivos) {
                 val texto = leerArchivo(a) ?: continue
 
-                try{
+                try {
                     val productos = Json.decodeFromString<List<ProductoDto>>(texto)
-                    if(productos.none() {it.id == idProducto}) continue
+                    if (productos.none { it.id == idProducto }) continue
 
                     val actualizados = productos.map { producto ->
-                        if(producto.id == idProducto) {
-                            producto.copy(checked = marcado,
-                                idUsuarioMark = idUsuarioMark)
-                        }
-                        else{
+                        if (producto.id == idProducto) {
+                            producto.copy(
+                                checked = marcado,
+                                idUsuarioMark = idUsuarioMark
+                            )
+                        } else {
                             producto
                         }
                     }
 
-                    guardarArchivo (a, Json.encodeToString(actualizados))
-
+                    guardarArchivo(a, Json.encodeToString(actualizados))
                     return@withLock
-                }catch(e : Exception){
+                } catch (e: Exception) {
                     println("Error al deserializar")
                 }
             }
         }
     }
 
-
     override suspend fun actualizarCantidad(idLista: Int, idProducto: Int, nuevaCantidad: Int) {
         if (nuevaCantidad < 1)
             return
 
-        if(EstadoConexion.getConexion() && idProducto > 0){
-            try{
+        if (EstadoConexion.getConexion() && idProducto > 0) {
+            try {
                 ApiServidor.actualizarCantidad(nuevaCantidad, idLista, idProducto)
-            }
-            catch(e: CancellationException){
+            } catch (e: CancellationException) {
                 throw e
-            }
-            catch(e: Exception){
-
+            } catch (e: Exception) {
             }
         }
 
         mutexPendientes.withLock {
             val archivo =
-                if(idProducto < 0) {
+                if (idProducto < 0) {
                     productosPendientes(idLista)
                 } else {
                     "productos_$idLista.json"
@@ -176,9 +166,8 @@ class ProductoRepositoryImpl : ProductoRepository {
 
             val productos = Json.decodeFromString<List<ProductoDto>>(leerArchivo(archivo) ?: "[]")
 
-            val actualizados = productos.map {
-                producto ->
-                if(producto.id == idProducto) {
+            val actualizados = productos.map { producto ->
+                if (producto.id == idProducto) {
                     producto.copy(cantidad = nuevaCantidad)
                 } else {
                     producto
@@ -190,23 +179,21 @@ class ProductoRepositoryImpl : ProductoRepository {
                 Json.encodeToString(actualizados)
             )
         }
-
     }
 
     override suspend fun eliminarProducto(idLista: Int, idProducto: Int) {
-
-        if(EstadoConexion.getConexion() && idProducto > 0){
-            try{
+        if (EstadoConexion.getConexion() && idProducto > 0) {
+            try {
                 ApiServidor.eliminarProducto(idLista, idProducto)
-            }catch(e : CancellationException) {
+            } catch (e: CancellationException) {
                 throw e
-            }catch(e : Exception){
+            } catch (e: Exception) {
             }
         }
 
         mutexPendientes.withLock {
             val archivo =
-                if(idProducto < 0){
+                if (idProducto < 0) {
                     productosPendientes(idLista)
                 } else {
                     "productos_$idLista.json"
@@ -218,6 +205,4 @@ class ProductoRepositoryImpl : ProductoRepository {
             guardarArchivo(archivo, Json.encodeToString(elim))
         }
     }
-
-
 }

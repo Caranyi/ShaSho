@@ -1,6 +1,5 @@
 package com.example.shashoapp.features.listaListas.presentation.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,44 +11,24 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shashoapp.core.AppPreferences
 import com.example.shashoapp.core.TextosApp
-
-import org.jetbrains.compose.resources.painterResource
-import shashoapp.shared.generated.resources.Res
-import shashoapp.shared.generated.resources.addCircle
-import shashoapp.shared.generated.resources.home
-import shashoapp.shared.generated.resources.logoShaSho
-import shashoapp.shared.generated.resources.settings
-
-import com.example.shashoapp.features.BarraNavegacion.presentation.ui.BarraNav
 import com.example.shashoapp.features.listaListas.domain.model.Lista
 import com.example.shashoapp.features.listaListas.presentation.ListasAction
 import com.example.shashoapp.features.listaListas.presentation.ListasState
 import com.example.shashoapp.features.listaListas.presentation.ListasViewModel
-import com.example.shashoapp.features.listaListas.presentation.ui.CrearLista
-import com.example.shashoapp.features.listaListas.presentation.ui.ListaItem
 
 @Composable
 fun ListasScreenRoot(
@@ -82,7 +61,7 @@ fun ListasScreen(
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
                 .fillMaxSize()
         ) {
             // TÍTULO "MIS LISTAS"
@@ -97,7 +76,7 @@ fun ListasScreen(
                     text = textos.misListas,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
 
@@ -106,7 +85,7 @@ fun ListasScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .background(Color(0xFFF5F5F5))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
@@ -115,12 +94,12 @@ fun ListasScreen(
                 ) {
                     itemsIndexed(
                         items = state.listas,
-                        key = { i, lista -> "${lista.id}_$i"}
-                    ) { i,lista ->
+                        key = { i, lista -> "${lista.id}_$i" }
+                    ) { _, lista ->
                         ListaItem(
                             lista = lista,
                             onClick = { onAction(ListasAction.OnListaClick(lista)) },
-                            onEliminar = {onAction(ListasAction.EliminarLista(lista.id))}
+                            onEliminar = { onAction(ListasAction.EliminarLista(lista.id)) }
                         )
                     }
                     item {
@@ -129,7 +108,7 @@ fun ListasScreen(
                 }
             }
 
-            if(state.mostrarCrear){
+            if (state.mostrarCrear) {
                 CrearLista(
                     onDismiss = {
                         onAction(ListasAction.CerrarCrearLista)

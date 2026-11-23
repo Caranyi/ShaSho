@@ -1,9 +1,6 @@
 package com.example.shashoapp.features.listaProductos.presentation.ui
 
-import com.example.shashoapp.features.BarraNavegacion.presentation.ui.BarraNav
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,56 +16,37 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.shashoapp.Route
-
-// Imports de recursos visuales (Drawables)
-import shashoapp.shared.generated.resources.Res
-import shashoapp.shared.generated.resources.logoShaSho
-import shashoapp.shared.generated.resources.home
-import shashoapp.shared.generated.resources.addCircle
-import shashoapp.shared.generated.resources.settings
-import shashoapp.shared.generated.resources.arrowLeft
-import shashoapp.shared.generated.resources.arrowRight
-
-// Imports de clases propias del proyecto
+import com.example.shashoapp.core.AppPreferences
+import com.example.shashoapp.core.EstadoConexion
+import com.example.shashoapp.core.TextosApp
 import com.example.shashoapp.features.listaProductos.presentation.ProductosAction
 import com.example.shashoapp.features.listaProductos.presentation.ProductosState
 import com.example.shashoapp.features.listaProductos.presentation.ProductosViewModel
 import org.jetbrains.compose.resources.painterResource
-import shashoapp.shared.generated.resources.filtro
+import shashoapp.shared.generated.resources.Res
+import shashoapp.shared.generated.resources.arrowLeft
 import shashoapp.shared.generated.resources.reparto
-
-//compartir listas
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.text.input.KeyboardType
-import com.example.shashoapp.core.AppPreferences
-import com.example.shashoapp.core.EstadoConexion
-import com.example.shashoapp.core.TextosApp
-
 
 @Composable
 fun ProductosScreenRoot(
@@ -97,7 +75,7 @@ fun ProductosScreen(
     listaNombre: String,
     onAction: (ProductosAction) -> Unit,
     onVolver: () -> Unit,
-    onReparto:() -> Unit,
+    onReparto: () -> Unit,
     onHome: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -107,7 +85,7 @@ fun ProductosScreen(
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
                 .fillMaxSize()
         ) {
             // SECCIÓN 2: TÍTULO DE LA LISTA
@@ -121,7 +99,7 @@ fun ProductosScreen(
                     Icon(
                         painter = painterResource(Res.drawable.arrowLeft),
                         contentDescription = textos.anterior,
-                        tint = Color.Black,
+                        tint = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier.size(28.dp)
                     )
                 }
@@ -132,7 +110,7 @@ fun ProductosScreen(
                     text = listaNombre,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
 
@@ -140,7 +118,7 @@ fun ProductosScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFF5F5F5))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
                     .padding(horizontal = 24.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
@@ -149,21 +127,20 @@ fun ProductosScreen(
                     text = textos.listaCabecera,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onBackground
                 )
 
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-
-                    if(EstadoConexion.getConexion()){ //solo se puede repartir y compartir si hay conexion con la bd
-                        //COMPARTIR LISTA
+                    if (EstadoConexion.getConexion()) {
+                        // COMPARTIR LISTA
                         TextButton(onClick = { onAction(ProductosAction.AbrirCompartir) }) {
                             Text(
                                 text = textos.anadirPersona,
                                 fontSize = 14.sp,
-                                color = Color.Black
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                         }
 
@@ -171,7 +148,7 @@ fun ProductosScreen(
                             Icon(
                                 painter = painterResource(Res.drawable.reparto),
                                 contentDescription = textos.repartoTitulo,
-                                tint = Color.Black,
+                                tint = MaterialTheme.colorScheme.onBackground,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
@@ -184,7 +161,7 @@ fun ProductosScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .background(Color(0xFFF5F5F5))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 if (state.productosLista.isEmpty()) {
                     Box(
@@ -195,7 +172,7 @@ fun ProductosScreen(
                     ) {
                         Text(
                             text = textos.listaVacia,
-                            color = Color.Gray,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 16.sp
                         )
                     }
@@ -246,12 +223,13 @@ fun ProductosScreen(
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF673AB7)),
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(bottom=90.dp, end=16.dp)
+                .padding(bottom = 90.dp, end = 16.dp)
                 .size(56.dp)
         ) {
             Text(
                 text = "+",
                 fontSize = 28.sp,
+                color = Color.White,
                 textAlign = TextAlign.Center
             )
         }
@@ -262,22 +240,21 @@ fun ProductosScreen(
                 onDismissRequest = {
                     onAction(ProductosAction.CerrarMenuCrear)
                 },
-                onGuardar = {
-                    nombre, tipo, cantidad, precio, tienda ->
-                        onAction(
-                            ProductosAction.GuardarProducto(
-                                nombre,
-                                tipo,
-                                cantidad,
-                                precio,
-                                tienda
-                            )
+                onGuardar = { nombre, tipo, cantidad, precio, tienda ->
+                    onAction(
+                        ProductosAction.GuardarProducto(
+                            nombre,
+                            tipo,
+                            cantidad,
+                            precio,
+                            tienda
                         )
+                    )
                 }
             )
         }
 
-        // SECCION 8: COMPARTIR LISTA
+        // SECCIÓN 8: COMPARTIR LISTA
         if (state.mostrarCompartir) {
             AlertDialog(
                 onDismissRequest = { onAction(ProductosAction.CerrarCompartir) },
@@ -291,7 +268,7 @@ fun ProductosScreen(
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Email,
-                                autoCorrect = false
+                                autoCorrectEnabled = false
                             )
                         )
                         state.mensajeCompartir?.let { mensaje ->

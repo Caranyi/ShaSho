@@ -10,6 +10,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -24,7 +25,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.shashoapp.Route
 import com.example.shashoapp.core.AppPreferences
 import com.example.shashoapp.core.TextosApp
 import com.example.shashoapp.features.listaListas.domain.model.Lista
@@ -35,50 +35,49 @@ fun ListaItem(
     onClick: () -> Unit,
     onEliminar: () -> Unit,
     modifier: Modifier = Modifier
-
-){
+) {
     val idioma by AppPreferences.idioma.collectAsStateWithLifecycle()
     val textos = TextosApp.get(idioma)
 
-    var muestraDialogoConfirmacionEliminar by remember{
+    var muestraDialogoConfirmacionEliminar by remember {
         mutableStateOf(false)
     }
 
     Card(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
-        border = BorderStroke(1.dp, Color.Black),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
         elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
-    ){
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
-        ){
-            Column(modifier = Modifier.weight(1f)){
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = lista.nombre,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF673AB7)
+                    color = MaterialTheme.colorScheme.primary
                 )
 
-                //indica si la lista es compartida
+                // indica si la lista es compartida
                 if (lista.compartida) {
                     Text(
                         text = textos.compartida,
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
 
             IconButton(
-                onClick = {muestraDialogoConfirmacionEliminar = true},
+                onClick = { muestraDialogoConfirmacionEliminar = true },
                 modifier = Modifier.size(32.dp)
-            ){
+            ) {
                 Text(
                     text = "x",
                     color = Color.Red,
@@ -87,14 +86,13 @@ fun ListaItem(
                 )
             }
 
-            if(muestraDialogoConfirmacionEliminar) {
+            if (muestraDialogoConfirmacionEliminar) {
                 AlertDialog(
-                    onDismissRequest = {  muestraDialogoConfirmacionEliminar = false},
-                    title = {Text(textos.eliminarListaTitulo)},
+                    onDismissRequest = { muestraDialogoConfirmacionEliminar = false },
+                    title = { Text(textos.eliminarListaTitulo) },
                     text = {
                         Text("${textos.quieresEliminar} ${lista.nombre}?")
                     },
-
                     confirmButton = {
                         TextButton(
                             onClick = {
@@ -105,10 +103,9 @@ fun ListaItem(
                             Text(textos.eliminar, color = Color.Red)
                         }
                     },
-
                     dismissButton = {
                         TextButton(
-                            onClick = { muestraDialogoConfirmacionEliminar = false}
+                            onClick = { muestraDialogoConfirmacionEliminar = false }
                         ) {
                             Text(textos.cancelar)
                         }
@@ -117,6 +114,4 @@ fun ListaItem(
             }
         }
     }
-
-
 }

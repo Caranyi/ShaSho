@@ -5,21 +5,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,15 +31,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shashoapp.core.AppPreferences
 import com.example.shashoapp.core.TextosApp
-import com.example.shashoapp.features.listaProductos.presentation.ProductosAction
-import com.example.shashoapp.features.listaProductos.presentation.ui.ProductoItem
 import org.jetbrains.compose.resources.painterResource
 import shashoapp.shared.generated.resources.Res
-import shashoapp.shared.generated.resources.arrowLeft
-import shashoapp.shared.generated.resources.arrowRight
-import shashoapp.shared.generated.resources.filtro
-import shashoapp.shared.generated.resources.logoShaSho
-import shashoapp.shared.generated.resources.reparto
+import shashoapp.shared.generated.resources.ShaSho
 
 @Composable
 fun BienvenidaScreenRoot(
@@ -51,7 +41,7 @@ fun BienvenidaScreenRoot(
     onRegisterClick: () -> Unit,
     modifier: Modifier = Modifier,
     conexionOk: Boolean? = null
-){
+) {
     BienvenidaScreen(
         onLoginClick = onLoginClick,
         onRegisterClick = onRegisterClick,
@@ -71,13 +61,13 @@ fun BienvenidaScreen(
     val textos = TextosApp.get(idioma)
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Column(
             modifier = Modifier
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
                 .fillMaxSize()
         ) {
             // SECCIÓN 1: ZONA MORADA CON LOGO
@@ -89,11 +79,9 @@ fun BienvenidaScreen(
                     .background(Color(0xFF673AB7)),
                 contentAlignment = Alignment.Center
             ) {
-
                 Image(
-                    painter = painterResource(Res.drawable.logoShaSho),
+                    painter = painterResource(Res.drawable.ShaSho),
                     contentDescription = "Logo ShaSho",
-                    contentScale = ContentScale.Fit,
                     modifier = Modifier
                         .size(320.dp)
                         .clip(CircleShape)
@@ -108,16 +96,15 @@ fun BienvenidaScreen(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
                 Text(
                     text = textos.bienvenidaTitulo,
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
 
-            // SECCION 3: ESTADO CONEXION AL SERVIDOR
+            // SECCIÓN 3: ESTADO CONEXIÓN AL SERVIDOR
             Text(
                 text = when (conexionOk) {
                     null -> textos.conectandoServidor
@@ -126,30 +113,32 @@ fun BienvenidaScreen(
                 },
                 fontSize = 13.sp,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(), //para que funcione el centrar, no quitar
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.fillMaxWidth()
             )
 
             // SECCIÓN 4: ZONA DE BOTONES
             Row(
                 modifier = Modifier
+                    .widthIn(max = 420.dp)
                     .fillMaxWidth()
+                    .align(Alignment.CenterHorizontally)
                     .padding(horizontal = 20.dp, vertical = 20.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
-            ){
-
+            ) {
                 Button(
                     onClick = onLoginClick,
                     modifier = Modifier.weight(1f)
-                ){
-                    Text(textos.iniciarSesion);
+                ) {
+                    Text(textos.iniciarSesion)
                 }
 
                 Button(
                     onClick = onRegisterClick,
                     modifier = Modifier.weight(1f)
-                ){
-                    Text(textos.registrarse);
+                ) {
+                    Text(textos.registrarse)
                 }
             }
         }

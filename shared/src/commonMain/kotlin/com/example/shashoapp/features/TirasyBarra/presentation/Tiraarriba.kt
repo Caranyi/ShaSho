@@ -19,7 +19,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import shashoapp.shared.generated.resources.Res
-import shashoapp.shared.generated.resources.logoShaSho
+import shashoapp.shared.generated.resources.ShaSho
 
 @Composable
 fun Tira(
@@ -39,14 +39,13 @@ fun Tira(
             modifier = Modifier
                 .size(90.dp)
                 .clip(CircleShape)
-                .background(Color.White)
+                .background(Color(0xFF673AB7))
                 .clickable {onClickLogo()},
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = painterResource(Res.drawable.logoShaSho),
+                painter = painterResource(Res.drawable.ShaSho),
                 contentDescription = "Logo ShaSho",
-                contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .size(90.dp)
                     .padding(6.dp)

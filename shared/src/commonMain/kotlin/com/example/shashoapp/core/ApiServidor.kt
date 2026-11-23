@@ -1,18 +1,14 @@
 package com.example.shashoapp.core
 
-import com.example.shashoapp.features.listaProductos.domain.model.Producto
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
 import io.ktor.http.parameters
 import kotlin.coroutines.cancellation.CancellationException
-//para las listas
-import io.ktor.client.request.parameter
-import io.ktor.http.append
-
 
 val httpClient: HttpClient = HttpClient {
     install(HttpTimeout) {
@@ -23,10 +19,9 @@ val httpClient: HttpClient = HttpClient {
 
 object ApiServidor {
 
-    //la url (servidor)
     private val baseUrl: String get() = ServidorConfig.BASE_URL
 
-    //COMPROBAR CONEXION (aAPP)
+    // COMPROBAR CONEXION
     suspend fun ping(): Boolean = try {
         httpClient.get("$baseUrl/ping").status.isSuccess()
     } catch (e: CancellationException) {
@@ -35,7 +30,7 @@ object ApiServidor {
         false
     }
 
-    //USUARIO Y CONTRASENYA (AUTREPOSITORYIMPL)
+    // USUARIO Y CONTRASENYA (AUTHREPOSITORYIMPL)
     suspend fun login(correo: String, contrasena: String): Int {
         val respuesta = httpClient.submitForm(
             url = "$baseUrl/login",
@@ -44,22 +39,40 @@ object ApiServidor {
                 append("contrasena", contrasena)
             }
         )
-        return respuesta.bodyAsText().toInt()
+        val texto = respuesta.bodyAsText().trim()
+        if (texto == "-1") return -1
+        val partes = texto.split("|", limit = 2)
+        val id = partes[0].toIntOrNull() ?: return -1
+        if (partes.size > 1 && partes[1].isNotBlank()) {
+            SesionUsuario.setNombreUsuario(partes[1])
+        }
+        return id
     }
 
-    suspend fun registro(nombre: String, correo: String, contrasenya: String): Int{
+    suspend fun registro(nombre: String, correo: String, contrasenya: String): Int {
         val respuesta = httpClient.submitForm(
             url = "$baseUrl/registro",
-            formParameters = parameters{
+            formParameters = parameters {
                 append("nombre", nombre)
                 append("correo", correo)
                 append("contrasenya", contrasenya)
             }
         )
-        return respuesta.bodyAsText().toInt()
+        return respuesta.bodyAsText().trim().toInt()
     }
 
-    //LISTAS DEL USUARIO (LISTAREPOSITORYIMPL)
+    suspend fun actualizarNombreUsuario(idUsuario: Int, nuevoNombre: String): Boolean {
+        val respuesta = httpClient.submitForm(
+            url = "$baseUrl/usuario/nombre",
+            formParameters = parameters {
+                append("idUsuario", idUsuario.toString())
+                append("nombre", nuevoNombre)
+            }
+        )
+        return respuesta.bodyAsText().trim() == "true"
+    }
+
+    // LISTAS DEL USUARIO (LISTAREPOSITORYIMPL)
     suspend fun getListas(idUsuario: Int): String {
         val respuesta = httpClient.get("$baseUrl/listas") {
             parameter("idUsuario", idUsuario)
@@ -67,8 +80,7 @@ object ApiServidor {
         return respuesta.bodyAsText()
     }
 
-
-    //PRODUCTOS PARA UNA LISTA (PRODUCTOREPOSITORYIMPL)
+    // PRODUCTOS PARA UNA LISTA (PRODUCTOREPOSITORYIMPL)
     suspend fun getProductos(idLista: Int): String {
         val respuesta = httpClient.get("$baseUrl/productos") {
             parameter("idLista", idLista)
@@ -76,7 +88,7 @@ object ApiServidor {
         return respuesta.bodyAsText()
     }
 
-    //COMPARTIR LISTA (LISTAREPOSITORYIMPL)
+    // COMPARTIR LISTA (LISTAREPOSITORYIMPL)
     suspend fun compartirLista(idLista: Int, correo: String): Int {
         val respuesta = httpClient.submitForm(
             url = "$baseUrl/compartir",
@@ -95,19 +107,19 @@ object ApiServidor {
     ): Int {
         val respuesta = httpClient.submitForm(
             url = "$baseUrl/listas",
-            formParameters = parameters{
+            formParameters = parameters {
                 append("nombre", nombre)
                 append("idCreador", idCreador.toString())
             }
         )
 
-        if(!respuesta.status.isSuccess()){
+        if (!respuesta.status.isSuccess()) {
             throw Exception("no se ha podido crear lista")
         }
         return respuesta.bodyAsText().toInt()
     }
 
-    suspend fun eliminarLista(idLista: Int): Boolean{
+    suspend fun eliminarLista(idLista: Int): Boolean {
         val respuesta = httpClient.submitForm(
             url = "$baseUrl/listas/eliminar",
             formParameters = parameters {
@@ -145,17 +157,16 @@ object ApiServidor {
         return texto.toIntOrNull() ?: -1
     }
 
-    suspend fun eliminarProducto(idLista: Int, idProducto: Int) : Boolean{
+    suspend fun eliminarProducto(idLista: Int, idProducto: Int): Boolean {
         val respuesta = httpClient.submitForm(
             url = "$baseUrl/productos/eliminar",
-            formParameters = parameters{
+            formParameters = parameters {
                 append("idLista", idLista.toString())
                 append("idProducto", idProducto.toString())
             }
         )
         return respuesta.bodyAsText().trim() == "true"
     }
-
 
     suspend fun actualizarMarcado(
         idLista: Int,
@@ -173,12 +184,12 @@ object ApiServidor {
             }
         )
 
-        if(!respuesta.status.isSuccess()){
+        if (!respuesta.status.isSuccess()) {
             throw Exception("no se ha podido actualizar")
         }
     }
 
-    //actualizar cantidad de un producto en una lista
+    // actualizar cantidad de un producto en una lista
     suspend fun actualizarCantidad(cantidad: Int, idLista: Int, idProducto: Int): Boolean {
         val respuesta = httpClient.submitForm(
             url = "$baseUrl/productos/cantidad",
@@ -186,10 +197,8 @@ object ApiServidor {
                 append("cantidad", cantidad.toString())
                 append("idLista", idLista.toString())
                 append("idProducto", idProducto.toString())
-
             }
         )
         return respuesta.bodyAsText().trim() == "true"
     }
-
 }
