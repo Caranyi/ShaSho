@@ -97,7 +97,13 @@ class AjustesViewModel(
                 viewModelScope.launch {
                     AppPreferences.setIdUsuario(null)
                 }
-                _state.update { it.copy(idUsuario = null) }
+                _state.update {
+                    it.copy(
+                    idUsuario = null,
+                    nombreUsuario = "",
+                    fotoPerfilBytes = null
+                    )
+                }
             }
         }
     }

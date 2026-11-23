@@ -38,25 +38,26 @@ object AppPreferences {
         leerArchivo("pref_modo_oscuro.txt")?.let { guardado ->
             _modoOscuro.value = guardado.toBooleanStrictOrNull() ?: false
         }
-        leerArchivo("pref_nombre_usuario.txt")?.let { guardado ->
-            if (guardado.isNotBlank()) {
-                _nombreUsuario.value = guardado
-                if (SesionUsuario.getNombreUsuario().isBlank()) {
-                    SesionUsuario.setNombreUsuario(guardado)
-                }
-            }
-        }
-        leerArchivo("pref_foto_perfil.b64")?.let { b64 ->
-            if (b64.isNotBlank()) {
-                runCatching {
-                    Base64.decode(b64)
-                }.getOrNull()?.let { bytes ->
-                    _fotoPerfilBytes.value = bytes
-                }
-            }
-        }
         leerArchivo("pref_id_usuario.txt")?.let { guardado ->
             _idUsuario.value = guardado.toIntOrNull()
+        }
+        cargarDatosUsuario(_idUsuario.value)
+    }
+
+    suspend fun cargarDatosUsuario(id: Int?) {
+        val sufijo = if (id != null && id > 0) "_$id" else "_offline"
+
+        val nombreGuardado = leerArchivo("pref_nombre_usuario$sufijo.txt").orEmpty()
+        _nombreUsuario.value = nombreGuardado
+        if (nombreGuardado.isNotBlank()) {
+            SesionUsuario.setNombreUsuario(nombreGuardado)
+        }
+
+        val b64 = leerArchivo("pref_foto_perfil$sufijo.b64").orEmpty()
+        _fotoPerfilBytes.value = if (b64.isNotBlank()) {
+            runCatching { Base64.decode(b64) }.getOrNull()
+        } else {
+            null
         }
     }
 
@@ -74,8 +75,11 @@ object AppPreferences {
         _idUsuario.value = id
         if (id != null) {
             guardarArchivo("pref_id_usuario.txt", id.toString())
+            cargarDatosUsuario(id)
         } else {
             guardarArchivo("pref_id_usuario.txt", "")
+            _nombreUsuario.value = ""
+            _fotoPerfilBytes.value = null
         }
     }
 
@@ -87,12 +91,15 @@ object AppPreferences {
     suspend fun setNombreUsuario(nombre: String) {
         _nombreUsuario.value = nombre
         SesionUsuario.setNombreUsuario(nombre)
-        guardarArchivo("pref_nombre_usuario.txt", nombre)
+        val id = _idUsuario.value ?: SesionUsuario.getIdUsuario()
+        val sufijo = if (id != null && id > 0) "_$id" else "_offline"
+        guardarArchivo("pref_nombre_usuario$sufijo.txt", nombre)
     }
-
     suspend fun setFotoPerfil(bytes: ByteArray?) {
         _fotoPerfilBytes.value = bytes
+        val id = _idUsuario.value ?: SesionUsuario.getIdUsuario()
+        val sufijo = if (id != null && id > 0) "_$id" else "_offline"
         val encoded = if (bytes != null) Base64.encode(bytes) else ""
-        guardarArchivo("pref_foto_perfil.b64", encoded)
+        guardarArchivo("pref_foto_perfil$sufijo.b64", encoded)
     }
 }
