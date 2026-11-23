@@ -1,7 +1,5 @@
 package com.example.shashoapp.core
 
-import kotlin.String
-
 data class Texts(
     // para la pantalla de bienvenida
     val bienvenidaTitulo: String,
@@ -59,6 +57,10 @@ data class Texts(
     val usuarioPrefix: String,
     val modoOnline: String,
     val modoOffline: String,
+    val modoOscuro: String,
+    val cambiarFotoPerfil: String,
+    val cambiarNombreUsuario: String,
+    val nuevoNombreUsuario: String,
     val notificaciones: String,
     val idiomaLabel: String,
     val espanol: String,
@@ -77,7 +79,9 @@ data class Texts(
     val errorCantidadMayorCero: String,
     val errorPrecioNegativo: String,
     val errorCamposLoginObligatorios: String,
-    val errorTodosCamposObligatorios: String
+    val errorTodosCamposObligatorios: String,
+    val errorNombreUsuarioVacio: String,
+    val errorActualizarNombre: String
 )
 
 object TextosApp {
@@ -132,6 +136,10 @@ object TextosApp {
         usuarioPrefix = "Usuario #",
         modoOnline = "Modo en línea activado",
         modoOffline = "Modo sin conexión",
+        modoOscuro = "Modo oscuro",
+        cambiarFotoPerfil = "Cambiar foto",
+        cambiarNombreUsuario = "Cambiar nombre",
+        nuevoNombreUsuario = "Nuevo nombre de usuario",
         notificaciones = "Notificaciones",
         idiomaLabel = "Idioma",
         espanol = "Español",
@@ -148,7 +156,9 @@ object TextosApp {
         errorCantidadMayorCero = "La cantidad debe ser mayor que 0",
         errorPrecioNegativo = "El precio no puede ser negativo",
         errorCamposLoginObligatorios = "El correo y la contraseña son obligatorios",
-        errorTodosCamposObligatorios = "Todos los campos son obligatorios"
+        errorTodosCamposObligatorios = "Todos los campos son obligatorios",
+        errorNombreUsuarioVacio = "El nombre de usuario no puede estar vacío",
+        errorActualizarNombre = "No se pudo actualizar el nombre de usuario"
     )
 
     private val en = Texts(
@@ -202,6 +212,10 @@ object TextosApp {
         usuarioPrefix = "User #",
         modoOnline = "Online mode enabled",
         modoOffline = "Offline mode",
+        modoOscuro = "Dark mode",
+        cambiarFotoPerfil = "Change photo",
+        cambiarNombreUsuario = "Change name",
+        nuevoNombreUsuario = "New username",
         notificaciones = "Notifications",
         idiomaLabel = "Language",
         espanol = "Español",
@@ -218,7 +232,9 @@ object TextosApp {
         errorCantidadMayorCero = "Quantity must be greater than 0",
         errorPrecioNegativo = "Price cannot be negative",
         errorCamposLoginObligatorios = "Email and password are required",
-        errorTodosCamposObligatorios = "All fields are required"
+        errorTodosCamposObligatorios = "All fields are required",
+        errorNombreUsuarioVacio = "Username cannot be empty",
+        errorActualizarNombre = "Could not update username"
     )
 
     fun get(codigoIdioma: String): Texts = if (codigoIdioma == "en") en else es

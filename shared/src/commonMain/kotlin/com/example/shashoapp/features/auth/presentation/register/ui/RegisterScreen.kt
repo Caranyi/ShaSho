@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shashoapp.core.AppPreferences
 import com.example.shashoapp.core.TextosApp
+import com.example.shashoapp.features.auth.presentation.CampoContrasenya
 import com.example.shashoapp.features.auth.presentation.register.RegisterAction
 import com.example.shashoapp.features.auth.presentation.register.RegisterState
 import com.example.shashoapp.features.auth.presentation.register.RegisterViewModel
@@ -30,8 +31,8 @@ fun RegisterScreenRoot(
 
     RegisterScreen(
         state = state,
-        onAction = {
-            action -> if (action is RegisterAction.OnIrALoginClick) onNavigateToLogin()
+        onAction = { action ->
+            if (action is RegisterAction.OnIrALoginClick) onNavigateToLogin()
             else viewModel.onAction(action)
         },
         modifier = modifier
@@ -47,74 +48,84 @@ fun RegisterScreen(
     val idioma by AppPreferences.idioma.collectAsStateWithLifecycle()
     val textos = TextosApp.get(idioma)
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    Surface(
+        modifier = modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
     ) {
-        Text(
-            text = textos.crearCuenta,
-            style = MaterialTheme.typography.headlineLarge
-        )
-        Spacer(modifier = Modifier.height(32.dp))
-
-        OutlinedTextField(
-            value = state.nombre,
-            onValueChange = {onAction(RegisterAction.OnNombreChanged(it))},
-            label = {Text(textos.nombreCompleto)},
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = state.correo,
-            onValueChange = {onAction(RegisterAction.OnCorreoChanged(it))},
-            label = {Text(textos.correoElectronico)},
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = state.contrasenya,
-            onValueChange = {onAction(RegisterAction.OnContrasenyaChanged(it))},
-            label = {Text(textos.contrasenya)},
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        state.error?.let {
-            err -> Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = err,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            onClick = {onAction(RegisterAction.OnRegisterClick)},
-            enabled = !state.cargando,
-            modifier = Modifier.fillMaxWidth()
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            contentAlignment = Alignment.Center
         ) {
-            if (state.cargando) {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(24.dp)
+            Column(
+                modifier = Modifier
+                    .widthIn(max = 420.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = textos.crearCuenta,
+                    style = MaterialTheme.typography.headlineLarge
                 )
-            }
-            else {
-                Text(textos.registrarse)
-            }
-        }
-        Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
-        TextButton(onClick = {onAction(RegisterAction.OnIrALoginClick)}) {
-            Text(textos.yaTienesCuenta)
+                OutlinedTextField(
+                    value = state.nombre,
+                    onValueChange = { onAction(RegisterAction.OnNombreChanged(it)) },
+                    label = { Text(textos.nombreCompleto) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = state.correo,
+                    onValueChange = { onAction(RegisterAction.OnCorreoChanged(it)) },
+                    label = { Text(textos.correoElectronico) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                CampoContrasenya(
+                    value = state.contrasenya,
+                    onValueChange = { onAction(RegisterAction.OnContrasenyaChanged(it)) },
+                    label = textos.contrasenya,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                state.error?.let { err ->
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = err,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Button(
+                    onClick = { onAction(RegisterAction.OnRegisterClick) },
+                    enabled = !state.cargando,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    if (state.cargando) {
+                        CircularProgressIndicator(
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    } else {
+                        Text(textos.registrarse)
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+
+                TextButton(onClick = { onAction(RegisterAction.OnIrALoginClick) }) {
+                    Text(textos.yaTienesCuenta)
+                }
+            }
         }
     }
 }

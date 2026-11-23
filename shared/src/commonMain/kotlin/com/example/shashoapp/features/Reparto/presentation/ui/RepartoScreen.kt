@@ -1,9 +1,6 @@
 package com.example.shashoapp.features.Reparto.presentation.ui
 
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,39 +15,25 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.shashoapp.core.AppPreferences
+import com.example.shashoapp.core.TextosApp
 import com.example.shashoapp.features.Reparto.presentation.RepartoState
 import com.example.shashoapp.features.Reparto.presentation.RepartoViewModel
 import org.jetbrains.compose.resources.painterResource
 import shashoapp.shared.generated.resources.Res
 import shashoapp.shared.generated.resources.arrowLeft
-import shashoapp.shared.generated.resources.logoShaSho
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import com.example.shashoapp.core.AppPreferences
-import com.example.shashoapp.core.TextosApp
-import com.example.shashoapp.features.Reparto.domain.model.Participante
-import com.example.shashoapp.features.Reparto.presentation.RepartoAction
-import com.example.shashoapp.features.listaListas.presentation.ListasAction
-import com.example.shashoapp.features.listaListas.presentation.ui.ListaItem
-import kotlin.math.roundToInt
 
 @Composable
 fun RepartoScreenRoot(
@@ -58,7 +41,7 @@ fun RepartoScreenRoot(
     onVolver: () -> Unit,
     onHome: () -> Unit,
     modifier: Modifier = Modifier
-    ){
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     RepartoScreen(
@@ -75,19 +58,18 @@ fun RepartoScreen(
     onVolver: () -> Unit,
     onHome: () -> Unit,
     modifier: Modifier = Modifier
-){
+) {
     val idioma by AppPreferences.idioma.collectAsStateWithLifecycle()
     val textos = TextosApp.get(idioma)
 
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-
-            // SECCIÓN 2: TÍTULO DE LA LISTA Y PORCENTAJEPORREPARTIR
+            // SECCIÓN 2: TÍTULO DE LA LISTA Y PORCENTAJE POR REPARTIR
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -98,7 +80,7 @@ fun RepartoScreen(
                     Icon(
                         painter = painterResource(Res.drawable.arrowLeft),
                         contentDescription = textos.anterior,
-                        tint = Color.Black,
+                        tint = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier.size(28.dp)
                     )
                 }
@@ -109,18 +91,16 @@ fun RepartoScreen(
                     text = textos.repartoTitulo,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
-
-
 
             // LISTA DE TARJETAS
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .background(Color(0xFFF5F5F5))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
@@ -129,8 +109,8 @@ fun RepartoScreen(
                 ) {
                     itemsIndexed(
                         items = state.participantes,
-                        key = { i, participantes -> "${participantes.nombre}_$i"}
-                    ) { i, participante->
+                        key = { i, participantes -> "${participantes.nombre}_$i" }
+                    ) { _, participante ->
                         RepartoItem(
                             participante = participante,
                             onCardClick = {},
@@ -143,6 +123,5 @@ fun RepartoScreen(
                 }
             }
         }
-
     }
 }

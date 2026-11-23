@@ -1,0 +1,11 @@
+package com.example.shashoapp.core
+
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.ImageBitmap
+
+@Composable
+expect fun rememberSelectorImagenPerfil(
+    onImagenSeleccionada: (ByteArray) -> Unit
+): () -> Unit
+
+expect fun ByteArray.aImageBitmap(): ImageBitmap?

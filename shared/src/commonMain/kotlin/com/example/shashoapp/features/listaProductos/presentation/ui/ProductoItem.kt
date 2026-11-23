@@ -1,7 +1,6 @@
 package com.example.shashoapp.features.listaProductos.presentation.ui
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +14,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -40,9 +40,9 @@ fun ProductoItem(
     onCardClick: () -> Unit,
     modifier: Modifier = Modifier,
     borderWith: Dp = 1.dp,
-    borderColor: Color = Color.Black,
+    borderColor: Color = MaterialTheme.colorScheme.outline,
     elevation: Dp = 4.dp,
-    containerColor: Color = Color.White,
+    containerColor: Color = MaterialTheme.colorScheme.surface,
     showCheckBox: Boolean = false,
     onCheckedChange: ((Boolean) -> Unit)? = null,
     ensenyaCantidad: Boolean = true,
@@ -53,7 +53,7 @@ fun ProductoItem(
     val idioma by AppPreferences.idioma.collectAsStateWithLifecycle()
     val textos = TextosApp.get(idioma)
 
-    var muestraDialogoConfirmacionEliminar by remember{
+    var muestraDialogoConfirmacionEliminar by remember {
         mutableStateOf(false)
     }
 
@@ -75,7 +75,7 @@ fun ProductoItem(
                     checked = producto.isChecked,
                     onCheckedChange = onCheckedChange,
                     colors = CheckboxDefaults.colors(
-                        checkedColor = Color(0xFF673AB7)
+                        checkedColor = MaterialTheme.colorScheme.primary
                     )
                 )
             }
@@ -86,9 +86,13 @@ fun ProductoItem(
                 Text(
                     text = producto.nombre,
                     fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
-                Text(text = producto.precioFormateado)
+                Text(
+                    text = producto.precioFormateado,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
 
             if (ensenyaCantidad) {
@@ -97,7 +101,8 @@ fun ProductoItem(
                         Text(
                             "-",
                             fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
 
@@ -105,6 +110,7 @@ fun ProductoItem(
                         text = "${producto.dameCantidad}",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.padding(horizontal = 4.dp)
                     )
 
@@ -112,16 +118,17 @@ fun ProductoItem(
                         Text(
                             "+",
                             fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
             }
 
             IconButton(
-                onClick = {muestraDialogoConfirmacionEliminar = true},
+                onClick = { muestraDialogoConfirmacionEliminar = true },
                 modifier = Modifier.size(32.dp)
-            ){
+            ) {
                 Text(
                     text = "x",
                     color = Color.Red,
@@ -130,14 +137,13 @@ fun ProductoItem(
                 )
             }
 
-            if(muestraDialogoConfirmacionEliminar) {
+            if (muestraDialogoConfirmacionEliminar) {
                 AlertDialog(
-                    onDismissRequest = {  muestraDialogoConfirmacionEliminar = false},
-                    title = {Text(textos.eliminarProductoTitulo)},
+                    onDismissRequest = { muestraDialogoConfirmacionEliminar = false },
+                    title = { Text(textos.eliminarProductoTitulo) },
                     text = {
                         Text("${textos.quieresEliminar} ${producto.nombre}?")
                     },
-
                     confirmButton = {
                         TextButton(
                             onClick = {
@@ -148,10 +154,9 @@ fun ProductoItem(
                             Text(textos.eliminar, color = Color.Red)
                         }
                     },
-
                     dismissButton = {
                         TextButton(
-                            onClick = { muestraDialogoConfirmacionEliminar = false}
+                            onClick = { muestraDialogoConfirmacionEliminar = false }
                         ) {
                             Text(textos.cancelar)
                         }
@@ -159,7 +164,5 @@ fun ProductoItem(
                 )
             }
         }
-
-
     }
 }
