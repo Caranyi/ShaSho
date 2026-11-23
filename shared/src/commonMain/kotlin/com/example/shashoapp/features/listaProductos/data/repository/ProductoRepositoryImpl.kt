@@ -154,9 +154,19 @@ class ProductoRepositoryImpl : ProductoRepository {
         if (nuevaCantidad < 1)
             return
 
+        if (EstadoConexion.getConexion() && idProducto > 0) {
+            try {
+                ApiServidor.actualizarCantidad(nuevaCantidad, idLista, idProducto)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+
+            }
+        }
+
         mutexPendientes.withLock {
             val archivo =
-                if(idProducto < 0) {
+                if (idProducto < 0) {
                     productosPendientes(idLista)
                 } else {
                     "productos_$idLista.json"
@@ -164,9 +174,8 @@ class ProductoRepositoryImpl : ProductoRepository {
 
             val productos = Json.decodeFromString<List<ProductoDto>>(leerArchivo(archivo) ?: "[]")
 
-            val actualizados = productos.map {
-                producto ->
-                if(producto.id == idProducto) {
+            val actualizados = productos.map { producto ->
+                if (producto.id == idProducto) {
                     producto.copy(cantidad = nuevaCantidad)
                 } else {
                     producto
@@ -178,7 +187,6 @@ class ProductoRepositoryImpl : ProductoRepository {
                 Json.encodeToString(actualizados)
             )
         }
-
     }
 
     override suspend fun eliminarProducto(idLista: Int, idProducto: Int) {

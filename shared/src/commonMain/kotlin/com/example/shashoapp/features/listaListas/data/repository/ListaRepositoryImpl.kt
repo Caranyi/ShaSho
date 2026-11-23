@@ -125,13 +125,13 @@ class ListaRepositoryImpl : ListaRepository{
         }
     }
 
-    override suspend fun eliminarLista(idLista:Int){
-        if(EstadoConexion.getConexion() && idLista > 0){
-            try{
+    override suspend fun eliminarLista(idLista: Int) {
+        if (EstadoConexion.getConexion() && idLista > 0) {
+            try {
                 ApiServidor.eliminarLista(idLista)
-            }catch(e : CancellationException){
+            } catch (e: CancellationException) {
                 throw e
-            }catch(e:Exception){
+            } catch (e: Exception) {
 
             }
         }
@@ -160,7 +160,6 @@ class ListaRepositoryImpl : ListaRepository{
                     println("Error al procesar el borrado")
                 }
             }
-
         }
     }
 

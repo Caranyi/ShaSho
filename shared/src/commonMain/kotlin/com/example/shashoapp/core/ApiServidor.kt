@@ -72,7 +72,7 @@ object ApiServidor {
         return respuesta.bodyAsText().trim() == "true"
     }
 
-    // LISTAS DEL USUARIO
+    // LISTAS DEL USUARIO (LISTAREPOSITORYIMPL)
     suspend fun getListas(idUsuario: Int): String {
         val respuesta = httpClient.get("$baseUrl/listas") {
             parameter("idUsuario", idUsuario)
@@ -80,7 +80,7 @@ object ApiServidor {
         return respuesta.bodyAsText()
     }
 
-    // PRODUCTOS PARA UNA LISTA
+    // PRODUCTOS PARA UNA LISTA (PRODUCTOREPOSITORYIMPL)
     suspend fun getProductos(idLista: Int): String {
         val respuesta = httpClient.get("$baseUrl/productos") {
             parameter("idLista", idLista)
@@ -88,7 +88,7 @@ object ApiServidor {
         return respuesta.bodyAsText()
     }
 
-    // COMPARTIR LISTA
+    // COMPARTIR LISTA (LISTAREPOSITORYIMPL)
     suspend fun compartirLista(idLista: Int, correo: String): Int {
         val respuesta = httpClient.submitForm(
             url = "$baseUrl/compartir",
@@ -187,5 +187,18 @@ object ApiServidor {
         if (!respuesta.status.isSuccess()) {
             throw Exception("no se ha podido actualizar")
         }
+    }
+
+    // actualizar cantidad de un producto en una lista
+    suspend fun actualizarCantidad(cantidad: Int, idLista: Int, idProducto: Int): Boolean {
+        val respuesta = httpClient.submitForm(
+            url = "$baseUrl/productos/cantidad",
+            formParameters = parameters {
+                append("cantidad", cantidad.toString())
+                append("idLista", idLista.toString())
+                append("idProducto", idProducto.toString())
+            }
+        )
+        return respuesta.bodyAsText().trim() == "true"
     }
 }
