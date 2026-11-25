@@ -1,5 +1,7 @@
 package com.example.shashoapp.core
 
+import kotlin.String
+
 data class Texts(
     // para la pantalla de bienvenida
     val bienvenidaTitulo: String,
@@ -32,6 +34,16 @@ data class Texts(
     val eliminarListaTitulo: String,
     val quieresEliminar: String,
     val eliminar: String,
+    val tipo_lista_productos: String,
+    val tipo_lista_tareas: String,
+    val tipo_de_lista: String,
+
+    //para Tareas
+    val anadirTarea: String,
+    val nombreTarea: String,
+    val tareasVacias: String,
+    val eliminarTareaTitulo: String,
+
 
     // para Productos
     val listaCabecera: String,
@@ -114,6 +126,15 @@ object TextosApp {
         eliminarListaTitulo = "Eliminar lista",
         quieresEliminar = "¿Quieres eliminar",
         eliminar = "Eliminar",
+        tipo_lista_productos =  "Productos",
+        tipo_lista_tareas = "Tareas",
+        tipo_de_lista = "Tipo de lista",
+
+
+        anadirTarea =  "Añadir tarea",
+        nombreTarea =  "Nombre de la tarea",
+        tareasVacias = "Todavía no hay tareas. Añade una con +",
+        eliminarTareaTitulo = "Eliminar tarea",
 
         listaCabecera = "LISTA",
         anadirPersona = "+ Personas",
@@ -190,6 +211,14 @@ object TextosApp {
         eliminarListaTitulo = "Delete list",
         quieresEliminar = "Do you want to delete",
         eliminar = "Delete",
+        tipo_lista_productos =  "Products",
+        tipo_lista_tareas = "Tasks",
+        tipo_de_lista = "List type",
+
+        anadirTarea =  "Add task",
+        nombreTarea =  "Task name",
+        tareasVacias = "There are no tasks yet. Add one with +",
+        eliminarTareaTitulo = "Delete task",
 
         listaCabecera = "LIST",
         anadirPersona = "+ Person",

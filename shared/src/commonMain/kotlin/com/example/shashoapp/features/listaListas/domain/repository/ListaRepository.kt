@@ -6,7 +6,7 @@ interface ListaRepository {
     //pasa el id del usuario que hay guardado (o no)
     suspend fun getListas(idUsuario: Int?): List<Lista>
     suspend fun compartirLista(idLista: Int, correo: String): Result<Unit>
-    suspend fun crearLista(nombre: String, idCreador: Int?)
+    suspend fun crearLista(nombre: String, idCreador: Int?, tipo: String)
 
     suspend fun eliminarLista(idLista: Int)
     suspend fun sincronizarPendientes(idUsuario: Int?)

@@ -45,7 +45,7 @@ class ListasViewModel (
                 println("ACCIÓN GUARDAR RECIBIDA")
                 _state.update { it.copy(mostrarCrear = false) }
             }
-            is ListasAction.GuardarLista -> { guardarLista(action.nombre)}
+            is ListasAction.GuardarLista -> { guardarLista(action.nombre, action.tipo)}
             is ListasAction.EliminarLista -> {eliminarLista(action.idLista)}
         }
 
@@ -75,7 +75,7 @@ class ListasViewModel (
         }
     }
 
-    private fun guardarLista(nombre: String){
+    private fun guardarLista(nombre: String, tipo:String){
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true)}
             val usuarioActual = idUsuario ?: -1 // si no hay conexion ponemos como id por defecto -1
@@ -84,7 +84,7 @@ class ListasViewModel (
                 println("CREANDO LISTA: $nombre")
                 println("USUARIO: $idUsuario")
 
-                crearListaUseCase(nombre, idUsuario)
+                crearListaUseCase(nombre, idUsuario, tipo)
 
                 println("LISTA GUARDADA EN LOCAL")
 

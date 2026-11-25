@@ -31,12 +31,12 @@ object ApiServidor {
     }
 
     // USUARIO Y CONTRASENYA (AUTHREPOSITORYIMPL)
-    suspend fun login(correo: String, contrasena: String): Int {
+    suspend fun login(correo: String, contrasenya: String): Int {
         val respuesta = httpClient.submitForm(
             url = "$baseUrl/login",
             formParameters = parameters {
                 append("correo", correo)
-                append("contrasena", contrasena)
+                append("contrasenya", contrasenya)
             }
         )
         val texto = respuesta.bodyAsText().trim()
@@ -88,6 +88,53 @@ object ApiServidor {
         return respuesta.bodyAsText()
     }
 
+
+    // TAREAS DE UNA LISTA
+    suspend fun getTareas(idLista: Int): String {
+        val respuesta = httpClient.get("$baseUrl/tareas") {
+            parameter("idLista", idLista)
+        }
+        return respuesta.bodyAsText()
+    }
+
+    suspend fun crearTarea(idLista: Int, nombre: String): Int {
+        val respuesta = httpClient.submitForm(
+            url = "$baseUrl/tareas",
+            formParameters = parameters {
+                append("idLista", idLista.toString())
+                append("nombre", nombre)
+            }
+        )
+        return respuesta.bodyAsText().trim().toIntOrNull() ?: -1
+    }
+
+    suspend fun actualizarTareaCompletada(
+        idLista: Int,
+        idTarea: Int,
+        completada: Boolean
+    ): Boolean {
+        val respuesta = httpClient.submitForm(
+            url = "$baseUrl/tareas/completada",
+            formParameters = parameters {
+                append("idLista", idLista.toString())
+                append("idTarea", idTarea.toString())
+                append("completada", completada.toString())
+            }
+        )
+        return respuesta.bodyAsText().trim() == "true"
+    }
+
+    suspend fun eliminarTarea(idLista: Int, idTarea: Int): Boolean {
+        val respuesta = httpClient.submitForm(
+            url = "$baseUrl/tareas/eliminar",
+            formParameters = parameters {
+                append("idLista", idLista.toString())
+                append("idTarea", idTarea.toString())
+            }
+        )
+        return respuesta.bodyAsText().trim() == "true"
+    }
+
     // COMPARTIR LISTA (LISTAREPOSITORYIMPL)
     suspend fun compartirLista(idLista: Int, correo: String): Int {
         val respuesta = httpClient.submitForm(
@@ -103,13 +150,15 @@ object ApiServidor {
 
     suspend fun crearLista(
         nombre: String,
-        idCreador: Int
+        idCreador: Int,
+        tipo: String
     ): Int {
         val respuesta = httpClient.submitForm(
             url = "$baseUrl/listas",
             formParameters = parameters {
                 append("nombre", nombre)
                 append("idCreador", idCreador.toString())
+                append("tipo", tipo)
             }
         )
 

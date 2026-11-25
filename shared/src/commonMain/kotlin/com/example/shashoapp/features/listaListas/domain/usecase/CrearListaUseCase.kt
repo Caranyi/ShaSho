@@ -9,7 +9,8 @@ class CrearListaUseCase(
 ) {
     suspend operator fun invoke(
         nombre: String,
-        idCreador: Int?
+        idCreador: Int?,
+        tipo: String
     ){
         val textos = TextosApp.get(AppPreferences.idioma.value)
 
@@ -21,6 +22,6 @@ class CrearListaUseCase(
             textos.errorUsuarioNoEncontrado
         }
 
-        repository.crearLista(nombre.trim(), idCreador)
+        repository.crearLista(nombre.trim(), idCreador, tipo)
     }
 }

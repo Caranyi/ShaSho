@@ -38,6 +38,8 @@ import com.example.shashoapp.features.listaListas.presentation.ListasViewModel
 import com.example.shashoapp.features.listaListas.presentation.ui.ListasScreenRoot
 import com.example.shashoapp.features.listaProductos.presentation.ProductosViewModel
 import com.example.shashoapp.features.listaProductos.presentation.ui.ProductosScreenRoot
+import com.example.shashoapp.features.listaTareas.presentation.ui.TareasScreenRoot
+import com.example.shashoapp.features.listaTareas.presentation.TareasViewModel
 
 @Composable
 fun App(
@@ -147,15 +149,19 @@ fun App(
                     ListasScreenRoot(
                         viewModel = viewModel,
                         onListaClick = { lista ->
-                            navController.navigate(Route.Lista(id = lista.id, nombre = lista.nombre))
+                            if(lista.tipo == "productos"){
+                                navController.navigate(Route.ListaProductos(id = lista.id, nombre = lista.nombre))
+                            }else{
+                                navController.navigate(Route.ListaTareas(id = lista.id, nombre = lista.nombre))
+                            }
                         },
                         modifier = Modifier.padding(inner)
                     )
                 }
             }
 
-            composable<Route.Lista> { backStackEntry ->
-                val route: Route.Lista = backStackEntry.toRoute()
+            composable<Route.ListaProductos> { backStackEntry ->
+                val route: Route.ListaProductos = backStackEntry.toRoute()
 
                 val viewModel = remember(route.id) {
                     ProductosViewModel(
@@ -180,6 +186,34 @@ fun App(
                         modifier = Modifier.padding(inner),
                         onReparto = { navController.navigate(Route.Reparto(route.id)) },
                         listaNombre = route.nombre
+                    )
+                }
+            }
+
+            composable<Route.ListaTareas> { backStackEntry ->
+                val route: Route.ListaTareas = backStackEntry.toRoute()
+
+                val viewModel = remember(route.id) {
+                    TareasViewModel(
+                        getTareasUseCase = appContainer.getTareasUseCase,
+                        compartirListaUseCase = appContainer.compartirListaUseCase,
+                        crearTareaUseCase = appContainer.crearTareaUseCase,
+                        actualizarTareaCompletadaUseCase =
+                            appContainer.actualizarTareaCompletadaUseCase,
+                        eliminarTareaUseCase = appContainer.eliminarTareaUseCase,
+                        idLista = route.id,
+                    )
+                }
+                MainScafold(
+                    onInicio = { navController.popBackStack(Route.Home, false) },
+                    onCrear = {},
+                    onAjustes = { navController.navigate(Route.Ajustes) }
+                ) { inner ->
+                    TareasScreenRoot(
+                        viewModel = viewModel,
+                        listaNombre = route.nombre,
+                        onVolver = { navController.popBackStack() },
+                        modifier = Modifier.padding(inner)
                     )
                 }
             }

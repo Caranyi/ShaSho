@@ -113,8 +113,8 @@ fun ListasScreen(
                     onDismiss = {
                         onAction(ListasAction.CerrarCrearLista)
                     },
-                    onGuardar = { nombre ->
-                        onAction(ListasAction.GuardarLista(nombre))
+                    onGuardar = { nombre,tipo ->
+                        onAction(ListasAction.GuardarLista(nombre,tipo))
                     }
                 )
             }

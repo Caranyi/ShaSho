@@ -16,7 +16,10 @@ sealed interface Route {
     data object Register : Route
 
     @Serializable
-    data class Lista(val id: Int, val nombre: String) : Route
+    data class ListaProductos(val id: Int, val nombre: String) : Route
+
+    @Serializable
+    data class ListaTareas(val id: Int, val nombre: String) : Route
 
     @Serializable
     data object Ajustes : Route

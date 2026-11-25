@@ -12,6 +12,7 @@ data class ListaDto(
     val cantidadProductos: Int,
     //si una lista es compartida (falso por defecto porque al crearla solo hay un user)
     val compartida: Boolean = false,
+    val tipo: String = "productos",
     val idsUsuarios: List<Int> = emptyList()
 )
 
@@ -21,5 +22,6 @@ fun ListaDto.toDomain(): Lista = Lista(
     id_creador = idCreador,
     cantidadProductos = cantidadProductos,
     compartida = compartida,
+    tipo = tipo,
     ids_usuarios = idsUsuarios.toIntArray()
 )

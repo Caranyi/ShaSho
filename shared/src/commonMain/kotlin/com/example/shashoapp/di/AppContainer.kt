@@ -22,6 +22,12 @@ import com.example.shashoapp.features.listaProductos.domain.usecase.ActualizarMa
 import com.example.shashoapp.features.listaProductos.domain.usecase.CrearProductosUseCase
 import com.example.shashoapp.features.listaProductos.domain.usecase.EliminarProductoUseCase
 import com.example.shashoapp.features.listaProductos.domain.usecase.GetProductosListaUseCase
+import com.example.shashoapp.features.listaTareas.data.repository.TareaRepositoryImpl
+import com.example.shashoapp.features.listaTareas.domain.repository.TareaRepository
+import com.example.shashoapp.features.listaTareas.domain.usecase.ActualizarTareaCompletadaUseCase
+import com.example.shashoapp.features.listaTareas.domain.usecase.CrearTareaUseCase
+import com.example.shashoapp.features.listaTareas.domain.usecase.EliminarTareaUseCase
+import com.example.shashoapp.features.listaTareas.domain.usecase.GetTareasUseCase
 
 interface AppContainer {
     val getProductosListaUseCase: GetProductosListaUseCase
@@ -38,6 +44,14 @@ interface AppContainer {
     val getRepartoUSeCase: GetRepartoUseCase
     val eliminarProductoUseCase: EliminarProductoUseCase
     val actualizaCantidadesUseCase: ActualizaCantidadesUseCase
+
+    val getTareasUseCase: GetTareasUseCase
+
+    val crearTareaUseCase: CrearTareaUseCase
+
+    val actualizarTareaCompletadaUseCase: ActualizarTareaCompletadaUseCase
+
+    val eliminarTareaUseCase: EliminarTareaUseCase
 }
 
 class DefaultAppContainer : AppContainer {
@@ -115,5 +129,25 @@ class DefaultAppContainer : AppContainer {
 
     override val actualizaCantidadesUseCase by lazy {
         ActualizaCantidadesUseCase(productoRepository)
+    }
+
+    private val tareaRepository: TareaRepository by lazy {
+        TareaRepositoryImpl()
+    }
+
+    override val getTareasUseCase: GetTareasUseCase by lazy {
+        GetTareasUseCase(tareaRepository)
+    }
+
+    override val crearTareaUseCase: CrearTareaUseCase by lazy {
+        CrearTareaUseCase(tareaRepository)
+    }
+
+    override val actualizarTareaCompletadaUseCase: ActualizarTareaCompletadaUseCase by lazy {
+        ActualizarTareaCompletadaUseCase(tareaRepository)
+    }
+
+    override val eliminarTareaUseCase: EliminarTareaUseCase by lazy {
+        EliminarTareaUseCase(tareaRepository)
     }
 }

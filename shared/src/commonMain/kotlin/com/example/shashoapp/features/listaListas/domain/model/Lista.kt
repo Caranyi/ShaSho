@@ -6,7 +6,8 @@ data class Lista (
     val id_creador: Int,
     val ids_usuarios: IntArray = intArrayOf(),
     val cantidadProductos: Int,
-    val compartida: Boolean = false
+    val compartida: Boolean = false,
+    val tipo: String = "productos"
     ){
 
     val dameNumUsuarios: Int
