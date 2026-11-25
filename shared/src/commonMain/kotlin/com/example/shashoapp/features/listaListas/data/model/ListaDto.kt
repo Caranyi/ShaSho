@@ -24,5 +24,12 @@ fun ListaDto.toDomain(): Lista = Lista(
     compartida = compartida,
     tipo = tipo,
     ids_usuarios = idsUsuarios.toIntArray(),
-    imagenBytes = if (imagen.isNotBlank()) runCatching { Base64.decode(imagen) }.getOrNull() else null
-)
+    imagenBytes = if (imagen.isBlank()) {
+        null //si no se añade ninguna imagen
+    } else {
+        runCatching { Base64.decode(imagen) }
+            .onFailure { error ->
+                println("Error decodificando la imagen: ${error.message}")
+            }
+            .getOrNull()
+    })

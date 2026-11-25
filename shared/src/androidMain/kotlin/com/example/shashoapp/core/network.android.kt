@@ -1,6 +1,6 @@
 package com.example.shashoapp.core
 
 actual object ServidorConfig {
-    actual val BASE_URL: String = "http://192.168.1.42:8080"
+    actual val BASE_URL: String = "http://10.8.94.139:8080"
 
 }
