@@ -69,7 +69,7 @@ def buscar_listas_usuario(id_usuario):
     try:
         with con.cursor() as cur:
             cur.execute(
-                "SELECT l.id, l.nombre, l.id_creador, l.cantidad_productos, l.compartida "
+                "SELECT l.id, l.nombre, l.id_creador, l.cantidad_productos, l.compartida, l.tipo "
                 "FROM lista l "
                 "JOIN union_lista_usuario u ON u.id_lista = l.id "
                 "WHERE u.id_usuario = %s "
@@ -87,9 +87,38 @@ def buscar_listas_usuario(id_usuario):
             "idCreador": fila[2],
             "cantidadProductos": fila[3],
             "compartida": fila[4],
+            "tipo": fila[5]
         }
         for fila in filas
     ]
+
+# BUSCAR TAREAS LISTA *****************************************************************************************************
+
+def buscar_tareas_lista(id_lista):
+    con = psycopg2.connect(**DB_CONFIG)
+    try:
+        with con.cursor() as cur:
+            cur.execute(
+                """
+                SELECT id, nombre, completada
+                FROM tarea
+                WHERE id_lista = %s
+                ORDER BY id
+                """,
+                (id_lista,),
+            )
+            filas = cur.fetchall()
+
+        return [
+            {
+                "id": fila[0],
+                "nombre": fila[1],
+                "completada": fila[2],
+            }
+            for fila in filas
+        ]
+    finally:
+        con.close()
 
 # BUSCAR PRODUCTOS LISTA **************************************************************************************************
 def buscar_productos_lista(id_lista):
@@ -126,11 +155,9 @@ def buscar_productos_lista(id_lista):
 
 def compartir_lista(id_lista, correo):
 
+    correo_limpio = correo.strip().lower()
     con = psycopg2.connect(**DB_CONFIG)
     try:
-
-        correo_limpio = correo.strip().lower()
-
         with con.cursor() as cur:
 
             cur.execute("SELECT id FROM usuario WHERE LOWER(TRIM(correo)) = %s", (correo_limpio,))
@@ -172,13 +199,13 @@ def compartir():
     return str(compartir_lista(id_lista, correo))
 
 # CREAR LISTA **************************************************************************************************
-def crear_lista(nombre, id_creador):
+def crear_lista(nombre, id_creador, tipo):
     con = psycopg2.connect(**DB_CONFIG)
     try:
         with con.cursor() as cur:
             cur.execute(
-                "INSERT INTO lista (id_creador, nombre, cantidad_productos) VALUES (%s, %s, 0) RETURNING id",
-                (id_creador, nombre),
+                "INSERT INTO lista (id_creador, nombre, tipo, cantidad_productos) VALUES (%s, %s, %s, 0) RETURNING id",
+                (id_creador, nombre, tipo),
             )
             fila = cur.fetchone()
             if fila is None:
@@ -202,11 +229,12 @@ def crear_lista(nombre, id_creador):
 def crear_lista_db():
     nombre = request.form.get("nombre", "").strip()
     id_creador = request.form.get("idCreador", type=int)
+    tipo = request.form.get("tipo", "").strip().lower()
 
-    if not nombre or id_creador is None:
+    if not nombre or id_creador is None or tipo not in ("productos", "tareas"):
         return "-1"
 
-    id_generado = crear_lista(nombre, id_creador)
+    id_generado = crear_lista(nombre, id_creador, tipo)
     return str(id_generado)
 
 
@@ -241,6 +269,50 @@ def eliminar_lista_db():
     exito = eliminar_lista(id_lista)
     return "true" if exito else "false"
 
+#CREAR TAREAS ******************************************************************************************************
+def crear_tarea(id_lista, nombre):
+    con = psycopg2.connect(**DB_CONFIG)
+    try:
+        with con.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO tarea (id_lista, nombre)
+                VALUES (%s, %s)
+                RETURNING id
+                """,
+                (id_lista, nombre),
+            )
+            fila = cur.fetchone()
+
+        con.commit()
+        return fila[0] if fila else -1
+    except Exception as e:
+        con.rollback()
+        print("Error al crear tarea:", e)
+        return -1
+    finally:
+        con.close()
+
+
+@app.post("/tareas")
+def crear_tarea_db():
+    id_lista = request.form.get("idLista", type=int)
+    nombre = request.form.get("nombre", "").strip()
+
+    if id_lista is None or id_lista <= 0 or not nombre or not lista_tiene_tipo(id_lista, "tareas"):
+        return "-1"
+
+    return str(crear_tarea(id_lista, nombre))
+
+
+@app.get("/tareas")
+def tareas():
+    id_lista = request.args.get("idLista", type=int)
+
+    if id_lista is None or id_lista <= 0 or not lista_tiene_tipo(id_lista, "tareas"):
+        return jsonify([])
+
+    return jsonify(buscar_tareas_lista(id_lista))
 
 # CREAR PRODUCTOS **************************************************************************************************
 def crear_producto(id_lista, nombre, precio, tienda, tipo, cantidad):
@@ -249,7 +321,7 @@ def crear_producto(id_lista, nombre, precio, tienda, tipo, cantidad):
         with con.cursor() as cur:
             cur.execute(
                 """
-                INSERT INTO producto (id_lista, nombre, precio, tienda, tipo, cantidad, comprado)
+                INSERT INTO producto (id_lista, nombre, precio, tienda, tipo, cantidad, checked)
                 VALUES (%s, %s, %s, %s, %s, %s, FALSE)
                 RETURNING id
                 """,
@@ -279,7 +351,7 @@ def crear_producto_db():
     tipo = request.form.get("tipo", "").strip()
     cantidad = request.form.get("cantidad", type=int, default=1)
 
-    if not id_lista or id_lista <= 0 or not nombre:
+    if not id_lista or id_lista <= 0 or not nombre or cantidad < 1 or precio < 0 or not lista_tiene_tipo(id_lista, "productos"):
         return "-1"
 
     id_generado = crear_producto(id_lista, nombre, precio, tienda, tipo, cantidad)
@@ -289,31 +361,67 @@ def crear_producto_db():
 @app.get("/productos")
 def productos():
     id_lista = request.args.get("idLista", type=int)
-    if id_lista is None:
+    if id_lista is None or id_lista <= 0 or not lista_tiene_tipo(id_lista, "productos"):
         return jsonify([])
     return jsonify(buscar_productos_lista(id_lista))
 
+# ELIMINAR TAREAS ****************************************************************************************************
+def eliminar_tarea(id_lista, id_tarea):
+    con = psycopg2.connect(**DB_CONFIG)
+    try:
+        with con.cursor() as cur:
+            cur.execute(
+                "DELETE FROM tarea WHERE id = %s AND id_lista = %s",
+                (id_tarea, id_lista),
+            )
+            eliminada = cur.rowcount > 0
+
+        con.commit()
+        return eliminada
+    except Exception as e:
+        con.rollback()
+        print("Error al eliminar tarea:", e)
+        return False
+    finally:
+        con.close()
 
 
+@app.post("/tareas/eliminar")
+def eliminar_tarea_db():
+    id_lista = request.form.get("idLista", type=int)
+    id_tarea = request.form.get("idTarea", type=int)
 
+    if not id_lista or id_lista <= 0 or not id_tarea or id_tarea <= 0 or not lista_tiene_tipo(id_lista, "tareas"):
+        return "false"
+
+    return "true" if eliminar_tarea(id_lista, id_tarea) else "false"
 
 # ELIMINAR PRODUCTOS **************************************************************************************************
 def eliminar_producto(id_lista, id_producto):
     con = psycopg2.connect(**DB_CONFIG)
-
     try:
         with con.cursor() as cur:
-            cur.execute("DELETE FROM producto WHERE id = %s AND id_lista = %s",
-                        (id_producto, id_lista)
+            cur.execute(
+                "DELETE FROM producto WHERE id = %s AND id_lista = %s",
+                (id_producto, id_lista),
             )
+            eliminado = cur.rowcount > 0
 
-            cur.execute("UPDATE lista SET cantidad_productos = GREATEST(0, cantidad_productos-1) WHERE id = %s",
-                        (id_lista))
+            if eliminado:
+                cur.execute(
+                    """
+                    UPDATE lista
+                    SET cantidad_productos = GREATEST(0, cantidad_productos - 1)
+                    WHERE id = %s
+                    """,
+                    (id_lista,),
+                )
 
-            con.commit()
-            return True
+        con.commit()
+        return eliminado
     except Exception as e:
-        print("Error al elimina el producto en postgresql")
+        con.rollback()
+        print("Error al eliminar producto:", e)
         return False
     finally:
         con.close()
@@ -323,7 +431,7 @@ def eliminar_producto_db():
     id_lista = request.form.get("idLista", type=int)
     id_producto = request.form.get("idProducto", type=int)
 
-    if not id_lista or not id_producto:
+    if id_lista is None or id_lista <= 0 or id_producto is None or id_producto <= 0 or not lista_tiene_tipo(id_lista, "productos"):
         return "false"
 
     exito = eliminar_producto(id_lista, id_producto)
@@ -461,13 +569,181 @@ def usuarios_info():
                 ids.append(val)
     return jsonify(obtener_info_usuarios(ids))
 
+#  VER TIPO LISTA ****************************************************************************************************
+def lista_tiene_tipo(id_lista, tipo_esperado):
+    con = psycopg2.connect(**DB_CONFIG)
+    try:
+        with con.cursor() as cur:
+            cur.execute(
+                "SELECT 1 FROM lista WHERE id = %s AND tipo = %s",
+                (id_lista, tipo_esperado),
+            )
+            return cur.fetchone() is not None
+    finally:
+        con.close()
+
+# MARCADO PRODUCTOS ********************************************************************************************
+def actualizar_marcado_producto(
+    id_lista,
+    id_producto,
+    marcado,
+    id_usuario_mark
+):
+    con = psycopg2.connect(**DB_CONFIG)
+    try:
+        with con.cursor() as cur:
+            cur.execute(
+                """
+                UPDATE producto
+                SET checked = %s,
+                    id_usuario_mark = %s
+                WHERE id = %s AND id_lista = %s
+                """,
+                (marcado, id_usuario_mark, id_producto, id_lista),
+            )
+            actualizado = cur.rowcount > 0
+
+        con.commit()
+        return actualizado
+    except Exception as e:
+        con.rollback()
+        print("Error al actualizar el marcado del producto:", e)
+        return False
+    finally:
+        con.close()
 
 
+@app.post("/productos/marcado")
+def actualizar_marcado_producto_db():
+    id_lista = request.form.get("idLista", type=int)
+    id_producto = request.form.get("idProducto", type=int)
+    marcado_texto = request.form.get("marcado", "").strip().lower()
+    usuario_texto = request.form.get("idUsuarioMark", "null").strip().lower()
+
+    if (
+        id_lista is None or id_lista <= 0
+        or id_producto is None or id_producto <= 0
+        or marcado_texto not in ("true", "false")
+        or not lista_tiene_tipo(id_lista, "productos")
+    ):
+        return "false"
+
+    if usuario_texto in ("", "null"):
+        id_usuario_mark = None
+    else:
+        try:
+            id_usuario_mark = int(usuario_texto)
+        except ValueError:
+            return "false"
+
+        # Los IDs no positivos no corresponden a usuarios reales.
+        if id_usuario_mark <= 0:
+            id_usuario_mark = None
+
+    marcado = marcado_texto == "true"
+
+    if not marcado:
+        id_usuario_mark = None
+
+    actualizado = actualizar_marcado_producto(
+        id_lista,
+        id_producto,
+        marcado,
+        id_usuario_mark
+    )
+
+    return "true" if actualizado else "false"
+
+#COMPLETADO DE TAREAS **************************************************************************************************************
+def actualizar_tarea_completada(id_lista, id_tarea, completada):
+    con = psycopg2.connect(**DB_CONFIG)
+    try:
+        with con.cursor() as cur:
+            cur.execute(
+                """
+                UPDATE tarea
+                SET completada = %s
+                WHERE id = %s AND id_lista = %s
+                """,
+                (completada, id_tarea, id_lista),
+            )
+            actualizada = cur.rowcount > 0
+
+        con.commit()
+        return actualizada
+    except Exception as e:
+        con.rollback()
+        print("Error al actualizar la tarea:", e)
+        return False
+    finally:
+        con.close()
 
 
+@app.post("/tareas/completada")
+def actualizar_tarea_completada_db():
+    id_lista = request.form.get("idLista", type=int)
+    id_tarea = request.form.get("idTarea", type=int)
+    completada_texto = request.form.get("completada", "").strip().lower()
+
+    if (
+        id_lista is None or id_lista <= 0
+        or id_tarea is None or id_tarea <= 0
+        or completada_texto not in ("true", "false")
+        or not lista_tiene_tipo(id_lista, "tareas")
+    ):
+        return "false"
+
+    completada = completada_texto == "true"
+    actualizada = actualizar_tarea_completada(
+        id_lista, id_tarea, completada
+    )
+
+    return "true" if actualizada else "false"
+
+# ACTUALIZAR CANTIDAD DE PRODUCTOS *************************************************************************************************
+def actualizar_cantidad_producto(id_lista, id_producto, cantidad):
+    con = psycopg2.connect(**DB_CONFIG)
+    try:
+        with con.cursor() as cur:
+            cur.execute(
+                """
+                UPDATE producto
+                SET cantidad = %s
+                WHERE id = %s AND id_lista = %s
+                """,
+                (cantidad, id_producto, id_lista),
+            )
+            actualizado = cur.rowcount > 0
+
+        con.commit()
+        return actualizado
+    except Exception as e:
+        con.rollback()
+        print("Error al actualizar la cantidad del producto:", e)
+        return False
+    finally:
+        con.close()
 
 
+@app.post("/productos/cantidad")
+def actualizar_cantidad_producto_db():
+    id_lista = request.form.get("idLista", type=int)
+    id_producto = request.form.get("idProducto", type=int)
+    cantidad = request.form.get("cantidad", type=int)
 
+    if (
+        id_lista is None or id_lista <= 0
+        or id_producto is None or id_producto <= 0
+        or cantidad is None or cantidad < 1
+        or not lista_tiene_tipo(id_lista, "productos")
+    ):
+        return "false"
+
+    actualizado = actualizar_cantidad_producto(
+        id_lista, id_producto, cantidad
+    )
+
+    return "true" if actualizado else "false"
 
 
 if __name__ == "__main__":
