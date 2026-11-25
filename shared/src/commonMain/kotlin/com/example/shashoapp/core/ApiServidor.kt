@@ -8,7 +8,11 @@ import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
 import io.ktor.http.parameters
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.io.encoding.Base64
 
 val httpClient: HttpClient = HttpClient {
     install(HttpTimeout) {
@@ -70,6 +74,33 @@ object ApiServidor {
             }
         )
         return respuesta.bodyAsText().trim() == "true"
+    }
+
+    suspend fun actualizarFotoUsuario(idUsuario: Int, bytes: ByteArray?): Boolean {
+        val fotoB64 = if (bytes != null) Base64.encode(bytes) else ""
+        val respuesta = httpClient.submitForm(
+            url = "$baseUrl/usuario/foto",
+            formParameters = parameters {
+                append("idUsuario", idUsuario.toString())
+                append("foto", fotoB64)
+            }
+        )
+        return respuesta.bodyAsText().trim() == "true"
+    }
+
+    suspend fun getInfoUsuarios(idsUsuarios: IntArray): Map<Int, UsuarioInfoDto> {
+        val idsValidos = idsUsuarios.filter { it > 0 }.distinct()
+        if (idsValidos.isEmpty()) return emptyMap()
+
+        val respuesta = httpClient.get("$baseUrl/usuarios/info") {
+            parameter("ids", idsValidos.joinToString(","))
+        }
+        val texto = respuesta.bodyAsText()
+        val mapaString = Json.decodeFromString<Map<String, UsuarioInfoDto>>(texto)
+        return mapaString.mapNotNull { (k, v) ->
+            val id = k.toIntOrNull()
+            if (id != null) id to v else null
+        }.toMap()
     }
 
     // LISTAS DEL USUARIO (LISTAREPOSITORYIMPL)
@@ -202,3 +233,9 @@ object ApiServidor {
         return respuesta.bodyAsText().trim() == "true"
     }
 }
+
+@Serializable
+data class UsuarioInfoDto(
+    val nombre: String = "",
+    val fotoPerfil: String = ""
+)

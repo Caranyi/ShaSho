@@ -3,5 +3,6 @@ package com.example.shashoapp.features.Reparto.domain.model
 data class Participante(
     val usuarioId: Int,
     val nombre: String,
-    val pagado: Double = 0.0
+    val pagado: Double = 0.0,
+    val fotoPerfilBytes: ByteArray? = null
 )
