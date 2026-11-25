@@ -30,6 +30,13 @@ class AuthRepositoryImpl : AuthRepository {
         if (nombreServidor.isNotBlank()) {
             AppPreferences.setNombreUsuario(nombreServidor)
         }
+        runCatching {
+            val info = ApiServidor.getInfoUsuarios(intArrayOf(id))[id]
+            if (info != null && info.fotoPerfil.isNotBlank()) {
+                val bytes = kotlin.io.encoding.Base64.decode(info.fotoPerfil)
+                AppPreferences.setFotoPerfil(bytes)
+            }
+        }
 
         return Result.success(Usuario(id = id, nombre = nombreServidor, correo = correo, contrasenya = contrasenya))
     }

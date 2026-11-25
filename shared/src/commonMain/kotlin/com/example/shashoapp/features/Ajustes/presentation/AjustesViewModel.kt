@@ -2,6 +2,7 @@ package com.example.shashoapp.features.Ajustes.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.shashoapp.core.ApiServidor
 import com.example.shashoapp.core.AppPreferences
 import com.example.shashoapp.core.EstadoConexion
 import com.example.shashoapp.core.SesionUsuario
@@ -62,8 +63,14 @@ class AjustesViewModel(
             }
             is AjustesAction.onFotoPerfilSeleccionada -> {
                 _state.update { it.copy(fotoPerfilBytes = action.bytes) }
+                val id = _state.value.idUsuario ?: SesionUsuario.getIdUsuario()
                 viewModelScope.launch {
                     AppPreferences.setFotoPerfil(action.bytes)
+                    if (id != null && id > 0 && EstadoConexion.getConexion()) {
+                        runCatching {
+                            ApiServidor.actualizarFotoUsuario(id, action.bytes)
+                        }
+                    }
                 }
             }
             is AjustesAction.onAbrirDialogoNombre -> {
