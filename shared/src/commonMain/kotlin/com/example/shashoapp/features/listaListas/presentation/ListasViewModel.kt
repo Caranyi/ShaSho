@@ -45,7 +45,7 @@ class ListasViewModel (
                 println("ACCIÓN GUARDAR RECIBIDA")
                 _state.update { it.copy(mostrarCrear = false) }
             }
-            is ListasAction.GuardarLista -> { guardarLista(action.nombre, action.tipo)}
+            is ListasAction.GuardarLista -> { guardarLista(action.nombre, action.tipo, action.imagenBytes) }
             is ListasAction.EliminarLista -> {eliminarLista(action.idLista)}
         }
 
@@ -75,30 +75,17 @@ class ListasViewModel (
         }
     }
 
-    private fun guardarLista(nombre: String, tipo:String){
+    private fun guardarLista(nombre: String, tipo: String, imagenBytes: ByteArray?) {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true)}
-            val usuarioActual = idUsuario ?: -1 // si no hay conexion ponemos como id por defecto -1
-
+            _state.update { it.copy(isLoading = true) }
             try {
-                println("CREANDO LISTA: $nombre")
-                println("USUARIO: $idUsuario")
-
-                crearListaUseCase(nombre, idUsuario, tipo)
-
-                println("LISTA GUARDADA EN LOCAL")
-
+                crearListaUseCase(nombre, idUsuario, tipo, imagenBytes)
                 val listas = getListasUseCase(idUsuario)
-
-                println("LISTAS RECUPERADAS: ${listas.size}")
-
-
                 _state.update { it.copy(listas = listas, isLoading = false, mostrarCrear = false) }
-
             } catch (e: CancellationException) {
                 throw e
-            } catch (e: Exception){
-                _state.update { it.copy(isLoading = false)}
+            } catch (e: Exception) {
+                _state.update { it.copy(isLoading = false) }
             }
         }
     }

@@ -74,7 +74,8 @@ class ProductosViewModel(
                    tipo = producto.tipo,
                    cantidad = producto.cantidad,
                    precio = producto.precio,
-                   tienda = producto.tienda
+                   tienda = producto.tienda,
+                   imagenBytes = producto.imagenBytes
                )
 
                val productos = getProductosListaUseCase(idLista)

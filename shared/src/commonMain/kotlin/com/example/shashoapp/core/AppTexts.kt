@@ -93,7 +93,23 @@ data class Texts(
     val errorCamposLoginObligatorios: String,
     val errorTodosCamposObligatorios: String,
     val errorNombreUsuarioVacio: String,
-    val errorActualizarNombre: String
+    val errorActualizarNombre: String,
+    val errorUsuarioNoExisteCorreo: String,
+    val errorUsuarioYaEnLista: String,
+    val errorServidorCompartir: String,
+    val errorConexionServidor: String,
+    val errorListaNoValida: String,
+    val errorNombreTareaVacio: String,
+    val errorServidorValorInvalido: String,
+    val errorIniciarSesion: String,
+    val errorUsuarioClaveIncorrectos: String,
+    val errorCorreoYaRegistrado: String,
+    val errorCrearCuenta: String,
+
+    //para imagenes
+    val anadirImagenOpcional: String,
+    val cambiarImagen: String,
+    val quitarImagen: String
 )
 
 object TextosApp {
@@ -179,7 +195,22 @@ object TextosApp {
         errorCamposLoginObligatorios = "El correo y la contraseña son obligatorios",
         errorTodosCamposObligatorios = "Todos los campos son obligatorios",
         errorNombreUsuarioVacio = "El nombre de usuario no puede estar vacío",
-        errorActualizarNombre = "No se pudo actualizar el nombre de usuario"
+        errorActualizarNombre = "No se pudo actualizar el nombre de usuario",
+        errorUsuarioNoExisteCorreo = "No existe ningún usuario con ese correo",
+        errorUsuarioYaEnLista = "Ese usuario ya está en la lista",
+        errorServidorCompartir = "Error en el servidor al compartir la lista",
+        errorConexionServidor = "Error al conectar con el servidor",
+        errorListaNoValida = "La lista no es válida",
+        errorNombreTareaVacio = "El nombre de la tarea no puede estar vacío",
+        errorServidorValorInvalido = "El servidor no devuelve un valor válido",
+        errorIniciarSesion = "Error al iniciar sesión",
+        errorUsuarioClaveIncorrectos = "Usuario o clave incorrectos",
+        errorCorreoYaRegistrado = "El correo ya está registrado",
+        errorCrearCuenta = "No se pudo crear la cuenta",
+
+        anadirImagenOpcional = "Añadir imagen (opcional)",
+        cambiarImagen = "Cambiar imagen",
+        quitarImagen = "Quitar"
     )
 
     private val en = Texts(
@@ -263,7 +294,22 @@ object TextosApp {
         errorCamposLoginObligatorios = "Email and password are required",
         errorTodosCamposObligatorios = "All fields are required",
         errorNombreUsuarioVacio = "Username cannot be empty",
-        errorActualizarNombre = "Could not update username"
+        errorActualizarNombre = "Could not update username",
+        errorUsuarioNoExisteCorreo = "No user exists with that email",
+        errorUsuarioYaEnLista = "That user is already in the list",
+        errorServidorCompartir = "Server error while sharing the list",
+        errorConexionServidor = "Error connecting to the server",
+        errorListaNoValida = "The list is not valid",
+        errorNombreTareaVacio = "Task name cannot be empty",
+        errorServidorValorInvalido = "The server did not return a valid value",
+        errorIniciarSesion = "Error logging in",
+        errorUsuarioClaveIncorrectos = "Incorrect username or password",
+        errorCorreoYaRegistrado = "Email is already registered",
+        errorCrearCuenta = "Could not create account",
+
+        anadirImagenOpcional = "Add image (optional)",
+        cambiarImagen = "Change image",
+        quitarImagen = "Remove"
     )
 
     fun get(codigoIdioma: String): Texts = if (codigoIdioma == "en") en else es

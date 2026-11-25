@@ -10,7 +10,8 @@ data class Producto(
     val cantidad: Int = 1,
     val tienda: String = "",
     val tipo: String = "",
-    val idUsuarioMark: Int? = null
+    val idUsuarioMark: Int? = null,
+    val imagenBytes: ByteArray? = null
 ){
     val precioFormateado: String
         get() = "${precio.toString()}€"

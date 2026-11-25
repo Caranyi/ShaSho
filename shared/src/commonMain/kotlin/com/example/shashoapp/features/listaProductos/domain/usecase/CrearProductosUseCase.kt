@@ -14,18 +14,13 @@ class CrearProductosUseCase(
         tipo: String,
         cantidad: Int,
         precio: Double,
-        tienda: String
-    ){
+        tienda: String,
+        imagenBytes: ByteArray? = null
+    ) {
         val textos = TextosApp.get(AppPreferences.idioma.value)
-        require(nombre.isNotBlank()){
-            textos.errorNombreProductoVacio
-        }
-        require(cantidad > 0){
-            textos.errorCantidadMayorCero
-        }
-        require(precio >= 0){
-            textos.errorPrecioNegativo
-        }
+        require(nombre.isNotBlank()) { textos.errorNombreProductoVacio }
+        require(cantidad > 0) { textos.errorCantidadMayorCero }
+        require(precio >= 0) { textos.errorPrecioNegativo }
 
         repository.crearProducto(
             idLista,
@@ -33,7 +28,8 @@ class CrearProductosUseCase(
             tipo,
             cantidad,
             precio,
-            tienda
+            tienda,
+            imagenBytes
         )
     }
 }

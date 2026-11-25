@@ -13,10 +13,10 @@ data class ProductoDto(
     val tipo: String,
     val cantidad: Int,
     val checked: Boolean,
-    val idUsuarioMark: Int? = null
+    val idUsuarioMark: Int? = null,
+    val imagen: String = ""
 )
 
-//json a objeto
 fun ProductoDto.toDomain(): Producto = Producto(
     id = id,
     nombre = nombre,
@@ -25,5 +25,6 @@ fun ProductoDto.toDomain(): Producto = Producto(
     cantidad = cantidad,
     tienda = tienda,
     tipo = tipo,
-    idUsuarioMark = idUsuarioMark
+    idUsuarioMark = idUsuarioMark,
+    imagenBytes = if (imagen.isNotBlank()) runCatching { kotlin.io.encoding.Base64.decode(imagen) }.getOrNull() else null
 )

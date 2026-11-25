@@ -1,11 +1,15 @@
 package com.example.shashoapp.features.listaListas.presentation.ui
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -20,13 +24,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shashoapp.core.AppPreferences
 import com.example.shashoapp.core.TextosApp
+import com.example.shashoapp.core.aImageBitmap
 import com.example.shashoapp.features.listaListas.domain.model.Lista
 
 @Composable
@@ -42,6 +49,9 @@ fun ListaItem(
     var muestraDialogoConfirmacionEliminar by remember {
         mutableStateOf(false)
     }
+    val bitmapLista = remember(lista.imagenBytes) {
+        lista.imagenBytes?.aImageBitmap()
+    }
 
     Card(
         onClick = onClick,
@@ -56,6 +66,18 @@ fun ListaItem(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            if (bitmapLista != null) {
+                Image(
+                    bitmap = bitmapLista,
+                    contentDescription = lista.nombre,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+            }
+
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = lista.nombre,

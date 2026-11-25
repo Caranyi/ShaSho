@@ -2,6 +2,7 @@ package com.example.shashoapp.features.listaProductos.data.repository
 
 import com.example.shashoapp.core.ApiServidor
 import com.example.shashoapp.core.EstadoConexion
+import com.example.shashoapp.core.SesionUsuario
 import com.example.shashoapp.core.database.guardarArchivo
 import com.example.shashoapp.core.database.leerArchivo
 import com.example.shashoapp.features.listaProductos.data.model.ProductoDto
@@ -16,7 +17,15 @@ import kotlinx.serialization.json.Json
 class ProductoRepositoryImpl : ProductoRepository {
     private val mutexPendientes = Mutex()
 
-    private fun productosPendientes(idLista: Int) = "productos_pendientes_$idLista.json"
+    private fun usuarioActual(): Int = SesionUsuario.getIdUsuario() ?: -1
+
+    private fun archivoProductos(idLista: Int): String =
+        if (idLista > 0) "productos_$idLista.json"
+        else "productos_u${usuarioActual()}_l$idLista.json"
+
+    private fun productosPendientes(idLista: Int): String =
+        if (idLista > 0) "productos_pendientes_$idLista.json"
+        else "productos_pendientes_u${usuarioActual()}_l$idLista.json"
 
     // se va a pedir al servidor (modo online)
     override suspend fun getProductosDeLista(idLista: Int): List<Producto> {
@@ -58,14 +67,17 @@ class ProductoRepositoryImpl : ProductoRepository {
         tipo: String,
         cantidad: Int,
         precio: Double,
-        tienda: String
+        tienda: String,
+        imagenBytes: ByteArray?
     ) {
-        if (EstadoConexion.getConexion()) {
+        if (EstadoConexion.getConexion() && idLista > 0) {
             try {
-                val nuevoId = ApiServidor.crearProducto(idLista, nombre, precio, tienda, tipo, cantidad)
+                val nuevoId = ApiServidor.crearProducto(
+                    idLista, nombre, precio, tienda, tipo, cantidad, imagenBytes
+                )
                 if (nuevoId > 0) {
                     val texto = ApiServidor.getProductos(idLista)
-                    guardarArchivo("productos_$idLista.json", texto)
+                    guardarArchivo(archivoProductos(idLista), texto)
                     return
                 }
             } catch (e: CancellationException) {
@@ -86,12 +98,10 @@ class ProductoRepositoryImpl : ProductoRepository {
                 tipo = tipo,
                 tienda = tienda,
                 cantidad = cantidad,
-                checked = false
+                checked = false,
+                imagen = imagenBytes?.let { kotlin.io.encoding.Base64.encode(it) } ?: ""
             )
-            guardarArchivo(
-                archivo,
-                Json.encodeToString(pendientes + nuevoproducto)
-            )
+            guardarArchivo(archivo, Json.encodeToString(pendientes + nuevoproducto))
         }
     }
 
@@ -205,4 +215,5 @@ class ProductoRepositoryImpl : ProductoRepository {
             guardarArchivo(archivo, Json.encodeToString(elim))
         }
     }
+
 }

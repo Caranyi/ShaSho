@@ -128,12 +128,18 @@ object ApiServidor {
         return respuesta.bodyAsText()
     }
 
-    suspend fun crearTarea(idLista: Int, nombre: String): Int {
+    suspend fun crearTarea(
+        idLista: Int,
+        nombre: String,
+        imagenBytes: ByteArray? = null
+    ): Int {
+        val imagenB64 = imagenBytes?.let { Base64.encode(it) } ?: ""
         val respuesta = httpClient.submitForm(
             url = "$baseUrl/tareas",
             formParameters = parameters {
                 append("idLista", idLista.toString())
                 append("nombre", nombre)
+                append("imagen", imagenB64)
             }
         )
         return respuesta.bodyAsText().trim().toIntOrNull() ?: -1
@@ -182,14 +188,17 @@ object ApiServidor {
     suspend fun crearLista(
         nombre: String,
         idCreador: Int,
-        tipo: String
+        tipo: String,
+        imagenBytes: ByteArray? = null
     ): Int {
+        val imagenB64 = imagenBytes?.let { Base64.encode(it) } ?: ""
         val respuesta = httpClient.submitForm(
             url = "$baseUrl/listas",
             formParameters = parameters {
                 append("nombre", nombre)
                 append("idCreador", idCreador.toString())
                 append("tipo", tipo)
+                append("imagen", imagenB64)
             }
         )
 
@@ -215,8 +224,10 @@ object ApiServidor {
         precio: Double,
         tienda: String,
         tipo: String,
-        cantidad: Int
+        cantidad: Int,
+        imagenBytes: ByteArray? = null
     ): Int {
+        val imagenB64 = imagenBytes?.let { Base64.encode(it) } ?: ""
         val respuesta = httpClient.submitForm(
             url = "$baseUrl/productos",
             formParameters = parameters {
@@ -226,6 +237,7 @@ object ApiServidor {
                 append("tienda", tienda)
                 append("tipo", tipo)
                 append("cantidad", cantidad.toString())
+                append("imagen", imagenB64)
             }
         )
 

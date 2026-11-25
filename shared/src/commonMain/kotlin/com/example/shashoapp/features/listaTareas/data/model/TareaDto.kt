@@ -7,12 +7,13 @@ import kotlinx.serialization.Serializable
 data class TareaDto(
     val id: Int,
     val nombre: String,
-    val completada: Boolean
+    val completada: Boolean,
+    val imagen: String = ""
 )
 
-// json a objeto
 fun TareaDto.toDomain(): Tarea = Tarea(
     id = id,
     nombre = nombre,
-    completada = completada
+    completada = completada,
+    imagenBytes = if (imagen.isNotBlank()) runCatching { kotlin.io.encoding.Base64.decode(imagen) }.getOrNull() else null
 )

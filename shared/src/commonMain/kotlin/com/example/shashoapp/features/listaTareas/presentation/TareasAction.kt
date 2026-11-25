@@ -5,7 +5,10 @@ sealed interface TareasAction {
 
     data object CerrarCrear : TareasAction
 
-    data class GuardarTarea(val nombre: String) : TareasAction
+    data class GuardarTarea(
+        val nombre: String,
+        val imagenBytes: ByteArray? = null
+    ) : TareasAction
 
     data class CambiarCompletada(val idTarea: Int) : TareasAction
 

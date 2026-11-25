@@ -62,7 +62,7 @@ class TareasViewModel(
                 _state.update { it.copy(mostrarCrear = false, error = null) }
 
             is TareasAction.GuardarTarea ->
-                guardarTarea(action.nombre)
+                guardarTarea(action.nombre, action.imagenBytes)
 
             is TareasAction.CambiarCompletada ->
                 cambiarCompletada(action.idTarea)
@@ -89,10 +89,10 @@ class TareasViewModel(
         }
     }
 
-    private fun guardarTarea(nombre: String) {
+    private fun guardarTarea(nombre: String, imagenBytes: ByteArray?) {
         viewModelScope.launch {
             try {
-                crearTareaUseCase(idLista, nombre)
+                crearTareaUseCase(idLista, nombre, imagenBytes)
                 val tareas = getTareasUseCase(idLista)
 
                 _state.update {

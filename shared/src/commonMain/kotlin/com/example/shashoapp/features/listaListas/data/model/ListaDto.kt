@@ -1,8 +1,8 @@
 package com.example.shashoapp.features.listaListas.data.model
 
-import com.example.shashoapp.features.auth.domain.model.Usuario
 import com.example.shashoapp.features.listaListas.domain.model.Lista
 import kotlinx.serialization.Serializable
+import kotlin.io.encoding.Base64
 
 @Serializable
 data class ListaDto(
@@ -10,10 +10,10 @@ data class ListaDto(
     val nombre: String,
     val idCreador: Int,
     val cantidadProductos: Int,
-    //si una lista es compartida (falso por defecto porque al crearla solo hay un user)
     val compartida: Boolean = false,
     val tipo: String = "productos",
-    val idsUsuarios: List<Int> = emptyList()
+    val idsUsuarios: List<Int> = emptyList(),
+    val imagen: String = ""
 )
 
 fun ListaDto.toDomain(): Lista = Lista(
@@ -23,5 +23,6 @@ fun ListaDto.toDomain(): Lista = Lista(
     cantidadProductos = cantidadProductos,
     compartida = compartida,
     tipo = tipo,
-    ids_usuarios = idsUsuarios.toIntArray()
+    ids_usuarios = idsUsuarios.toIntArray(),
+    imagenBytes = if (imagen.isNotBlank()) runCatching { Base64.decode(imagen) }.getOrNull() else null
 )

@@ -223,11 +223,9 @@ fun TareasScreen(
 
         if (state.mostrarCrear) {
             CrearTarea(
-                onDismissRequest = {
-                    onAction(TareasAction.CerrarCrear)
-                },
-                onGuardar = { nombre ->
-                    onAction(TareasAction.GuardarTarea(nombre))
+                onDismissRequest = { onAction(TareasAction.CerrarCrear) },
+                onGuardar = { nombre, imagenBytes ->
+                    onAction(TareasAction.GuardarTarea(nombre, imagenBytes))
                 }
             )
         }

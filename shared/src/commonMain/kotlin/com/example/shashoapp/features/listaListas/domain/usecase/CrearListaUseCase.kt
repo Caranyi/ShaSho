@@ -10,18 +10,14 @@ class CrearListaUseCase(
     suspend operator fun invoke(
         nombre: String,
         idCreador: Int?,
-        tipo: String
-    ){
+        tipo: String,
+        imagenBytes: ByteArray? = null
+    ) {
         val textos = TextosApp.get(AppPreferences.idioma.value)
 
-        require(nombre.isNotBlank()){
-            textos.errorNombreListaVacio
-        }
+        require(nombre.isNotBlank()) { textos.errorNombreListaVacio }
+        requireNotNull(idCreador) { textos.errorUsuarioNoEncontrado }
 
-        requireNotNull(idCreador) {
-            textos.errorUsuarioNoEncontrado
-        }
-
-        repository.crearLista(nombre.trim(), idCreador, tipo)
+        repository.crearLista(nombre.trim(), idCreador, tipo, imagenBytes)
     }
 }

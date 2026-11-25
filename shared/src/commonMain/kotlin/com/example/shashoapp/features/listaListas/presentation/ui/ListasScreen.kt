@@ -110,11 +110,9 @@ fun ListasScreen(
 
             if (state.mostrarCrear) {
                 CrearLista(
-                    onDismiss = {
-                        onAction(ListasAction.CerrarCrearLista)
-                    },
-                    onGuardar = { nombre,tipo ->
-                        onAction(ListasAction.GuardarLista(nombre,tipo))
+                    onDismiss = { onAction(ListasAction.CerrarCrearLista) },
+                    onGuardar = { nombre, tipo, imagenBytes ->
+                        onAction(ListasAction.GuardarLista(nombre, tipo, imagenBytes))
                     }
                 )
             }

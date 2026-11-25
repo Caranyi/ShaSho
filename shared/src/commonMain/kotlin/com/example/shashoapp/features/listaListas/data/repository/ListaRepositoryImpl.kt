@@ -2,8 +2,10 @@ package com.example.shashoapp.features.listaListas.data.repository
 
 import androidx.compose.ui.text.toLowerCase
 import com.example.shashoapp.core.ApiServidor
+import com.example.shashoapp.core.AppPreferences
 import com.example.shashoapp.core.EstadoConexion
 import com.example.shashoapp.core.SesionUsuario
+import com.example.shashoapp.core.TextosApp
 import com.example.shashoapp.features.listaListas.data.model.ListaDto
 import com.example.shashoapp.features.listaListas.data.model.toDomain
 import com.example.shashoapp.features.listaListas.domain.model.Lista
@@ -64,83 +66,72 @@ class ListaRepositoryImpl : ListaRepository{
     }
 
     override suspend fun compartirLista(idLista: Int, correo: String): Result<Unit> {
+        val textos = TextosApp.get(AppPreferences.idioma.value)
         val correoLimpio = correo.trim().lowercase()
 
         //CONEXION
         var codigo: Int = try {
             ApiServidor.compartirLista(idLista, correoLimpio)
         } catch (e: Exception) {
-            return Result.failure(Exception("Error al conectar con el servidor: ${e.message}"))
+            return Result.failure(Exception("${textos.errorConexionServidor}: ${e.message}"))
         }
 
         //RESPUESTAS
         if(codigo == 1)
             return Result.success(Unit)
         else if (codigo == -1) {
-            return Result.failure(IllegalArgumentException("No existe ningún usuario con ese correo"))
+            return Result.failure(IllegalArgumentException(textos.errorUsuarioNoExisteCorreo))
         }
         else if (codigo == 0) {
-            return Result.failure(IllegalArgumentException("Ese usuario ya está en la lista"))
+            return Result.failure(IllegalArgumentException(textos.errorUsuarioYaEnLista))
         }
         else{
-            return Result.failure(Exception("Error en el servidor al compartir la lista"))
+            return Result.failure(Exception(textos.errorServidorCompartir))
         }
     }
 
-    override suspend fun crearLista(nombre: String, idCreador: Int?, tipo:String) {
-
-        //Necesitamos esos datos
-        val usuario = requireNotNull(idCreador){
-            "No hay usuario identificado"
-        }
-
-        require(nombre.isNotBlank()){
-            "El nombre no puede estar vacío"
-        }
+    override suspend fun crearLista(
+        nombre: String,
+        idCreador: Int?,
+        tipo: String,
+        imagenBytes: ByteArray?
+    ) {
+        val textos = TextosApp.get(AppPreferences.idioma.value)
+        val usuario = requireNotNull(idCreador) { textos.errorUsuarioNoEncontrado }
+        require(nombre.isNotBlank()) { textos.errorNombreListaVacio }
 
         if (EstadoConexion.getConexion()) {
             try {
                 val idServidor = ApiServidor.crearLista(
                     nombre = nombre.trim(),
                     idCreador = usuario,
-                    tipo = tipo
+                    tipo = tipo,
+                    imagenBytes = imagenBytes
                 )
-
-                if (idServidor > 0) {
-                    return
-                }
+                if (idServidor > 0) return
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                // Si falla el servidor, se guarda como pendiente.
             }
         }
 
-
         mutexPendientes.withLock {
-            //leemos las listas pendientes y las almacenamos en pendientes si las hay
             val archivo = listasPendientes(usuario)
             val texto = leerArchivo(archivo) ?: "[]"
             val pendientes = Json.decodeFromString<List<ListaDto>>(texto)
-
-            //valor temporal para id de lista, de momento
             val nuevoId = minOf(0, pendientes.minOfOrNull { it.id } ?: 0) - 1
 
-            //creamos lista nueva, temporal, solo para sincronizar más tarde
             val nuevaLista = ListaDto(
                 id = nuevoId,
                 nombre = nombre.trim(),
                 idCreador = usuario,
                 cantidadProductos = 0,
                 compartida = false,
-                tipo = tipo
+                tipo = tipo,
+                imagen = imagenBytes?.let { kotlin.io.encoding.Base64.encode(it) } ?: ""
             )
 
-            guardarArchivo(
-                archivo,
-                Json.encodeToString(pendientes + nuevaLista)
-            )
-
+            guardarArchivo(archivo, Json.encodeToString(pendientes + nuevaLista))
         }
     }
 
@@ -183,6 +174,7 @@ class ListaRepositoryImpl : ListaRepository{
     }
 
     override  suspend fun sincronizarPendientes(idUsuario: Int?){
+        val textos = TextosApp.get(AppPreferences.idioma.value)
         val archivo = archivo_listas(idUsuario)
 
         //devolvemos null -> porque sino, no se puede crear
@@ -204,11 +196,15 @@ class ListaRepositoryImpl : ListaRepository{
 
 
         for(lista in pendientes) {
-            //se manda con idUsuario (el usuario conectado), aunque la lista se creara con -1
-            val idDef = ApiServidor.crearLista(lista.nombre, idUsuario, lista.tipo)
+
+            val imgBytes = if (lista.imagen.isNotBlank()) {
+                runCatching { kotlin.io.encoding.Base64.decode(lista.imagen) }.getOrNull()
+            } else null
+
+            val idDef = ApiServidor.crearLista(lista.nombre, idUsuario, lista.tipo, imgBytes)
 
             check(idDef > 0) {
-                "El servidor no devuelve un valor válido"
+                textos.errorServidorValorInvalido
             }
 
             val listaCreada = lista.copy(id = idDef)

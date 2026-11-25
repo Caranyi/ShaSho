@@ -15,8 +15,13 @@ sealed interface ProductosAction{
     data class OnCorreoChange(val correo: String): ProductosAction
     data object ConfirmarCompartir: ProductosAction
 
-    data class GuardarProducto(val nombre: String, val tipo: String, val cantidad: Int,
-        val precio: Double, val tienda: String
+    data class GuardarProducto(
+        val nombre: String,
+        val tipo: String,
+        val cantidad: Int,
+        val precio: Double,
+        val tienda: String,
+        val imagenBytes: ByteArray? = null
     ) : ProductosAction
 
     data class EliminarProducto(val idProducto: Int) : ProductosAction

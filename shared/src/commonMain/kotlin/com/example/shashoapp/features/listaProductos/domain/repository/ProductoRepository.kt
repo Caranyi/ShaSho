@@ -14,7 +14,8 @@ interface ProductoRepository {
         tipo: String,
         cantidad: Int,
         precio: Double,
-        tienda: String
+        tienda: String,
+        imagenBytes: ByteArray? = null
     )
 
     suspend fun actualizaMarcado(

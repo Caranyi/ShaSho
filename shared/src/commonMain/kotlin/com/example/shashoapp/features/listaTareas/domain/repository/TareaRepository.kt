@@ -7,7 +7,8 @@ interface TareaRepository {
 
     suspend fun crearTarea(
         idLista: Int,
-        nombre: String
+        nombre: String,
+        imagenBytes: ByteArray? = null
     )
 
     suspend fun actualizarCompletada(

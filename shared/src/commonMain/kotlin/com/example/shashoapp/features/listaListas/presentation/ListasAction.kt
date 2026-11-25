@@ -9,5 +9,9 @@ sealed interface ListasAction {
 
     data class EliminarLista(val idLista:Int) : ListasAction
 
-    data class GuardarLista(val nombre: String, val tipo: String) : ListasAction
+    data class GuardarLista(
+        val nombre: String,
+        val tipo: String,
+        val imagenBytes: ByteArray? = null
+    ) : ListasAction
 }

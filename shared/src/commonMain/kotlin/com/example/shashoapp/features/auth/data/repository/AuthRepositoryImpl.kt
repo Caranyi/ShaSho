@@ -13,15 +13,16 @@ class AuthRepositoryImpl : AuthRepository {
 
     // LOGIN (MIRA EN BASE DE DATOS)
     override suspend fun login(correo: String, contrasenya: String): Result<Usuario> {
+        val textos = TextosApp.get(AppPreferences.idioma.value)
         val id = try {
             ApiServidor.login(correo, contrasenya)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            return Result.failure(Exception("Error al iniciar sesion"))
+            return Result.failure(Exception(textos.errorIniciarSesion))
         }
         if (id == -1) {
-            return Result.failure(IllegalArgumentException("Usuario o Clave incorrectas"))
+            return Result.failure(IllegalArgumentException(textos.errorUsuarioClaveIncorrectos))
         }
         // GUARDA EL ID Y NOMBRE DEL USUARIO
         SesionUsuario.setIdUsuario(id)
@@ -43,18 +44,19 @@ class AuthRepositoryImpl : AuthRepository {
 
     // REGISTER
     override suspend fun register(nombre: String, correo: String, contrasenya: String): Result<Usuario> {
+        val textos = TextosApp.get(AppPreferences.idioma.value)
         val id = try {
             ApiServidor.registro(nombre, correo, contrasenya)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            return Result.failure(Exception("Error al conectar con el servidor"))
+            return Result.failure(Exception(textos.errorConexionServidor))
         }
         if (id == -1) {
-            return Result.failure(IllegalArgumentException("El correo ya está registrado"))
+            return Result.failure(IllegalArgumentException(textos.errorCorreoYaRegistrado))
         }
         if (id <= 0) {
-            return Result.failure(Exception("No se pudo crear la cuenta"))
+            return Result.failure(Exception(textos.errorCrearCuenta))
         }
 
         // GUARDA EL ID Y NOMBRE DEL USUARIO

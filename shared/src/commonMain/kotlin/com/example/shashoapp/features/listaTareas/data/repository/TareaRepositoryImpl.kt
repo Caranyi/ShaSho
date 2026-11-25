@@ -2,6 +2,7 @@ package com.example.shashoapp.features.listaTareas.data.repository
 
 import com.example.shashoapp.core.ApiServidor
 import com.example.shashoapp.core.EstadoConexion
+import com.example.shashoapp.core.SesionUsuario
 import com.example.shashoapp.core.database.guardarArchivo
 import com.example.shashoapp.core.database.leerArchivo
 import com.example.shashoapp.features.listaTareas.data.model.TareaDto
@@ -19,11 +20,15 @@ class TareaRepositoryImpl : TareaRepository {
 
     private val mutexPendientes = Mutex()
 
+    private fun usuarioActual(): Int = SesionUsuario.getIdUsuario() ?: -1
+
     private fun archivoTareas(idLista: Int) =
-        "tareas_$idLista.json"
+        if (idLista > 0) "tareas_$idLista.json"
+        else "tareas_u${usuarioActual()}_l$idLista.json"
 
     private fun tareasPendientes(idLista: Int) =
-        "tareas_pendientes_$idLista.json"
+        if (idLista > 0) "tareas_pendientes_$idLista.json"
+        else "tareas_pendientes_u${usuarioActual()}_l$idLista.json"
 
     override suspend fun getTareas(idLista: Int): List<Tarea> {
         val archivo = archivoTareas(idLista)
@@ -64,10 +69,14 @@ class TareaRepositoryImpl : TareaRepository {
         return (guardadas + pendientes).map { it.toDomain() }
     }
 
-    override suspend fun crearTarea(idLista: Int, nombre: String) {
-        if (EstadoConexion.getConexion()) {
+    override suspend fun crearTarea(
+        idLista: Int,
+        nombre: String,
+        imagenBytes: ByteArray?
+    ) {
+        if (EstadoConexion.getConexion() && idLista > 0) {
             try {
-                val nuevoId = ApiServidor.crearTarea(idLista, nombre)
+                val nuevoId = ApiServidor.crearTarea(idLista, nombre, imagenBytes)
 
                 if (nuevoId > 0) {
                     try {
@@ -76,45 +85,35 @@ class TareaRepositoryImpl : TareaRepository {
                     } catch (e: CancellationException) {
                         throw e
                     } catch (e: Exception) {
-                        // se crea, la caché se actualizará al volver a cargar
                     }
                     return
                 }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                // Si falla el servidor, guardamos la tarea como pendiente
             }
         }
 
         mutexPendientes.withLock {
             val archivo = tareasPendientes(idLista)
-
             val pendientes = try {
-                Json.decodeFromString<List<TareaDto>>(
-                    leerArchivo(archivo) ?: "[]"
-                )
+                Json.decodeFromString<List<TareaDto>>(leerArchivo(archivo) ?: "[]")
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 emptyList()
             }
 
-            val nuevoId = minOf(
-                0,
-                pendientes.minOfOrNull { it.id } ?: 0
-            ) - 1
+            val nuevoId = minOf(0, pendientes.minOfOrNull { it.id } ?: 0) - 1
 
             val nuevaTarea = TareaDto(
                 id = nuevoId,
                 nombre = nombre.trim(),
-                completada = false
+                completada = false,
+                imagen = imagenBytes?.let { kotlin.io.encoding.Base64.encode(it) } ?: ""
             )
 
-            guardarArchivo(
-                archivo,
-                Json.encodeToString(pendientes + nuevaTarea)
-            )
+            guardarArchivo(archivo, Json.encodeToString(pendientes + nuevaTarea))
         }
     }
 

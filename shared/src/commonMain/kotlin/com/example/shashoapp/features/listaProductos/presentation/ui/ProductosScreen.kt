@@ -237,17 +237,11 @@ fun ProductosScreen(
         // SECCIÓN 7: DESPLEGABLE DE AÑADIR CATÁLOGO DE PRODUCTOS
         if (state.showCreateMenu) {
             CrearProducto(
-                onDismissRequest = {
-                    onAction(ProductosAction.CerrarMenuCrear)
-                },
-                onGuardar = { nombre, tipo, cantidad, precio, tienda ->
+                onDismissRequest = { onAction(ProductosAction.CerrarMenuCrear) },
+                onGuardar = { nombre, tipo, cantidad, precio, tienda, imagenBytes ->
                     onAction(
                         ProductosAction.GuardarProducto(
-                            nombre,
-                            tipo,
-                            cantidad,
-                            precio,
-                            tienda
+                            nombre, tipo, cantidad, precio, tienda, imagenBytes
                         )
                     )
                 }

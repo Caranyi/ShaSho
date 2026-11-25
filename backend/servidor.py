@@ -64,12 +64,11 @@ def login():
 # BUSCAR LISTAS USUARIO **************************************************************************************************
 
 def buscar_listas_usuario(id_usuario):
-
     con = psycopg2.connect(**DB_CONFIG)
     try:
         with con.cursor() as cur:
             cur.execute(
-                "SELECT l.id, l.nombre, l.id_creador, l.cantidad_productos, l.compartida, l.tipo "
+                "SELECT l.id, l.nombre, l.id_creador, l.cantidad_productos, l.compartida, l.tipo, l.imagen "
                 "FROM lista l "
                 "JOIN union_lista_usuario u ON u.id_lista = l.id "
                 "WHERE u.id_usuario = %s "
@@ -87,7 +86,8 @@ def buscar_listas_usuario(id_usuario):
             "idCreador": fila[2],
             "cantidadProductos": fila[3],
             "compartida": fila[4],
-            "tipo": fila[5]
+            "tipo": fila[5],
+            "imagen": fila[6] or "",
         }
         for fila in filas
     ]
@@ -100,7 +100,7 @@ def buscar_tareas_lista(id_lista):
         with con.cursor() as cur:
             cur.execute(
                 """
-                SELECT id, nombre, completada
+                SELECT id, nombre, completada, imagen
                 FROM tarea
                 WHERE id_lista = %s
                 ORDER BY id
@@ -114,6 +114,7 @@ def buscar_tareas_lista(id_lista):
                 "id": fila[0],
                 "nombre": fila[1],
                 "completada": fila[2],
+                "imagen": fila[3] or "",
             }
             for fila in filas
         ]
@@ -122,12 +123,11 @@ def buscar_tareas_lista(id_lista):
 
 # BUSCAR PRODUCTOS LISTA **************************************************************************************************
 def buscar_productos_lista(id_lista):
-
     con = psycopg2.connect(**DB_CONFIG)
     try:
         with con.cursor() as cur:
             cur.execute(
-                "SELECT id, nombre, precio, tienda, tipo, cantidad, checked, id_usuario_mark "
+                "SELECT id, nombre, precio, tienda, tipo, cantidad, checked, id_usuario_mark, imagen "
                 "FROM producto "
                 "WHERE id_lista = %s "
                 "ORDER BY id",
@@ -147,6 +147,7 @@ def buscar_productos_lista(id_lista):
             "cantidad": fila[5],
             "checked": fila[6],
             "idUsuarioMark": fila[7],
+            "imagen": fila[8] or "",
         }
         for fila in filas
     ]
@@ -199,19 +200,20 @@ def compartir():
     return str(compartir_lista(id_lista, correo))
 
 # CREAR LISTA **************************************************************************************************
-def crear_lista(nombre, id_creador, tipo):
+def crear_lista(nombre, id_creador, tipo, imagen=None):
     con = psycopg2.connect(**DB_CONFIG)
     try:
         with con.cursor() as cur:
             cur.execute(
-                "INSERT INTO lista (id_creador, nombre, tipo, cantidad_productos) VALUES (%s, %s, %s, 0) RETURNING id",
-                (id_creador, nombre, tipo),
+                "INSERT INTO lista (id_creador, nombre, tipo, cantidad_productos, imagen) "
+                "VALUES (%s, %s, %s, 0, %s) RETURNING id",
+                (id_creador, nombre, tipo, imagen),
             )
             fila = cur.fetchone()
             if fila is None:
                 return -1
 
-            nuevo_id = fila[0]  
+            nuevo_id = fila[0]
 
             cur.execute(
                 "INSERT INTO union_lista_usuario (id_lista, id_usuario) VALUES (%s, %s)",
@@ -230,20 +232,13 @@ def crear_lista_db():
     nombre = request.form.get("nombre", "").strip()
     id_creador = request.form.get("idCreador", type=int)
     tipo = request.form.get("tipo", "").strip().lower()
+    imagen = request.form.get("imagen", "").strip() or None
 
     if not nombre or id_creador is None or tipo not in ("productos", "tareas"):
         return "-1"
 
-    id_generado = crear_lista(nombre, id_creador, tipo)
+    id_generado = crear_lista(nombre, id_creador, tipo, imagen)
     return str(id_generado)
-
-
-@app.get("/listas")
-def listas():
-    id_usuario = request.args.get("idUsuario", type=int)
-    if id_usuario is None:
-        return jsonify([])
-    return jsonify(buscar_listas_usuario(id_usuario))
 
 # ELIMINAR LISTA **************************************************************************************************
 def eliminar_lista(id_lista):
@@ -270,17 +265,17 @@ def eliminar_lista_db():
     return "true" if exito else "false"
 
 #CREAR TAREAS ******************************************************************************************************
-def crear_tarea(id_lista, nombre):
+def crear_tarea(id_lista, nombre, imagen=None):
     con = psycopg2.connect(**DB_CONFIG)
     try:
         with con.cursor() as cur:
             cur.execute(
                 """
-                INSERT INTO tarea (id_lista, nombre)
-                VALUES (%s, %s)
+                INSERT INTO tarea (id_lista, nombre, imagen)
+                VALUES (%s, %s, %s)
                 RETURNING id
                 """,
-                (id_lista, nombre),
+                (id_lista, nombre, imagen),
             )
             fila = cur.fetchone()
 
@@ -293,39 +288,29 @@ def crear_tarea(id_lista, nombre):
     finally:
         con.close()
 
-
 @app.post("/tareas")
 def crear_tarea_db():
     id_lista = request.form.get("idLista", type=int)
     nombre = request.form.get("nombre", "").strip()
+    imagen = request.form.get("imagen", "").strip() or None
 
     if id_lista is None or id_lista <= 0 or not nombre or not lista_tiene_tipo(id_lista, "tareas"):
         return "-1"
 
-    return str(crear_tarea(id_lista, nombre))
-
-
-@app.get("/tareas")
-def tareas():
-    id_lista = request.args.get("idLista", type=int)
-
-    if id_lista is None or id_lista <= 0 or not lista_tiene_tipo(id_lista, "tareas"):
-        return jsonify([])
-
-    return jsonify(buscar_tareas_lista(id_lista))
+    return str(crear_tarea(id_lista, nombre, imagen))
 
 # CREAR PRODUCTOS **************************************************************************************************
-def crear_producto(id_lista, nombre, precio, tienda, tipo, cantidad):
+def crear_producto(id_lista, nombre, precio, tienda, tipo, cantidad, imagen=None):
     con = psycopg2.connect(**DB_CONFIG)
     try:
         with con.cursor() as cur:
             cur.execute(
                 """
-                INSERT INTO producto (id_lista, nombre, precio, tienda, tipo, cantidad, checked)
-                VALUES (%s, %s, %s, %s, %s, %s, FALSE)
+                INSERT INTO producto (id_lista, nombre, precio, tienda, tipo, cantidad, checked, imagen)
+                VALUES (%s, %s, %s, %s, %s, %s, FALSE, %s)
                 RETURNING id
                 """,
-                (id_lista, nombre, precio, tienda, tipo, cantidad),
+                (id_lista, nombre, precio, tienda, tipo, cantidad, imagen),
             )
             fila = cur.fetchone()
             nuevo_id = fila[0] if fila else -1
@@ -350,20 +335,13 @@ def crear_producto_db():
     tienda = request.form.get("tienda", "").strip()
     tipo = request.form.get("tipo", "").strip()
     cantidad = request.form.get("cantidad", type=int, default=1)
+    imagen = request.form.get("imagen", "").strip() or None
 
     if not id_lista or id_lista <= 0 or not nombre or cantidad < 1 or precio < 0 or not lista_tiene_tipo(id_lista, "productos"):
         return "-1"
 
-    id_generado = crear_producto(id_lista, nombre, precio, tienda, tipo, cantidad)
+    id_generado = crear_producto(id_lista, nombre, precio, tienda, tipo, cantidad, imagen)
     return str(id_generado)
-
-
-@app.get("/productos")
-def productos():
-    id_lista = request.args.get("idLista", type=int)
-    if id_lista is None or id_lista <= 0 or not lista_tiene_tipo(id_lista, "productos"):
-        return jsonify([])
-    return jsonify(buscar_productos_lista(id_lista))
 
 # ELIMINAR TAREAS ****************************************************************************************************
 def eliminar_tarea(id_lista, id_tarea):
