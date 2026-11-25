@@ -40,13 +40,13 @@ def ping():
 
 # BUSCAR ID USUARIO **************************************************************************************************
 
-def buscar_usuario_login(correo, contrasena):
+def buscar_usuario_login(correo, contrasenya):
     con = psycopg2.connect(**DB_CONFIG)
     try:
         with con.cursor() as cur:
             cur.execute(
                 "SELECT id, nombre FROM usuario WHERE correo = %s AND contrasenya = %s",
-                (correo, contrasena),
+                (correo, contrasenya),
             )
             fila = cur.fetchone()
         if fila:
@@ -58,8 +58,8 @@ def buscar_usuario_login(correo, contrasena):
 @app.post("/login")
 def login():
     correo = request.form.get("correo", "").strip()
-    contrasena = request.form.get("contrasena", "")
-    return buscar_usuario_login(correo, contrasena)
+    contrasena = request.form.get("contrasenya", "")
+    return buscar_usuario_login(correo, contrasenya)
 
 # BUSCAR LISTAS USUARIO **************************************************************************************************
 

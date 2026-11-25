@@ -204,7 +204,7 @@ object TextosApp {
         errorNombreTareaVacio = "El nombre de la tarea no puede estar vacío",
         errorServidorValorInvalido = "El servidor no devuelve un valor válido",
         errorIniciarSesion = "Error al iniciar sesión",
-        errorUsuarioClaveIncorrectos = "Usuario o clave incorrectos",
+        errorUsuarioClaveIncorrectos = "Correo o clave incorrectos",
         errorCorreoYaRegistrado = "El correo ya está registrado",
         errorCrearCuenta = "No se pudo crear la cuenta",
 
@@ -303,7 +303,7 @@ object TextosApp {
         errorNombreTareaVacio = "Task name cannot be empty",
         errorServidorValorInvalido = "The server did not return a valid value",
         errorIniciarSesion = "Error logging in",
-        errorUsuarioClaveIncorrectos = "Incorrect username or password",
+        errorUsuarioClaveIncorrectos = "Incorrect email or password",
         errorCorreoYaRegistrado = "Email is already registered",
         errorCrearCuenta = "Could not create account",
 
