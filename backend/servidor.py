@@ -92,6 +92,19 @@ def buscar_listas_usuario(id_usuario):
         for fila in filas
     ]
 
+
+@app.get("/listas")
+def obtener_listas_usuario_db():
+    id_usuario = request.args.get("idUsuario", type=int)
+    if id_usuario is None or id_usuario <= 0:
+        return jsonify([]), 400
+
+    try:
+        return jsonify(buscar_listas_usuario(id_usuario))
+    except Exception as e:
+        print("Error obteniendo listas del usuario:", e)
+        return jsonify({"error": "No se pudieron obtener las listas"}), 500
+
 # BUSCAR TAREAS LISTA *****************************************************************************************************
 
 def buscar_tareas_lista(id_lista):
@@ -120,6 +133,19 @@ def buscar_tareas_lista(id_lista):
         ]
     finally:
         con.close()
+
+
+@app.get("/tareas")
+def obtener_tareas_lista_db():
+    id_lista = request.args.get("idLista", type=int)
+    if id_lista is None or id_lista <= 0:
+        return jsonify([]), 400
+
+    try:
+        return jsonify(buscar_tareas_lista(id_lista))
+    except Exception as e:
+        print("Error obteniendo tareas de la lista:", e)
+        return jsonify({"error": "No se pudieron obtener las tareas"}), 500
 
 # BUSCAR PRODUCTOS LISTA **************************************************************************************************
 def buscar_productos_lista(id_lista):
@@ -151,6 +177,19 @@ def buscar_productos_lista(id_lista):
         }
         for fila in filas
     ]
+
+
+@app.get("/productos")
+def obtener_productos_lista_db():
+    id_lista = request.args.get("idLista", type=int)
+    if id_lista is None or id_lista <= 0:
+        return jsonify([]), 400
+
+    try:
+        return jsonify(buscar_productos_lista(id_lista))
+    except Exception as e:
+        print("Error obteniendo productos de la lista:", e)
+        return jsonify({"error": "No se pudieron obtener los productos"}), 500
 
 # COMPARTIR LISTA **************************************************************************************************
 
